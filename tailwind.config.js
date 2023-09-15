@@ -9,9 +9,9 @@ module.exports = {
     extend: {
       colors: {
         pink:{
-          'lighter': '#EEDADB',
+          'light': '#EEDADB',
           'default': '#D9ABAB',
-          'pink-dark': '#AA7474',
+          'dark': '#AA7474',
         },
       },  
     },

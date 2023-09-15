@@ -1,9 +1,9 @@
 <template>
      <section class="bg-gray-100 lg:pt-28 sm:pb-36 pb-16 pt-36 relative">
-        <div class="container">
+        <div class="">
             <div class="flex justify-center">
                 <div class="lg:w-7/12 text-center">
-                    <h1 class="text-5xl/relaxed text-gray-700">Social Impact</h1>
+                    <h1 class="text-5xl/relaxed text-pink-dark font-bold">Social Impact</h1>
                     <p class="mb-6 md:text-lg text-gray-500">Please fill out the following form and we will get back to you shortly</p>
                 </div>
             </div>

@@ -11,25 +11,25 @@
   <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
     <ul class="flex flex-col font-medium p-4 md:p-0 md:flex-row md:space-x-8 md:mt-0 md:border-0 text-black">
       <li>
-        <router-link :to="{name:'home'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Home</router-link>
+        <router-link :to="{name:'home'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Home</router-link>
       </li>
       <li>
-        <router-link :to="{name:'collection'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Collection</router-link>
+        <router-link :to="{name:'collection'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Collection</router-link>
       </li>
       <li>
-        <router-link :to="{name:'shop'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Shop</router-link>
+        <router-link :to="{name:'shop'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Shop</router-link>
       </li>
       <li>
-        <router-link :to="{name:'about'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">About Us</router-link>
+        <router-link :to="{name:'about'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">About Us</router-link>
       </li>
       <li>
-        <router-link :to="{name:'impact'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Social Impact</router-link>
+        <router-link :to="{name:'impact'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Social Impact</router-link>
       </li>
       <li>
-        <router-link :to="{name:'blog'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Blog</router-link>
+        <router-link :to="{name:'blog'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Blog</router-link>
       </li>
       <li>
-        <router-link :to="{name:'contant'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500">Contact</router-link>
+        <router-link :to="{name:'contant'}" class="block py-2 pl-3 pr-4 text-white rounded md:bg-transparent md:text-pink-dark md:p-0 md:dark:text-pink-dark">Contact</router-link>
       </li>
     </ul>
   </div>

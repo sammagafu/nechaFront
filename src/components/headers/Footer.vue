@@ -1,6 +1,6 @@
 <template>
 
-<footer class="bg-pink-lighter shadow dark:bg-gray-900">
+<footer class="bg-pink-light shadow dark:bg-gray-900">
     <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">
         <div class="sm:flex sm:items-center sm:justify-between">
             <router-link :to="{name:'home'}"><img src="@/assets/necha-logo.svg" class="h-12 mr-3" alt="Necha Logo" /></router-link>

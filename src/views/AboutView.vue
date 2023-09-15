@@ -1,6 +1,6 @@
 <template>
   <section class="bg-gray-100 lg:pt-28 sm:pb-36 pb-16 pt-36 relative">
-     <div class="container">
+     <div class="">
          <div class="flex justify-center">
              <div class="lg:w-7/12 text-center">
                  <h1 class="text-5xl/relaxed text-gray-700">About Us</h1>
