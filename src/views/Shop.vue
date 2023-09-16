@@ -258,7 +258,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product1.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
@@ -1671,7 +1671,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product1.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
