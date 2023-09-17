@@ -62,12 +62,6 @@
                 </div>
         </div>
     </div>
-    <!-- <div class="top-[250px] left-[115px] absolute hidden lg:block wow zoomIn" data-wow-duration="1s"
-        style="visibility: visible; animation-duration: 1s; animation-name: zoomIn;"><img
-            src="assets/img/brushes/news/1.png" alt=""></div>
-    <div class="top-0 right-0 absolute hidden lg:block wow zoomIn" data-wow-duration="1s"
-        style="visibility: visible; animation-duration: 1s; animation-name: zoomIn;"><img
-            src="assets/img/brushes/news/2.png" alt=""></div> -->
 </section>
 <!-- blog ends here -->
 </template>
@@ -78,3 +72,5 @@ import Breadcrumbs from "@/components/headers/Breadcrumbs.vue";
 import { ref } from "vue";
 
 </script>
+
+//
