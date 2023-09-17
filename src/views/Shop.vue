@@ -418,7 +418,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product2.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
@@ -512,7 +512,7 @@
                       <div class="relative overflow-hidden md:w-1/3">
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product3.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
@@ -618,7 +618,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product4.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
@@ -776,7 +776,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product5.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
@@ -1829,7 +1829,7 @@
                         >
                         <img
                           class="md:absolute w-full md:h-full md:object-cover"
-                          src="assets/images/products/drone/product2.webp"
+                          src="@/assets/img/product/1.jpg"
                           alt="product image"
                           loading="lazy"
                           width="432"
