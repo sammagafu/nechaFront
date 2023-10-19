@@ -4,9 +4,9 @@
 
 <template>
     <section class="bg-gray-100 lg:pt-28 sm:pb-36 pb-16 pt-36 relative">
-        <div class="container">
+        <div class="container mx-auto">
             <div class="flex justify-center">
-                <div class="lg:w-7/12 text-center">
+                <div class="text-center">
                     <h1 class="text-5xl/relaxed text-gray-700">Contact Us</h1>
                     <p class="mb-6 md:text-lg text-gray-500">Please fill out the following form and we will get back to you shortly</p>
                 </div>
@@ -37,24 +37,24 @@
                                     <div class="md:w-1/2">
                                         <div class="mb-5">
                                             <label for="exampleInputName1" class="block text-sm font-medium mb-1 text-gray-600">Name <span class="text-red-500">*</span></label>
-                                            <input type="text" class="py-2 px-4 leading-6 block w-full border-gray-300 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputName1" placeholder="Your Name">
+                                            <input type="text" class="bg-gray-50 border text-gray-900 sm:text-sm focus:ring-primary-600 focus:border-primary-600 py-2 px-4 leading-6 block w-full border-gray-600 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputName1" placeholder="Your Name">
                                         </div>
                                     </div>
                                     <div class="md:w-1/2">
                                         <div class="mb-5">
                                             <label for="exampleInputName" class="block text-sm font-medium mb-1 text-gray-600">Name <span class="text-red-500">*</span></label>
-                                            <input type="text" class="py-2 px-4 leading-6 block w-full border-gray-300 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputName" placeholder="Your Name">
+                                            <input type="text" class="bg-gray-50 border text-gray-900 sm:text-sm focus:ring-primary-600 focus:border-primary-600 py-2 px-4 leading-6 block w-full border-gray-600 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputName" placeholder="Your Name">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="w-full">
                                     <div class="mb-5">
                                         <label for="exampleInputEmail1" class="block text-sm font-medium mb-1 text-gray-600">Email <span class="text-red-500">*</span></label>
-                                        <input type="email" class="py-2 px-4 leading-6 block w-full border-gray-300 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputEmail1" placeholder="Your Email">
+                                        <input type="email" class="bg-gray-50 border text-gray-900 sm:text-sm focus:ring-primary-600 focus:border-primary-600 py-2 px-4 leading-6 block w-full border-gray-600 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleInputEmail1" placeholder="Your Email">
                                     </div>
                                     <div class="mb-5">
                                         <label for="exampleFormControlTextarea1" class="block text-sm font-medium mb-1 text-gray-600">Message <span class="text-red-500">*</span></label>
-                                        <textarea class="py-2 px-4 leading-6 block w-full border-gray-300 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleFormControlTextarea1" rows="4" placeholder="Type Your Massage..."></textarea>
+                                        <textarea class="bg-gray-50 border text-gray-900 sm:text-sm focus:ring-primary-600 focus:border-primary-600 py-2 px-4 leading-6 block w-full border-gray-600 rounded text-sm focus:border-gray-300 focus:ring-0" id="exampleFormControlTextarea1" rows="4" placeholder="Type Your Massage..."></textarea>
                                     </div>
                                 </div>
                                 <button type="submit" class="inline-flex items-center text-sm bg-primary text-white font-medium leading-6 text-center align-middle select-none py-2 px-4 rounded-md transition-all hover:shadow-lg hover:shadow-primary/80">

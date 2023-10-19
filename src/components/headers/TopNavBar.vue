@@ -5,7 +5,7 @@
   <router-link :to="{name:'home'}"><img src="@/assets/necha-logo.svg" class="h-20 mr-3" alt="Necha Logo" /></router-link>
   <div class="flex items-center justify-between md:order-2">
     <i class="pi pi-search mx-2" style="font-size: 1.2rem"></i>
-    <i class="pi pi-user mx-2" style="font-size: 1.2rem"></i>
+    <router-link :to="{name:'login'}"><i class="pi pi-user mx-2" style="font-size: 1.2rem"></i></router-link>
     <i class="pi pi-shopping-bag mx-2" style="font-size: 1.2rem"></i>
   </div>
   <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
