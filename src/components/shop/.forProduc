@@ -1,0 +1,102 @@
+<div>
+            <div class="relative overflow-hidden">
+                <span class="font-semibold uppercase text-sm text-white inline-block py-1 px-2 leading-none absolute top-3  z-10 right-3 bg-orange">Sale</span>
+                <div class="gallery mb-6">
+                    <div class="swiper-container swiper-initialized swiper-horizontal swiper-pointer-events">
+                        <div class="swiper-wrapper" id="swiper-wrapper-4baf9b65b2862ed1" aria-live="polite" style="transform: translate3d(0px, 0px, 0px);">
+                            <div class="swiper-slide swiper-slide-active" style="width: 559px;" role="group" aria-label="1 / 5">
+                                <img src="assets/images/single-product/lg/product1.webp" alt="product image">
+                            </div>
+                            <div class="swiper-slide swiper-slide-next" style="width: 559px;" role="group" aria-label="2 / 5">
+                                <img src="assets/images/single-product/lg/product2.webp" alt="product image">
+                            </div>
+                            <div class="swiper-slide" style="width: 559px;" role="group" aria-label="3 / 5">
+                                <img src="assets/images/single-product/lg/product3.webp" alt="product image">
+                            </div>
+                            <div class="swiper-slide" style="width: 559px;" role="group" aria-label="4 / 5">
+                                <img src="assets/images/single-product/lg/product4.webp" alt="product image">
+                            </div>
+                            <div class="swiper-slide" role="group" aria-label="5 / 5" style="width: 559px;">
+                                <img src="assets/images/single-product/lg/product5.webp" alt="product image">
+                            </div>
+                        </div>
+                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+
+                </div>
+
+                <div class="gallery-nav relative">
+                    <div class="swiper-container swiper-initialized swiper-horizontal swiper-pointer-events swiper-thumbs">
+                        <div class="swiper-wrapper" id="swiper-wrapper-b5238d2bf924fa4f" aria-live="polite" style="transition-duration: 0ms; transform: translate3d(-567px, 0px, 0px);"><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="1" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="2 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product2.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="2" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="3 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product3.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="3" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="4 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product4.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-prev" data-swiper-slide-index="4" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="5 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product5.webp" alt="product image">
+                                </a>
+                            </div>
+                            <div class="swiper-slide swiper-slide-visible swiper-slide-active swiper-slide-thumb-active" data-swiper-slide-index="0" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="1 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product1.webp" alt="product image">
+                                </a>
+                            </div>
+                            <div class="swiper-slide swiper-slide-visible swiper-slide-next" data-swiper-slide-index="1" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="2 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product2.webp" alt="product image">
+                                </a>
+                            </div>
+                            <div class="swiper-slide swiper-slide-visible" data-swiper-slide-index="2" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="3 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product3.webp" alt="product image">
+                                </a>
+                            </div>
+                            <div class="swiper-slide swiper-slide-visible" data-swiper-slide-index="3" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="4 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product4.webp" alt="product image">
+                                </a>
+                            </div>
+                            <div class="swiper-slide swiper-slide-duplicate-prev" data-swiper-slide-index="4" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="5 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product5.webp" alt="product image">
+                                </a>
+                            </div>
+                        <div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active swiper-slide-thumb-active" data-swiper-slide-index="0" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="1 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product1.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="1" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="2 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product2.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="2" style="width: 133.75px; margin-right: 8px;" role="group" aria-label="3 / 5">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product3.webp" alt="product image">
+                                </a>
+                            </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="3" role="group" aria-label="4 / 5" style="width: 133.75px; margin-right: 8px;">
+                                <a href="javascript:void(0)">
+                                    <img src="assets/images/single-product/sm/product4.webp" alt="product image">
+                                </a>
+                            </div></div>
+                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+                    <!-- If we need pagination -->
+                    <!-- <div class="swiper-pagination"></div> -->
+                    <div class="swiper-buttons">
+                        <div class="swiper-button-prev right-auto left-4  w-8 h-8 rounded-full  border border-solid border-gray-500 text-sm text-dark opacity-100 transition-all hover:text-orange hover:border-orange" tabindex="0" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-b5238d2bf924fa4f">
+                            <i class="ion-chevron-left"></i>
+                        </div>
+                        <div class="swiper-button-next left-auto right-4  w-8 h-8 rounded-full  border border-solid border-gray-500 text-sm text-dark opacity-100 transition-all hover:text-orange hover:border-orange" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-b5238d2bf924fa4f">
+                            <i class="ion-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>

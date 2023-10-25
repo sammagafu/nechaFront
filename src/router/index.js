@@ -17,7 +17,18 @@ const router = createRouter({
     {
       path: '/shop',
       name: 'shop',
-      component: () => import('../views/Shop.vue')
+      children:[
+        {
+          path: '',
+          name: 'shopIndex',
+          component: () => import('../views/shop/Shop.vue')
+        },
+        {
+          path: ':slug',
+          name: 'shopDetail',
+          component: () => import('../views/shop/Details.vue')
+        },
+      ]
     },
     {
       path: '/impact',
