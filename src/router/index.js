@@ -41,9 +41,14 @@ const router = createRouter({
     },
     {
       path: '/account',
-      name: 'account',
-      // component: () => import('../views/Login.vue'),
+      // name: 'account',
+      // component: () => import('@/views/accounts/MyAccount.vue.vue'),
       children : [
+        {
+          path: '',
+          name: 'myaccount',
+          component: () => import('../views/accounts/MyAccount.vue'),
+        },
         {
           path:'login',
           name:'login',
@@ -54,6 +59,7 @@ const router = createRouter({
           name:'register',
           component:()=>import('../views/accounts/Register.vue'),
         },
+        
       ]
     },
   ]

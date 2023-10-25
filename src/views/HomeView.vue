@@ -1,6 +1,3 @@
-<script setup>
-import Carousel from "@/components/body/Carousel.vue";
-</script>
 
 <template>
   <Carousel></Carousel>
@@ -23,19 +20,16 @@ import Carousel from "@/components/body/Carousel.vue";
             <!--   ✅ Product card 1 - Starts Here 👇 -->
             <div
               class="w-100 bg-black-100 shadow-md rounded-xl duration-500 hover:scale-105 cursor-pointer hover:shadow-xl"
-              v-for="product in 4" :key="product">
+              v-for="product in product" :key="product">
               <a href="#">
-                <img src="@/assets/img/product/1.jpg" alt="Product" class="h-100 w-full object-cover" />
+                <img :src="product.cover" alt="Product" class="h-100 w-full object-cover" />
                 <div class="px-4 py-3 w-72">
-                  <span class="text-indigo-600 mr-3 uppercase text-xs">Lotion</span>
+                  <span class="text-indigo-600 mr-3 uppercase text-xs">{{ product.category.name }}</span>
                   <p class="text-lg font-semibold text-indigo-900 truncate block uppercase">
-                    Lemon Grass Body butter
+                    {{product.name}}
                   </p>
                   <div class="flex items-center">
-                    <p class="text-lg font-semibold text-black cursor-auto my-3">$149</p>
-                    <del>
-                      <p class="text-sm text-gray-600 cursor-auto ml-2">$199</p>
-                    </del>
+                    <p class="text-lg font-semibold text-black cursor-auto my-3">{{ currency }} TZS {{ product.price }}</p>
                     <div class="ml-auto flex justify-between space-x-3">
                       <router-link :to="{ name: '' }"><i class="pi pi-shopping-bag"
                           style="font-size: 1.5rem"></i></router-link>
@@ -248,3 +242,37 @@ import Carousel from "@/components/body/Carousel.vue";
     </section>
   </section>
 </div></template>
+
+<script setup>
+import { ref,reactive, onMounted,computed } from 'vue'
+import Carousel from "@/components/body/Carousel.vue";
+import axiosInstance from "../http";
+import { useAuthStore } from '@/stores/auth';
+import { localizationStore } from '@/stores/localization';
+
+const product = ref([])
+const currency =  ref([])
+const userData = useAuthStore()
+const localization = localizationStore()
+
+const isAuthenticated = computed(() => userData.isAuthenticated);
+
+const login = () => {
+      // Simulate a successful login and store the token
+      userData.login({ token: 'your_jwt_token_here', remember: true });
+    };
+
+
+onMounted(() => {
+  axiosInstance.get("product/")
+  .then(async(response) => {
+    console.log(response.data);
+    product.value = await response.data;
+  })
+  .catch(error => {
+    console.log(error);
+  });
+})
+
+
+</script>
