@@ -1,0 +1,107 @@
+@keyframes sf-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sf-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sf-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes sf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes sf-pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes sf-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sf-slide-up-bar {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes sf-cart-bounce {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  70% { transform: scale(0.96); }
+}
+
+@keyframes sf-toast-in {
+  from { transform: translateY(16px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes sf-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes sf-ken-burns {
+  from { transform: scale(1.05); }
+  to { transform: scale(1.12); }
+}
+
+@keyframes sf-glow-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(12px, -8px) scale(1.05); }
+  66% { transform: translate(-8px, 6px) scale(0.98); }
+}
+
+@keyframes sf-skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes sf-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.sf-reveal {
+  animation: sf-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sf-reveal-1 { animation-delay: 0.05s; }
+.sf-reveal-2 { animation-delay: 0.12s; }
+.sf-reveal-3 { animation-delay: 0.2s; }
+.sf-reveal-4 { animation-delay: 0.28s; }
+.sf-reveal-5 { animation-delay: 0.36s; }
+.sf-reveal-6 { animation-delay: 0.44s; }
+
+.sf-stagger > * {
+  animation: sf-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.sf-stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.sf-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.sf-stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.sf-stagger > *:nth-child(4) { animation-delay: 0.16s; }
+.sf-stagger > *:nth-child(5) { animation-delay: 0.2s; }
+.sf-stagger > *:nth-child(6) { animation-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-reveal,
+  .sf-reveal-1, .sf-reveal-2, .sf-reveal-3,
+  .sf-reveal-4, .sf-reveal-5, .sf-reveal-6,
+  .sf-stagger > * {
+    animation: none !important;
+  }
+}

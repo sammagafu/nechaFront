@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <title>Necha Africa — Personal Care, Beauty &amp; Wellness</title>
+    <script>
+      (function () {
+        var stored = localStorage.getItem('necha_theme');
+        var dark =
+          stored === 'dark' ||
+          (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var theme = dark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var bg = dark ? '#0c0c0c' : '#faf9f7';
+        document.documentElement.style.background = bg;
+        document.body && (document.body.style.background = bg);
+      })();
+    </script>
+    <style>
+      html, body { background: #faf9f7; }
+      html[data-theme='dark'], html[data-theme='dark'] body { background: #0c0c0c; }
+      #app:empty::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: #faf9f7;
+      }
+      html[data-theme='dark'] #app:empty::before {
+        background:
+          radial-gradient(ellipse 70% 45% at 50% 100%, rgba(134, 188, 66, 0.14), transparent 72%),
+          #0c0c0c;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

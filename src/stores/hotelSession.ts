@@ -1,0 +1,111 @@
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { fetchHotelBySlug, fetchProductsBySlug } from '@/api/hotels'
+import { getApiError } from '@/api/client'
+import type { StorefrontHotel, StorefrontProduct } from '@/types/storefront'
+
+const REFERRAL_KEY = 'necha_hotel_referral'
+const REFERRAL_APPLIED_KEY = 'necha_referral_applied'
+const ROOM_KEY = 'necha_hotel_room'
+
+function readReferralApplied(slug: string): boolean {
+  try {
+    const raw = localStorage.getItem(REFERRAL_APPLIED_KEY)
+    if (!raw) return true
+    const map = JSON.parse(raw) as Record<string, boolean>
+    return map[slug] !== false
+  } catch {
+    return true
+  }
+}
+
+function writeReferralApplied(slug: string, applied: boolean) {
+  try {
+    const raw = localStorage.getItem(REFERRAL_APPLIED_KEY)
+    const map = raw ? (JSON.parse(raw) as Record<string, boolean>) : {}
+    map[slug] = applied
+    localStorage.setItem(REFERRAL_APPLIED_KEY, JSON.stringify(map))
+  } catch {
+    /* ignore */
+  }
+}
+
+export const useHotelSessionStore = defineStore('hotelSession', () => {
+  const slug = ref('')
+  const refCode = ref('')
+  const hotel = ref<StorefrontHotel | null>(null)
+  const products = ref<StorefrontProduct[]>([])
+  const loading = ref(false)
+  const error = ref('')
+  const roomNumber = ref(localStorage.getItem(ROOM_KEY) || '')
+  const referralApplied = ref(true)
+
+  const referralCode = computed(() => hotel.value?.referral_code || refCode.value)
+
+  function persistReferral(code: string) {
+    refCode.value = code
+    localStorage.setItem(REFERRAL_KEY, code)
+  }
+
+  function setRoomNumber(value: string) {
+    roomNumber.value = value
+    localStorage.setItem(ROOM_KEY, value)
+  }
+
+  async function load(slugValue: string, ref?: string) {
+    loading.value = true
+    error.value = ''
+    slug.value = slugValue
+    if (ref) {
+      persistReferral(ref)
+      referralApplied.value = true
+      writeReferralApplied(slugValue, true)
+    } else {
+      referralApplied.value = readReferralApplied(slugValue)
+    }
+    try {
+      hotel.value = await fetchHotelBySlug(slugValue, ref || refCode.value || undefined)
+      if (hotel.value.referral_code) persistReferral(hotel.value.referral_code)
+      products.value = await fetchProductsBySlug(slugValue, true)
+    } catch (e) {
+      hotel.value = null
+      products.value = []
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loadAllProducts() {
+    if (!slug.value) return
+    products.value = await fetchProductsBySlug(slug.value, false)
+  }
+
+  function removeReferral() {
+    referralApplied.value = false
+    if (slug.value) writeReferralApplied(slug.value, false)
+  }
+
+  function restoreReferral() {
+    referralApplied.value = true
+    if (slug.value) writeReferralApplied(slug.value, true)
+  }
+
+  return {
+    slug,
+    refCode,
+    hotel,
+    products,
+    loading,
+    error,
+    roomNumber,
+    referralApplied,
+    referralCode,
+    load,
+    loadAllProducts,
+    setRoomNumber,
+    removeReferral,
+    restoreReferral,
+  }
+})

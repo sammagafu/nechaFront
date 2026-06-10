@@ -1,0 +1,94 @@
+@import './necha-theme.css';
+
+:root {
+  --font-family: var(--font-body);
+  --bg: var(--color-bg);
+  --bg-soft: var(--color-bg-soft);
+  --surface: var(--color-surface-elevated);
+  --text: var(--color-text);
+  --muted: var(--color-muted);
+  --accent: var(--color-accent);
+  --accent-dark: var(--color-accent-hover);
+  --border: var(--color-border);
+  --success: var(--color-success);
+  --error: var(--color-error);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-4) max(var(--page-gutter), env(safe-area-inset-left, 0px))
+    var(--space-6) max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  max-width: 960px;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
+}
+
+.app-main--full {
+  max-width: none;
+  padding: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.grid-2 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-family);
+}
+
+
+.page-title {
+  margin: 0 0 0.5rem;
+}
