@@ -7,7 +7,7 @@
     </header>
 
     <div class="grid grid-2">
-      <form class="card card-elevated" @submit.prevent="login">
+      <form class="card card-elevated form-stack" @submit.prevent="login">
         <h3>Sign in</h3>
         <div class="field">
           <label>Email</label>

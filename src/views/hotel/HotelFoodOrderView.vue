@@ -6,27 +6,38 @@
       <p>Delivered to your room at {{ session.hotel.name }} — pay via M-Pesa or card at checkout.</p>
     </header>
 
-    <form class="hotel-food-form" @submit.prevent="submit">
-      <div class="checkout-label">Your details</div>
-      <input v-model="form.customer_name" placeholder="Full name *" required />
-      <input v-model="form.customer_phone" type="tel" placeholder="Phone number *" required />
-      <input v-model="form.room_number" placeholder="Room number *" required />
+    <form class="hotel-food-form sf-form-stack" @submit.prevent="submit">
+      <section class="checkout-section">
+        <div class="checkout-label">Your details</div>
+        <div class="sf-form-fields">
+          <input v-model="form.customer_name" placeholder="Full name *" required />
+          <input v-model="form.customer_phone" type="tel" placeholder="Phone number *" required />
+          <input v-model="form.room_number" placeholder="Room number *" required />
+        </div>
+      </section>
 
-      <div class="checkout-label">Menu items</div>
-      <div v-for="(item, index) in form.items" :key="index" class="food-item-row">
-        <input v-model="item.name" placeholder="Item name" required />
-        <input v-model.number="item.quantity" type="number" min="1" placeholder="Qty" required />
-        <input v-model.number="item.unit_price" type="number" min="0" placeholder="Price (TZS)" required />
-        <button v-if="form.items.length > 1" type="button" class="food-remove" @click="removeItem(index)">×</button>
-      </div>
-      <button type="button" class="food-add" @click="addItem">+ Add another item</button>
+      <section class="checkout-section">
+        <div class="checkout-label">Menu items</div>
+        <div class="sf-form-fields">
+          <div v-for="(item, index) in form.items" :key="index" class="food-item-row">
+            <input v-model="item.name" placeholder="Item name" required />
+            <input v-model.number="item.quantity" type="number" min="1" placeholder="Qty" required />
+            <input v-model.number="item.unit_price" type="number" min="0" placeholder="Price (TZS)" required />
+            <button v-if="form.items.length > 1" type="button" class="food-remove" @click="removeItem(index)">×</button>
+          </div>
+          <button type="button" class="food-add" @click="addItem">+ Add another item</button>
+        </div>
+      </section>
 
-      <textarea v-model="form.notes" rows="3" placeholder="Allergies, timing, special requests…" />
+      <section class="checkout-section">
+        <div class="checkout-label">Notes</div>
+        <textarea v-model="form.notes" rows="3" placeholder="Allergies, timing, special requests…" />
+      </section>
 
       <p v-if="error" class="food-error">{{ error }}</p>
-      <p v-if="success" class="food-success">Order sent! Reference #{{ success }}</p>
+      <p v-if="success" class="food-success">{{ success }}</p>
 
-      <button type="submit" class="sf-btn-primary sf-btn-primary--block" :disabled="submitting">
+      <button type="submit" class="sf-btn-primary sf-btn-primary--block hotel-food-submit" :disabled="submitting">
         {{ submitting ? 'Sending…' : 'Place food order →' }}
       </button>
     </form>
@@ -120,24 +131,17 @@ async function submit() {
 }
 
 .hotel-food-form {
-  display: grid;
-  gap: 0.65rem;
+  padding: 0 0 1rem;
 }
 
-.hotel-food-form input,
-.hotel-food-form textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 0.5px solid var(--sf-warm-grey);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--color-white);
+.hotel-food-form .checkout-section {
+  margin-inline: 0;
 }
 
 .food-item-row {
   display: grid;
   grid-template-columns: 1fr 72px 100px auto;
-  gap: 0.5rem;
+  gap: 0.65rem;
   align-items: center;
 }
 
@@ -157,19 +161,25 @@ async function submit() {
   font-size: 12px;
   color: var(--sf-purple);
   cursor: pointer;
-  padding: 0;
-  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
+  margin: 0;
 }
 
 .food-error {
   color: #c00;
   font-size: 12px;
   margin: 0;
+  padding: 0 2px;
 }
 
 .food-success {
   color: var(--sf-green-checkout);
   font-size: 12px;
   margin: 0;
+  padding: 0 2px;
+}
+
+.hotel-food-submit {
+  margin-top: 0.25rem;
 }
 </style>

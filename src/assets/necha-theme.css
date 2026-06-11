@@ -87,7 +87,9 @@
   --tracking-tight: -0.01em;
   --tracking-caps: 0.06em;
   --tracking-label: 0.02em;
-  --field-gap: 0.5rem;
+  --field-gap: 0.65rem;
+  --form-gap: 1.35rem;
+  --form-section-gap: 1.5rem;
   --input-padding-x: 1rem;
   --input-padding-y: 0.75rem;
   --stack-gap-text: 0.75rem;
@@ -307,6 +309,23 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: var(--field-gap);
+  margin: 0;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-gap);
+}
+
+.form-stack > .field,
+.form-stack > .grid {
+  margin: 0;
+}
+
+.form-stack > h3,
+.form-stack > .form-heading {
+  margin: 0 0 0.15rem;
 }
 
 .grid .field {
@@ -314,9 +333,11 @@ a:hover {
 }
 
 .field label {
+  display: block;
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   letter-spacing: var(--tracking-label);
   color: var(--color-text);
 }
@@ -459,6 +480,18 @@ textarea::placeholder {
 .bg-soft { background: var(--color-bg-soft); }
 .bg-warm { background: var(--color-bg-warm); }
 .bg-blush { background: var(--color-bg-blush); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .eyebrow {
   margin: 0 0 var(--space-2);

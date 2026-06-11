@@ -314,6 +314,7 @@
 
 .category-pill {
   flex-shrink: 0;
+  touch-action: manipulation;
   padding: 6px 14px;
   border-radius: 20px;
   border: 0.5px solid var(--sf-warm-grey);
@@ -646,20 +647,76 @@
   align-items: center;
 }
 
+.sf-form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sf-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .checkout-section {
-  margin: 16px 20px;
-  padding: 12px 14px;
+  margin: 0 20px;
+  padding: 16px 18px;
   background: var(--sf-cream);
   border: 0.5px solid var(--sf-warm-grey);
-  border-radius: 8px;
+  border-radius: 10px;
+}
+
+.checkout-page > form.sf-form-stack {
+  padding-bottom: 100px;
 }
 
 .checkout-label {
+  display: block;
   font-size: 10px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--sf-muted);
-  margin-bottom: 10px;
+  margin: 0 0 0.85rem;
+}
+
+.checkout-section .sf-field-label {
+  display: block;
+  margin: 0 0 0.45rem;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sf-text-muted);
+}
+
+.checkout-section input,
+.checkout-section textarea,
+.checkout-section select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.9rem;
+  border: 0.5px solid var(--sf-warm-grey);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  background: var(--sf-white);
+  color: var(--sf-charcoal);
+}
+
+.checkout-section textarea {
+  min-height: 96px;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  resize: vertical;
+}
+
+.checkout-section input:focus,
+.checkout-section textarea:focus,
+.checkout-section select:focus {
+  outline: none;
+  border-color: var(--sf-purple-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sf-purple-deep) 12%, transparent);
 }
 
 .payment-grid {

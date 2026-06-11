@@ -94,7 +94,7 @@ function onHashClick(event: MouseEvent, href?: string) {
 
 <style scoped>
 .vf {
-  padding: clamp(2.5rem, 5vw, 4rem) 0;
+  padding: clamp(3.25rem, 7vw, 5.5rem) 0;
   background: var(--color-bg-soft);
   border-block: 1px solid var(--color-border);
 }

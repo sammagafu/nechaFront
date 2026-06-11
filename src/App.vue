@@ -1,11 +1,9 @@
 <template>
   <RouteLoadingBar :active="navigating && !booting" />
 
-  <Transition name="boot-fade">
-    <AppLoadingScreen v-if="booting" />
-  </Transition>
+  <AppLoadingScreen v-if="booting" />
 
-  <div class="app-shell" :class="{ 'app-shell--booting': booting }">
+  <div class="app-shell">
     <template v-if="!isStandaloneRoute">
       <SiteHeader />
       <main class="app-main" :class="{ 'app-main--full': isFullWidth }">
@@ -51,20 +49,6 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <style scoped>
-.app-shell--booting {
-  pointer-events: none;
-  user-select: none;
-}
-
-.boot-fade-enter-active,
-.boot-fade-leave-active {
-  transition: opacity 0.55s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
-}
-
-.boot-fade-leave-to {
-  opacity: 0;
-}
-
 .back-to-top {
   position: fixed;
   right: max(var(--space-4), env(safe-area-inset-right, 0px));

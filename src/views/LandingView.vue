@@ -155,13 +155,17 @@
             <li v-for="(step, i) in hotelSteps" :key="step"><span>0{{ i + 1 }}</span>{{ step }}</li>
           </ol>
         </div>
-        <form class="hotel-card-form" @submit.prevent="goToHotel">
-          <label for="code">Property code</label>
-          <div class="hotel-input-row">
-            <input id="code" v-model="code" placeholder="e.g. SEACLIFF24" required />
-            <button class="btn btn-green" type="submit">Enter</button>
+        <form class="hotel-card-form form-stack" @submit.prevent="goToHotel">
+          <div class="field">
+            <label for="code">Property code</label>
+            <div class="hotel-input-row">
+              <input id="code" v-model="code" placeholder="e.g. SEACLIFF24" required />
+              <button class="btn btn-green hotel-enter-btn" type="submit">Enter</button>
+            </div>
           </div>
-          <button type="button" class="text-link-sm" @click="tryDemo">Open demo hotel portal →</button>
+          <p class="hotel-form-foot">
+            <button type="button" class="text-link-sm" @click="tryDemo">Open demo hotel portal →</button>
+          </p>
         </form>
       </div>
     </section>
@@ -396,6 +400,7 @@ function tryDemo() {
 <style scoped>
 .homepage {
   background: var(--color-bg);
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
 .notice-banner {
@@ -441,7 +446,7 @@ function tryDemo() {
   display: grid;
   gap: clamp(2rem, 5vw, 3.5rem);
   align-items: center;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  padding-block: clamp(3.25rem, 8vw, 6rem);
 }
 
 @media (min-width: 960px) {
@@ -766,7 +771,7 @@ function tryDemo() {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
 }
 
 .section-head-row--center {
@@ -788,7 +793,7 @@ function tryDemo() {
 }
 
 .section {
-  padding: clamp(2.5rem, 5vw, 4rem) 0;
+  padding: clamp(3.25rem, 7vw, 5.5rem) 0;
 }
 
 /* Category rail */
@@ -947,8 +952,8 @@ function tryDemo() {
 
 .hotel-card {
   display: grid;
-  gap: 2rem;
-  padding: clamp(1.75rem, 4vw, 2.5rem);
+  gap: clamp(2rem, 4vw, 3rem);
+  padding: clamp(2rem, 4vw, 3rem);
   border-radius: var(--radius-2xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -956,13 +961,17 @@ function tryDemo() {
 
 @media (min-width: 768px) {
   .hotel-card {
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1.2fr 0.85fr;
     align-items: center;
   }
 }
 
+.hotel-card-copy .section-title-sm {
+  margin-bottom: 0.65rem;
+}
+
 .hotel-card-copy p {
-  margin: 0 0 1rem;
+  margin: 0 0 1.35rem;
   font-size: 15px;
   line-height: 1.7;
   color: var(--color-body);
@@ -973,7 +982,7 @@ function tryDemo() {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
 .hotel-steps-list li {
@@ -994,36 +1003,26 @@ function tryDemo() {
 }
 
 .hotel-card-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--field-gap);
-}
-
-.hotel-card-form label {
-  display: block;
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: var(--tracking-label);
-  color: var(--color-text);
+  align-self: stretch;
 }
 
 .hotel-input-row {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
   margin: 0;
 }
 
 @media (min-width: 480px) {
   .hotel-input-row {
     flex-direction: row;
+    align-items: stretch;
   }
 }
 
 .hotel-input-row input {
   flex: 1;
+  min-width: 0;
   min-height: 48px;
   padding: var(--input-padding-y) var(--input-padding-x);
   border: 1px solid var(--color-border);
@@ -1032,14 +1031,27 @@ function tryDemo() {
   line-height: 1.5;
 }
 
+.hotel-enter-btn {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding-inline: 1.5rem;
+}
+
+.hotel-form-foot {
+  margin: 0;
+  padding-top: 0.15rem;
+}
+
 .text-link-sm {
   border: none;
   background: none;
-  padding: 0;
+  padding: 0.35rem 0;
   font-size: 13px;
+  line-height: 1.5;
   color: var(--color-necha-green-dark);
   cursor: pointer;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Why */
@@ -1080,7 +1092,7 @@ function tryDemo() {
 
 /* Partner */
 .partner-strip {
-  padding-block: 0;
+  padding-block: clamp(2.5rem, 5vw, 4rem);
 }
 
 .partner-band {
@@ -1115,7 +1127,9 @@ function tryDemo() {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  padding: 1rem 20px 2.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem) max(var(--page-gutter), env(safe-area-inset-left, 0px))
+    clamp(2.5rem, 5vw, 4rem);
+  padding-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   text-align: center;
   font-size: 13px;
   color: var(--color-body);

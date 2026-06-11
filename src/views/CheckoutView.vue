@@ -20,7 +20,7 @@
     </div>
 
     <form v-else class="checkout-layout" @submit.prevent="placeOrder">
-      <div class="card card-elevated checkout-form">
+      <div class="card card-elevated checkout-form form-stack">
         <h3>Billing details</h3>
         <div class="grid grid-2">
           <div class="field">
@@ -168,18 +168,13 @@ async function placeOrder() {
 
 .checkout-form h3,
 .order-summary h3 {
-  margin: 0 0 1.5rem;
+  margin: 0;
   font-size: 1.25rem;
   line-height: var(--leading-display);
 }
 
 .checkout-form .grid {
-  margin-bottom: 0.25rem;
-}
-
-.checkout-form > .field + .grid,
-.checkout-form > .grid + .field {
-  margin-top: 0.25rem;
+  gap: var(--form-gap);
 }
 
 .order-lines {

@@ -5,27 +5,30 @@
       <span style="font-size: 11px; color: var(--sf-muted)">{{ cart.count }} items · {{ formatTZS(cart.subtotal) }}</span>
     </div>
 
-    <form @submit.prevent="submit">
+    <form class="sf-form-stack" @submit.prevent="submit">
       <div class="checkout-section">
         <div class="checkout-label">Delivery to your room</div>
-        <label style="display: block; font-size: 11px; margin-bottom: 4px">Hotel</label>
-        <div style="background: var(--sf-cream); padding: 10px; font-size: 13px; font-weight: 500; margin-bottom: 12px">{{ session.hotel.name }}</div>
-        <label style="display: block; font-size: 11px; margin-bottom: 4px">Your room number *</label>
-        <input
-          v-model="room"
-          type="text"
-          placeholder="e.g. 304"
-          style="width: 100%; border: 0.5px solid var(--sf-warm-grey); border-radius: 6px; padding: 10px 15px; letter-spacing: 0.05em"
-        />
-        <p v-if="roomError" style="color: #c00; font-size: 11px; margin-top: 6px">Please enter your room number</p>
-        <p style="font-size: 11px; color: var(--sf-muted); margin-top: 6px">Enter your room number so we can deliver directly to your door.</p>
+        <div class="sf-form-fields">
+          <div>
+            <span class="sf-field-label">Hotel</span>
+            <div class="checkout-hotel-name">{{ session.hotel.name }}</div>
+          </div>
+          <div>
+            <label class="sf-field-label" for="checkout-room">Your room number *</label>
+            <input id="checkout-room" v-model="room" type="text" placeholder="e.g. 304" />
+          </div>
+        </div>
+        <p v-if="roomError" class="checkout-field-error">Please enter your room number</p>
+        <p class="checkout-field-hint">Enter your room number so we can deliver directly to your door.</p>
       </div>
 
       <div class="checkout-section">
         <div class="checkout-label">Your details</div>
-        <input v-model="fullName" placeholder="Full name *" required style="width: 100%; margin-bottom: 8px; padding: 10px; border-radius: 6px; border: 0.5px solid var(--sf-warm-grey)" />
-        <input v-model="phone" type="tel" placeholder="Phone number *" required style="width: 100%; margin-bottom: 8px; padding: 10px; border-radius: 6px; border: 0.5px solid var(--sf-warm-grey)" />
-        <input v-model="email" type="email" placeholder="Email (for receipt)" style="width: 100%; padding: 10px; border-radius: 6px; border: 0.5px solid var(--sf-warm-grey)" />
+        <div class="sf-form-fields">
+          <input v-model="fullName" placeholder="Full name *" required />
+          <input v-model="phone" type="tel" placeholder="Phone number *" required />
+          <input v-model="email" type="email" placeholder="Email (for receipt)" />
+        </div>
       </div>
 
       <div class="checkout-section">
@@ -72,8 +75,8 @@
         </div>
       </div>
 
-      <div style="padding: 0 20px 24px">
-        <p v-if="submitError" style="color: #c00; font-size: 11px; margin-bottom: 8px">{{ submitError }}</p>
+      <div class="checkout-submit-wrap">
+        <p v-if="submitError" class="checkout-field-error">{{ submitError }}</p>
         <button type="submit" class="sf-btn-primary sf-btn-primary--block" :disabled="submitting">
           {{ submitting ? 'Placing order…' : 'Place order →' }}
         </button>
@@ -157,3 +160,32 @@ async function submit() {
   }
 }
 </script>
+
+<style scoped>
+.checkout-hotel-name {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: var(--sf-white);
+  border: 0.5px solid var(--sf-warm-grey);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.checkout-field-hint {
+  margin: 0.65rem 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--sf-muted);
+}
+
+.checkout-field-error {
+  margin: 0.65rem 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #c00;
+}
+
+.checkout-submit-wrap {
+  padding: 0 20px 24px;
+}
+</style>

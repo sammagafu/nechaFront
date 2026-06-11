@@ -34,6 +34,12 @@ withDefaults(
   overflow: hidden;
 }
 
+/* Transition leave classes are applied to this root — don't block clicks while fading out */
+.app-loading.boot-fade-leave-active,
+.app-loading.boot-fade-leave-from {
+  pointer-events: none;
+}
+
 .app-loading::before {
   content: '';
   position: absolute;

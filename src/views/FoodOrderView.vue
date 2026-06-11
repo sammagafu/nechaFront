@@ -6,7 +6,7 @@
       <p class="page-subtitle">Place a room service or table order.</p>
     </header>
 
-    <form class="card card-elevated form-card" @submit.prevent="submit">
+    <form class="card card-elevated form-card form-stack" @submit.prevent="submit">
       <div class="grid grid-2">
         <div class="field">
           <label>Name</label>

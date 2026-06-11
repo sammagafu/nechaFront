@@ -32,6 +32,38 @@
     </div>
 
     <div class="shop-toolbar section-inner">
+      <div class="shop-filter-bar">
+        <form class="shop-filter-search" role="search" @submit.prevent="applySearch">
+          <Icon name="search" :size="18" class="shop-filter-search-icon" />
+          <input
+            v-model="localSearch"
+            type="search"
+            placeholder="Search products, brands…"
+            aria-label="Search products"
+            autocomplete="off"
+            @input="onSearchInput"
+          />
+          <button
+            v-if="localSearch"
+            type="button"
+            class="shop-filter-clear"
+            aria-label="Clear search"
+            @click="clearSearch"
+          >
+            Clear
+          </button>
+        </form>
+        <label class="shop-filter-sort">
+          <span class="sr-only">Sort by</span>
+          <select v-model="sortBy" aria-label="Sort products">
+            <option value="default">Featured</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
+      </div>
+
       <nav class="shop-cats" aria-label="Categories">
         <router-link
           to="/shop"
@@ -52,9 +84,11 @@
           {{ cat.label }}
         </router-link>
       </nav>
-      <p v-if="searchQuery" class="shop-search-note">
-        Showing results for “{{ searchQuery }}”
-        <router-link :to="clearSearchLink" class="text-link" @click="clearSurprise">Clear</router-link>
+
+      <p v-if="hasActiveFilters" class="shop-filter-meta">
+        {{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'product' : 'products' }}
+        <template v-if="searchQuery"> matching “{{ searchQuery }}”</template>
+        <button type="button" class="text-link shop-filter-reset" @click="resetFilters">Reset filters</button>
       </p>
     </div>
 
@@ -111,7 +145,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/components/ui/Icon.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import { productPath } from '@/config/app'
@@ -123,8 +157,13 @@ import { normalizeCategory } from '@/composables/useProductCategories'
 import type { CommerceProduct } from '@/types/commerce'
 
 const route = useRoute()
+const router = useRouter()
 const catalog = useCatalogStore()
 const cart = useCartStore()
+
+const localSearch = ref('')
+const sortBy = ref<'default' | 'price-asc' | 'price-desc' | 'name'>('default')
+let searchDebounce: ReturnType<typeof setTimeout> | undefined
 
 const surprisePick = ref<CommerceProduct | null>(null)
 
@@ -138,7 +177,10 @@ const surpriseTaglines = [
 
 const surpriseTagline = ref(surpriseTaglines[0])
 
-onMounted(() => catalog.load())
+onMounted(() => {
+  catalog.load()
+  syncSearchFromRoute()
+})
 
 const activeCategory = computed(() => {
   const param = route.params.categoryId
@@ -168,8 +210,27 @@ const filteredProducts = computed(() => {
         (p.brandName?.toLowerCase().includes(needle) ?? false),
     )
   }
-  return list
+
+  const sorted = [...list]
+  switch (sortBy.value) {
+    case 'price-asc':
+      sorted.sort((a, b) => a.price - b.price)
+      break
+    case 'price-desc':
+      sorted.sort((a, b) => b.price - a.price)
+      break
+    case 'name':
+      sorted.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    default:
+      break
+  }
+  return sorted
 })
+
+const hasActiveFilters = computed(
+  () => Boolean(searchQuery.value || activeCategory.value || sortBy.value !== 'default'),
+)
 
 const activeCategoryMeta = computed(() =>
   shopCategories.find((c) => c.id === activeCategory.value),
@@ -187,9 +248,36 @@ const pageSubtitle = computed(() => {
 
 const heroImage = computed(() => activeCategoryMeta.value?.image ?? siteImages.banner)
 
-const clearSearchLink = computed(() =>
-  activeCategory.value ? categoryShopLink(activeCategory.value) : '/shop',
-)
+function shopRoutePath() {
+  return activeCategory.value ? categoryShopLink(activeCategory.value) : '/shop'
+}
+
+function syncSearchFromRoute() {
+  localSearch.value = searchQuery.value
+}
+
+function applySearch() {
+  clearTimeout(searchDebounce)
+  const q = localSearch.value.trim()
+  router.push({ path: shopRoutePath(), query: q ? { q } : {} })
+}
+
+function onSearchInput() {
+  clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(applySearch, 280)
+}
+
+function clearSearch() {
+  localSearch.value = ''
+  applySearch()
+}
+
+function resetFilters() {
+  localSearch.value = ''
+  sortBy.value = 'default'
+  clearSurprise()
+  router.push('/shop')
+}
 
 function clearSurprise() {
   surprisePick.value = null
@@ -223,9 +311,12 @@ watch(
   () => route.fullPath,
   () => {
     if (!catalog.loaded) catalog.load()
+    syncSearchFromRoute()
     clearSurprise()
   },
 )
+
+watch(searchQuery, syncSearchFromRoute)
 </script>
 
 <style scoped>
@@ -367,6 +458,110 @@ watch(
 
 .shop-toolbar {
   padding-top: 1.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.shop-filter-bar {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .shop-filter-bar {
+    grid-template-columns: 1fr minmax(160px, 200px);
+    align-items: center;
+  }
+}
+
+.shop-filter-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--touch-min, 44px);
+  padding: 0 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.shop-filter-search:focus-within {
+  border-color: var(--color-necha-green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-necha-green) 14%, transparent);
+}
+
+.shop-filter-search-icon {
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.shop-filter-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0.65rem 0;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.shop-filter-search input:focus {
+  outline: none;
+}
+
+.shop-filter-search input::placeholder {
+  color: var(--color-muted);
+}
+
+.shop-filter-clear {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.5rem;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-necha-green-dark);
+  cursor: pointer;
+}
+
+.shop-filter-sort select {
+  width: 100%;
+  min-height: var(--touch-min, 44px);
+  padding: 0.55rem 2rem 0.55rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888780' d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+}
+
+.shop-filter-sort select:focus {
+  outline: none;
+  border-color: var(--color-necha-green);
+}
+
+.shop-filter-meta {
+  margin: 0.85rem 0 0;
+  font-size: 13px;
+  color: var(--color-body);
+}
+
+.shop-filter-reset {
+  margin-left: 0.5rem;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .shop-cats {
@@ -387,6 +582,7 @@ watch(
 
 .shop-cat-pill {
   flex-shrink: 0;
+  touch-action: manipulation;
   padding: 0.55rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -404,12 +600,6 @@ watch(
   border-color: var(--color-necha-green);
   color: var(--color-text);
   background: color-mix(in srgb, var(--color-necha-green) 10%, var(--color-surface));
-}
-
-.shop-search-note {
-  margin: 0.85rem 0 0;
-  font-size: 14px;
-  color: var(--color-body);
 }
 
 .surprise-spotlight {

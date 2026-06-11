@@ -1,7 +1,7 @@
 import { onMounted, ref } from 'vue'
 import router from '@/router'
 
-const MIN_BOOT_MS = 900
+const MIN_BOOT_MS = 600
 const MAX_BOOT_MS = 4500
 
 function waitForFonts(): Promise<void> {

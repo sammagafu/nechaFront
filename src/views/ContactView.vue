@@ -20,7 +20,7 @@
         </p>
       </aside>
 
-      <form class="contact-form card card-elevated" @submit.prevent="submitted = true">
+      <form class="contact-form form-stack card card-elevated" @submit.prevent="submitted = true">
         <div class="field">
           <label for="contact-type">I am a</label>
           <select id="contact-type" v-model="form.type" required>
@@ -151,6 +151,10 @@ const form = reactive({
 }
 
 .contact-form {
-  padding: 1.75rem;
+  padding: clamp(1.75rem, 4vw, 2.25rem);
+}
+
+.contact-form .grid {
+  gap: var(--form-gap);
 }
 </style>
