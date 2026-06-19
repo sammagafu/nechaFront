@@ -40,7 +40,13 @@ export function categoryPath(categoryId: string): string {
   return `/shop/category/${categoryId}`
 }
 
-export function hotelEntryUrl(hotelCode: string, slug = catalogConfig.hotelSlug): string {
+export function hotelEntryUrl(
+  hotelCode: string,
+  slug = catalogConfig.hotelSlug,
+  channel: 'room' | 'poster' | 'lobby' = 'room',
+): string {
   const base = (appConfig.appUrl || '').replace(/\/$/, '') || ''
-  return `${base}/hotel/${slug}?ref=${encodeURIComponent(hotelCode)}`
+  const params = new URLSearchParams({ ref: hotelCode })
+  if (channel !== 'room') params.set('channel', channel)
+  return `${base}/hotel/${slug}?${params.toString()}`
 }

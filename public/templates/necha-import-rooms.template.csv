@@ -1,0 +1,4 @@
+room_number,room_type,floor,notes,is_active
+101,Standard,1,Ocean view,true
+102,Deluxe,1,,true
+201,Suite,2,Corner suite,true

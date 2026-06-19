@@ -74,6 +74,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
 import { hotelCartScope } from '@/utils/cartScope'
+import { normalizeHotelChannel } from '@/utils/hotelContext'
 import StorefrontFooter from '@/components/storefront/StorefrontFooter.vue'
 import StickyCartBar from '@/components/storefront/StickyCartBar.vue'
 import CartToast from '@/components/storefront/CartToast.vue'
@@ -99,9 +100,10 @@ function closeNav() {
 async function init() {
   const slug = route.params.slug as string
   const ref = (route.query.ref as string) || undefined
+  const entryChannel = normalizeHotelChannel(route.query.channel as string | undefined)
   try {
     cart.setScope(hotelCartScope(slug))
-    await session.load(slug, ref)
+    await session.load(slug, ref, entryChannel)
   } catch {
     router.replace({ path: '/', query: { hotelError: '1' } })
   }

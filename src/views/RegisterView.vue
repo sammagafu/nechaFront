@@ -67,6 +67,7 @@ import type { AuthPerk } from '@/components/auth/AuthShell.vue'
 import SocialAuthButtons from '@/components/SocialAuthButtons.vue'
 import { getApiError } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
+import { readHotelContext } from '@/utils/hotelContext'
 import { safeRedirectPath } from '@/utils/redirect'
 
 const perks: AuthPerk[] = [
@@ -123,7 +124,11 @@ async function register() {
   loading.value = true
   error.value = ''
   try {
-    await auth.registerCustomer(registerForm)
+    const hotelContext = readHotelContext()
+    await auth.registerCustomer({
+      ...registerForm,
+      ...(hotelContext ? { hotel_context: hotelContext } : {}),
+    })
     await onAuthSuccess()
   } catch (e) {
     error.value = getApiError(e)

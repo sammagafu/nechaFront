@@ -1,0 +1,4 @@
+category,slug,name,description,price,currency,tag,sort_order,is_active
+breakfast,bf-fruit-bowl,Tropical fruit bowl,Seasonal mango papaya and passion fruit with mint,18000,TZS,Light,1,true
+mains,main-tilapia,Grilled tilapia and ugali,Lake fish with kachumbari and lemon herb butter,38000,TZS,Chef pick,1,true
+drinks,dr-passion,Fresh passion juice,Pressed to order lightly sweetened,12000,TZS,,1,true

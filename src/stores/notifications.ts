@@ -69,14 +69,20 @@ export const useNotificationsStore = defineStore('notifications', () => {
   }
 
   async function markRead(ids?: string[]) {
-    const target = ids?.length ? ids : items.value.filter((n) => !n.read_at).map((n) => n.id)
-    if (!target.length) return
-    await markNotificationsRead(target)
-    await loadNotifications()
+    if (ids === undefined) {
+      await markNotificationsRead([])
+      items.value = []
+      unreadCount.value = 0
+      return
+    }
+    if (!ids.length) return
+    await markNotificationsRead(ids)
+    items.value = items.value.filter((n) => !ids.includes(n.id))
+    unreadCount.value = Math.max(0, unreadCount.value - ids.length)
   }
 
   async function markChatNotificationsRead() {
-    const ids = items.value.filter((n) => !n.read_at && isChatNotification(n.type)).map((n) => n.id)
+    const ids = items.value.filter((n) => isChatNotification(n.type)).map((n) => n.id)
     if (!ids.length) return
     await markRead(ids)
   }

@@ -9,9 +9,9 @@ export const adminBrand = {
   loginAside:
     'Personal care, beauty, and wellness — curated for hotel guests and delivered across Dar es Salaam by electric vehicle.',
   loginFooter: 'Built in DSM for African hospitality.',
-  dashboardWelcome: 'Here’s what’s happening across the platform today.',
+  dashboardWelcome: 'Platform overview',
   dashboardSub:
-    'Partner hotels, guest orders, and reservations at a glance — same data your team sees on the ground.',
+    'High-level counts across all partner hotels. Open Store owner to drill into a single hotel’s revenue, products, and guest activity.',
   quickActionsTitle: 'Quick actions',
   analyticsWelcome: 'Platform analytics',
   analyticsSub: 'Revenue, order volume, and partner performance across the last 30 days.',

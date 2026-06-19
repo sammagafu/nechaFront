@@ -45,6 +45,31 @@ export interface Product {
   is_featured?: boolean
 }
 
+export interface HotelRoom {
+  room_number: string
+  room_type?: string
+  floor?: string
+}
+
+export interface HotelMenuCategory {
+  id: string
+  label: string
+}
+
+export interface HotelMenuItem {
+  id: string
+  category: string
+  name: string
+  description: string
+  price: number
+  tag?: string
+}
+
+export interface HotelMenuResponse {
+  categories: HotelMenuCategory[]
+  items: HotelMenuItem[]
+}
+
 export interface HotelReservationRequest {
   hotel_code: string
   guest_name: string

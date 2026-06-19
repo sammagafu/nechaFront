@@ -8,6 +8,7 @@
           <h2>{{ hotelName }} — Products</h2>
           <div class="admin-actions">
             <router-link :to="`/admin/hotels/${hotelId}/products/new`" class="admin-btn admin-btn--primary">+ Add product</router-link>
+            <router-link :to="`/admin/import/${hotelId}`" class="admin-btn admin-btn--ghost">Import CSV</router-link>
             <router-link to="/admin/hotels" class="admin-btn admin-btn--ghost">Hotels</router-link>
           </div>
         </div>

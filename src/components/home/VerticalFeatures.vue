@@ -351,6 +351,15 @@ function onHashClick(event: MouseEvent, href?: string) {
 /* Dark mode */
 [data-theme='dark'] .vf {
   background: var(--color-bg-soft);
+  border-block-color: var(--color-border);
+}
+
+[data-theme='dark'] .vf-eyebrow {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .vf-title em {
+  color: var(--color-necha-green);
 }
 
 [data-theme='dark'] .vf-card {

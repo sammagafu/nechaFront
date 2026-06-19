@@ -69,6 +69,7 @@ export interface StoreDashboard {
   order_trend: DailyMetric[]
   top_products: ProductPerformance[]
   recent_orders: AdminOrder[]
+  recent_reservations: AdminReservation[]
 }
 
 export interface AdminHotel {
@@ -128,6 +129,67 @@ export interface AdminOrder {
   created_at: string
 }
 
+export interface AdminOrderItem {
+  id: string
+  name: string
+  quantity: number
+  unit_price: number
+  total_price: number
+  notes?: string
+}
+
+export interface AdminOrderDetail extends AdminOrder {
+  table_number?: string
+  notes?: string
+  payment_provider?: string
+  payment_status?: string
+  payment_ref?: string
+  updated_at: string
+  items: AdminOrderItem[]
+}
+
+export interface OrderSummary {
+  total: number
+  pending: number
+  in_progress: number
+  delivered: number
+  product_orders: number
+  food_orders: number
+  orders_today: number
+  orders_last_30_days: number
+  total_revenue: number
+  revenue_last_30_days: number
+  currency: string
+}
+
+export interface ImportResult {
+  kind: string
+  created: number
+  updated: number
+  skipped: number
+  errors?: string[]
+}
+
+export interface AdminGuestStay {
+  id: string
+  user_id?: string
+  user_email?: string
+  user_name?: string
+  hotel_id: string
+  hotel_name: string
+  channel?: string
+  room_number?: string
+  referral_code?: string
+  source: string
+  order_id?: string
+  reservation_id?: string
+  scanned_at?: string
+  created_at: string
+  items_summary?: string
+  total_amount?: number
+  currency?: string
+}
+
 export interface AdminReservation {
   id: string
   hotel_id: string
@@ -140,7 +202,13 @@ export interface AdminReservation {
   guest_phone: string
   check_in?: string
   check_out?: string
+  room_type?: string
+  guest_count?: number
   reservation_date?: string
+  table_number?: string
   party_size?: number
+  special_requests?: string
+  notes?: string
   created_at: string
+  updated_at?: string
 }

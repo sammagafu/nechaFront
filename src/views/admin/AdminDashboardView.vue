@@ -6,6 +6,7 @@
       <h2>{{ adminBrand.dashboardWelcome }}</h2>
       <p>{{ adminBrand.dashboardSub }}</p>
     </header>
+
     <div class="admin-stats">
       <div
         v-for="(card, index) in statCards"
@@ -26,56 +27,28 @@
       </div>
     </div>
 
-    <div v-if="analytics" class="admin-analytics-grid">
-      <div class="admin-chart-grid">
-        <div class="admin-card admin-chart-card">
-          <h3>Orders — last 14 days</h3>
-          <AdminTrendChart :points="analytics.order_trend" value-key="count" variant="orders" />
-        </div>
-        <div class="admin-card admin-chart-card">
-          <h3>Revenue — last 14 days</h3>
-          <AdminTrendChart
-            :points="analytics.order_trend"
-            value-key="revenue"
-            variant="revenue"
-            :currency="analytics.currency"
-          />
-        </div>
-      </div>
-
-      <div class="admin-chart-grid admin-chart-grid--3">
-        <div class="admin-card admin-chart-card">
-          <h3>Orders by status</h3>
-          <AdminDonutChart
-            :segments="statusDonutSegments"
-            center-label="Orders"
-          />
-        </div>
-        <div class="admin-card admin-chart-card">
-          <h3>Activity mix (30d)</h3>
-          <AdminDonutChart
-            :segments="activityDonutSegments"
-            center-label="Events"
-          />
-        </div>
-        <div class="admin-card admin-chart-card">
-          <h3>Top hotels by orders</h3>
-          <AdminBarChart :rows="topHotelRows" />
-        </div>
+    <div class="admin-card admin-dashboard-store-cta">
+      <div class="admin-card-body">
+        <h3>Per-hotel store performance</h3>
+        <p>
+          Revenue, product sales, and recent guest orders for a partner hotel live on the
+          <strong>Store owner</strong> dashboard — pick a hotel there to see store-level detail.
+        </p>
+        <router-link to="/admin/store" class="admin-btn admin-btn--primary">Open store owner dashboard</router-link>
       </div>
     </div>
 
     <div class="admin-card">
       <div class="admin-card-head">
         <h2>{{ adminBrand.quickActionsTitle }}</h2>
-        <router-link to="/admin/analytics" class="admin-btn admin-btn--ghost">Full analytics</router-link>
+        <router-link to="/admin/analytics" class="admin-btn admin-btn--ghost">Platform analytics</router-link>
       </div>
       <div class="admin-card-body admin-actions">
         <router-link to="/admin/hotels/new" class="admin-btn admin-btn--primary">Onboard a hotel</router-link>
         <router-link to="/admin/hotels" class="admin-btn admin-btn--ghost">Partner hotels</router-link>
-        <router-link to="/admin/discovery" class="admin-btn admin-btn--ghost">Discovery listings</router-link>
-        <router-link to="/admin/store" class="admin-btn admin-btn--ghost">Store owner</router-link>
         <router-link to="/admin/orders" class="admin-btn admin-btn--ghost">Guest orders</router-link>
+        <router-link to="/admin/reservations" class="admin-btn admin-btn--ghost">Reservations</router-link>
+        <router-link to="/admin/discovery" class="admin-btn admin-btn--ghost">Discovery listings</router-link>
         <router-link :to="demoStorefrontPath" class="admin-btn admin-btn--ghost" target="_blank">Preview demo portal</router-link>
       </div>
     </div>
@@ -84,17 +57,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import AdminBarChart from '@/components/admin/AdminBarChart.vue'
-import AdminDonutChart from '@/components/admin/AdminDonutChart.vue'
-import AdminTrendChart from '@/components/admin/AdminTrendChart.vue'
 import Icon from '@/components/ui/Icon.vue'
 import type { IconName } from '@/components/ui/icons'
-import { fetchAnalytics, fetchDashboard } from '@/api/admin'
+import { fetchDashboard } from '@/api/admin'
 import { getApiError } from '@/api/client'
 import { adminBrand } from '@/config/admin'
 import { appConfig } from '@/config/app'
-import type { AnalyticsOverview, DashboardStats } from '@/types/auth'
-import { CHART_COLORS } from '@/utils/adminCharts'
+import type { DashboardStats } from '@/types/auth'
 
 const STAT_PALETTE = [
   { accent: '#86bc42', soft: 'rgba(134, 188, 66, 0.16)' },
@@ -106,7 +75,6 @@ const STAT_PALETTE = [
 ]
 
 const stats = ref<DashboardStats | null>(null)
-const analytics = ref<AnalyticsOverview | null>(null)
 const loading = ref(true)
 const error = ref('')
 const statColors = ref([...STAT_PALETTE])
@@ -129,39 +97,6 @@ const statCards = computed(() => {
   ]
 })
 
-const statusDonutSegments = computed(() =>
-  (analytics.value?.orders_by_status ?? []).map((row, index) => ({
-    label: row.status,
-    value: row.count,
-    color: CHART_COLORS[index % CHART_COLORS.length],
-  })),
-)
-
-const activityDonutSegments = computed(() => {
-  if (!analytics.value) return []
-  return [
-    {
-      label: 'Orders',
-      value: analytics.value.orders_last_30_days,
-      color: CHART_COLORS[0],
-    },
-    {
-      label: 'Reservations',
-      value: analytics.value.reservations_last_30_days,
-      color: CHART_COLORS[2],
-    },
-  ]
-})
-
-const topHotelRows = computed(() =>
-  (analytics.value?.top_hotels ?? []).map((hotel, index) => ({
-    label: hotel.hotel_name,
-    value: hotel.order_count,
-    display: String(hotel.order_count),
-    color: `linear-gradient(90deg, ${CHART_COLORS[index % CHART_COLORS.length]}, color-mix(in srgb, ${CHART_COLORS[index % CHART_COLORS.length]} 70%, #fff))`,
-  })),
-)
-
 function shufflePalette() {
   const next = [...STAT_PALETTE]
   for (let i = next.length - 1; i > 0; i -= 1) {
@@ -174,12 +109,7 @@ function shufflePalette() {
 onMounted(async () => {
   shufflePalette()
   try {
-    const [dashboard, analyticsData] = await Promise.all([
-      fetchDashboard(),
-      fetchAnalytics(),
-    ])
-    stats.value = dashboard
-    analytics.value = analyticsData
+    stats.value = await fetchDashboard()
   } catch (e) {
     error.value = getApiError(e)
   } finally {
@@ -187,3 +117,18 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.admin-dashboard-store-cta h3 {
+  margin: 0 0 0.35rem;
+  font-size: 15px;
+}
+
+.admin-dashboard-store-cta p {
+  margin: 0 0 0.85rem;
+  max-width: 56ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+</style>

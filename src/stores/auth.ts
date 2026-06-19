@@ -9,6 +9,7 @@ import {
 } from '@/api/auth'
 import { getApiError } from '@/api/client'
 import type { User } from '@/types/auth'
+import type { HotelContextPayload } from '@/utils/hotelContext'
 
 const TOKEN_KEY = 'access_token'
 
@@ -68,7 +69,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function registerCustomer(payload: { email: string; password: string; full_name: string; phone?: string }) {
+  async function registerCustomer(payload: {
+    email: string
+    password: string
+    full_name: string
+    phone?: string
+    hotel_context?: HotelContextPayload
+  }) {
     loading.value = true
     error.value = ''
     try {
@@ -82,11 +89,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function loginWithGoogle(idToken: string) {
+  async function loginWithGoogle(idToken: string, hotelContext?: HotelContextPayload) {
     loading.value = true
     error.value = ''
     try {
-      const result = await apiLoginWithGoogle(idToken)
+      const result = await apiLoginWithGoogle(idToken, hotelContext)
       if (result.user.role !== 'customer') {
         throw new Error('Customer account required')
       }
@@ -99,11 +106,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function loginWithApple(idToken: string, fullName?: string) {
+  async function loginWithApple(idToken: string, fullName?: string, hotelContext?: HotelContextPayload) {
     loading.value = true
     error.value = ''
     try {
-      const result = await apiLoginWithApple(idToken, fullName)
+      const result = await apiLoginWithApple(idToken, fullName, hotelContext)
       if (result.user.role !== 'customer') {
         throw new Error('Customer account required')
       }

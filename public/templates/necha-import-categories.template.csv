@@ -1,0 +1,6 @@
+slug,label,kind,sort_order,is_active
+skin_care,Skin care,product,1,true
+wellness,Wellness,product,2,true
+breakfast,Breakfast,menu,1,true
+mains,Mains,menu,2,true
+drinks,Drinks,menu,3,true

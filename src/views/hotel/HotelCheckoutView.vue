@@ -15,7 +15,10 @@
           </div>
           <div>
             <label class="sf-field-label" for="checkout-room">Your room number *</label>
-            <input id="checkout-room" v-model="room" type="text" placeholder="e.g. 304" />
+            <input id="checkout-room" v-model="room" type="text" placeholder="e.g. 304" list="checkout-room-numbers" />
+            <datalist id="checkout-room-numbers">
+              <option v-for="num in roomOptions" :key="num" :value="num" />
+            </datalist>
           </div>
         </div>
         <p v-if="roomError" class="checkout-field-error">Please enter your room number</p>
@@ -75,9 +78,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { createProductOrder } from '@/api/orders'
+import { fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
@@ -95,9 +99,34 @@ const email = ref('')
 const roomError = ref(false)
 const submitError = ref('')
 const submitting = ref(false)
+const roomOptions = ref<string[]>([])
 
 const fee = computed(() => deliveryFee(cart.subtotal))
 const total = computed(() => cart.subtotal + fee.value)
+
+onMounted(() => {
+  void loadRooms()
+})
+
+watch(
+  () => session.hotel?.slug,
+  () => {
+    void loadRooms()
+  },
+)
+
+async function loadRooms() {
+  const slug = session.hotel?.slug
+  if (!slug) return
+  try {
+    const rooms = await fetchHotelRooms(slug)
+    if (rooms.length) {
+      roomOptions.value = rooms.map((entry) => entry.room_number)
+    }
+  } catch {
+    // Room suggestions are optional
+  }
+}
 
 function confirmRemoveReferral() {
   if (window.confirm(`Removing this code means ${session.hotel?.name} won't earn a reward on this purchase. Are you sure?`)) {

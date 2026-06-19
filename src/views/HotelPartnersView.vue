@@ -1,10 +1,5 @@
 <template>
   <div ref="pageRef" class="pl-page">
-    <PartnerSurpriseToast
-      :visible="showSurpriseToast"
-      title="Plot twist unlocked"
-      subtitle="Swipe the hero — a third slide was hiding in plain sight."
-    />
     <p v-if="showHotelError" class="pl-notice">
       That hotel link wasn't recognised.
       <router-link to="/shop">Browse the shop</router-link>
@@ -296,7 +291,6 @@ import HomeHeroShowcase, { type HeroShowcaseSlide } from '@/components/home/Home
 import DiscoveryShowcase from '@/components/partners/DiscoveryShowcase.vue'
 import HotelEarningsCalculator from '@/components/partners/HotelEarningsCalculator.vue'
 import PartnerSignupForm from '@/components/partners/PartnerSignupForm.vue'
-import PartnerSurpriseToast from '@/components/partners/PartnerSurpriseToast.vue'
 import { catalogConfig } from '@/config/app'
 import { siteImages } from '@/config/images'
 import '@/assets/partner-landing.css'
@@ -310,7 +304,6 @@ const heroIndex = ref(0)
 const activeSection = ref('how-sec')
 const partnerHotels = ref<PartnerHotelCard[]>([])
 const surpriseUnlocked = ref(false)
-const showSurpriseToast = ref(false)
 const revealed = reactive({ how: false, calc: false, why: false })
 
 const slidesSeen = new Set<number>()
@@ -330,7 +323,6 @@ const signupFormRef = ref<InstanceType<typeof PartnerSignupForm> | null>(null)
 
 let sectionObserver: IntersectionObserver | null = null
 let revealObserver: IntersectionObserver | null = null
-let surpriseToastTimer: ReturnType<typeof setTimeout> | null = null
 
 const prefersReducedMotion = ref(false)
 
@@ -556,16 +548,9 @@ const platformFeatures = [
   },
 ]
 
-function unlockSurprise(showToast = true) {
+function unlockSurprise() {
   if (surpriseUnlocked.value) return
   surpriseUnlocked.value = true
-  if (showToast) {
-    showSurpriseToast.value = true
-    clearTimeout(surpriseToastTimer ?? undefined)
-    surpriseToastTimer = setTimeout(() => {
-      showSurpriseToast.value = false
-    }, 3800)
-  }
   if (!prefersReducedMotion.value) {
     setTimeout(() => heroRef.value?.goTo(heroSlidesBase.length), 700)
   }
@@ -574,7 +559,7 @@ function unlockSurprise(showToast = true) {
 function onHeroSlideChange(index: number) {
   slidesSeen.add(index)
   if (!surpriseUnlocked.value && slidesSeen.has(0) && slidesSeen.has(1)) {
-    unlockSurprise(true)
+    unlockSurprise()
   }
 }
 
@@ -672,7 +657,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (surpriseToastTimer) clearTimeout(surpriseToastTimer)
   sectionObserver?.disconnect()
   revealObserver?.disconnect()
 })

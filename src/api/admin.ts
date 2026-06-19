@@ -1,12 +1,16 @@
 import client from './client'
 import type { ApiSuccess } from '@/types/api'
 import type {
+  AdminGuestStay,
   AdminHotel,
   AdminOrder,
+  AdminOrderDetail,
   AdminProduct,
   AdminReservation,
   AnalyticsOverview,
   DashboardStats,
+  ImportResult,
+  OrderSummary,
   StoreDashboard,
 } from '@/types/auth'
 
@@ -65,6 +69,21 @@ export async function fetchOrders() {
   return data.data
 }
 
+export async function fetchOrder(id: string) {
+  const { data } = await client.get<ApiSuccess<AdminOrderDetail>>(`/admin/orders/${id}`)
+  return data.data
+}
+
+export async function fetchOrderSummary() {
+  const { data } = await client.get<ApiSuccess<OrderSummary>>('/admin/orders/summary')
+  return data.data
+}
+
+export async function fetchGuestStays() {
+  const { data } = await client.get<ApiSuccess<AdminGuestStay[]>>('/admin/guest-stays')
+  return data.data
+}
+
 export async function updateOrderStatus(id: string, status: string) {
   const { data } = await client.patch<ApiSuccess<AdminOrder>>(`/admin/orders/${id}/status`, { status })
   return data.data
@@ -75,7 +94,27 @@ export async function fetchReservations() {
   return data.data
 }
 
+export async function fetchReservation(id: string) {
+  const { data } = await client.get<ApiSuccess<AdminReservation>>(`/admin/reservations/${id}`)
+  return data.data
+}
+
 export async function updateReservationStatus(id: string, status: string) {
   const { data } = await client.patch<ApiSuccess<AdminReservation>>(`/admin/reservations/${id}/status`, { status })
+  return data.data
+}
+
+export async function importHotelCSV(
+  hotelId: string,
+  kind: 'rooms' | 'categories' | 'menu',
+  file: File,
+) {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await client.post<ApiSuccess<ImportResult>>(
+    `/admin/hotels/${hotelId}/import/${kind}`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
   return data.data
 }

@@ -8,7 +8,7 @@
 
     <nav class="food-cats" aria-label="Menu categories">
       <button
-        v-for="cat in foodMenuCategories"
+        v-for="cat in menuCategories"
         :key="cat.id"
         type="button"
         class="food-cat"
@@ -82,7 +82,10 @@
         <div class="sf-form-fields food-checkout-fields">
           <input v-model="form.customer_name" placeholder="Full name *" required />
           <input v-model="form.customer_phone" type="tel" placeholder="Phone *" required />
-          <input v-model="form.room_number" placeholder="Room number *" required />
+          <input v-model="form.room_number" placeholder="Room number *" required list="food-room-numbers" />
+          <datalist id="food-room-numbers">
+            <option v-for="num in roomOptions" :key="num" :value="num" />
+          </datalist>
           <textarea v-model="form.notes" rows="2" placeholder="Allergies or timing notes…" />
         </div>
 
@@ -98,8 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { createFoodOrder } from '@/api/orders'
+import { fetchHotelMenu, fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
 import { formatTZS } from '@/composables/usePricing'
 import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
@@ -113,6 +117,9 @@ const checkoutDialog = ref<HTMLDialogElement | null>(null)
 const submitting = ref(false)
 const error = ref('')
 const success = ref('')
+const menuCategories = ref(foodMenuCategories)
+const menuItems = ref<FoodMenuItem[]>(foodMenuItems)
+const roomOptions = ref<string[]>([])
 
 const cart = reactive<Record<string, { item: FoodMenuItem; quantity: number }>>({})
 
@@ -125,8 +132,8 @@ const form = reactive({
 
 const visibleItems = computed(() =>
   activeCategory.value === 'all'
-    ? foodMenuItems
-    : foodMenuItems.filter((i) => i.category === activeCategory.value),
+    ? menuItems.value
+    : menuItems.value.filter((i) => i.category === activeCategory.value),
 )
 
 const orderLines = computed(() =>
@@ -149,6 +156,42 @@ watch(checkoutOpen, (open) => {
   if (open && !el.open) el.showModal()
   if (!open && el.open) el.close()
 })
+
+onMounted(() => {
+  void loadCatalog()
+})
+
+watch(
+  () => session.hotel?.slug,
+  () => {
+    void loadCatalog()
+  },
+)
+
+async function loadCatalog() {
+  const slug = session.hotel?.slug
+  if (!slug) return
+
+  try {
+    const [menu, rooms] = await Promise.all([fetchHotelMenu(slug), fetchHotelRooms(slug)])
+    if (menu.items.length) {
+      menuCategories.value = menu.categories
+      menuItems.value = menu.items.map((item) => ({
+        id: item.id,
+        category: item.category,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        tag: item.tag,
+      }))
+    }
+    if (rooms.length) {
+      roomOptions.value = rooms.map((room) => room.room_number)
+    }
+  } catch {
+    // Keep bundled demo menu when hotel catalog is empty or unavailable
+  }
+}
 
 function qty(id: string) {
   return cart[id]?.quantity ?? 0

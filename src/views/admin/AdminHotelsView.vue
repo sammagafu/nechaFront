@@ -33,7 +33,9 @@
             <td class="admin-actions">
               <router-link :to="`/admin/hotels/${hotel.id}/edit`" class="admin-btn admin-btn--ghost">Edit</router-link>
               <router-link :to="`/admin/hotels/${hotel.id}/products`" class="admin-btn admin-btn--ghost">Products</router-link>
-              <a :href="`/hotel/${hotel.slug}?ref=${hotel.referral_code || hotel.code}`" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Storefront</a>
+              <router-link :to="`/admin/import/${hotel.id}`" class="admin-btn admin-btn--ghost">Import CSV</router-link>
+              <a :href="hotelEntryUrl(hotel.referral_code || hotel.code, hotel.slug, 'room')" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Room QR</a>
+              <a :href="hotelEntryUrl(hotel.referral_code || hotel.code, hotel.slug, 'poster')" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Poster QR</a>
             </td>
           </tr>
         </tbody>
@@ -48,6 +50,7 @@
 import { onMounted, ref } from 'vue'
 import { fetchHotels } from '@/api/admin'
 import { getApiError } from '@/api/client'
+import { hotelEntryUrl } from '@/config/app'
 import type { AdminHotel } from '@/types/auth'
 
 const hotels = ref<AdminHotel[]>([])

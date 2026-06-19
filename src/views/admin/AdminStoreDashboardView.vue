@@ -29,6 +29,12 @@
         >
           Manage products
         </router-link>
+        <router-link
+          :to="`/admin/import/${dashboard.hotel.id}`"
+          class="admin-btn admin-btn--ghost"
+        >
+          Import CSV
+        </router-link>
       </div>
     </div>
 
@@ -88,40 +94,80 @@
           <AdminBarChart :rows="productRows" />
         </div>
         <div class="admin-card admin-chart-card">
-          <h3>Orders vs reservations</h3>
-          <AdminDonutChart :segments="storeActivitySegments" center-label="Total" />
+          <h3>Order volume (30d)</h3>
+          <AdminDonutChart :segments="orderActivitySegments" center-label="Orders" />
+        </div>
+        <div class="admin-card admin-chart-card">
+          <h3>Reservations</h3>
+          <AdminDonutChart :segments="reservationActivitySegments" center-label="Bookings" />
         </div>
       </div>
 
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <h2>Recent orders</h2>
-          <router-link to="/admin/orders" class="admin-btn admin-btn--ghost">All orders</router-link>
+      <div class="admin-store-activity-grid">
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h2>Recent orders</h2>
+            <router-link to="/admin/orders" class="admin-btn admin-btn--ghost">All orders</router-link>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Guest</th>
+                  <th>Type</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="order in dashboard.recent_orders" :key="order.id">
+                  <td>{{ order.customer_name }}</td>
+                  <td>{{ orderTypeLabel(order.type) }}</td>
+                  <td>{{ order.room_number || '—' }}</td>
+                  <td><span class="admin-badge admin-badge--pending">{{ order.status }}</span></td>
+                  <td>{{ formatPrice(order.total_amount, order.currency) }}</td>
+                  <td>{{ formatDate(order.created_at) }}</td>
+                </tr>
+                <tr v-if="!dashboard.recent_orders.length">
+                  <td colspan="6" class="admin-empty">No orders for this hotel yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Guest</th>
-                <th>Room</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in dashboard.recent_orders" :key="order.id">
-                <td>{{ order.customer_name }}</td>
-                <td>{{ order.room_number || '—' }}</td>
-                <td><span class="admin-badge admin-badge--pending">{{ order.status }}</span></td>
-                <td>{{ formatPrice(order.total_amount, order.currency) }}</td>
-                <td>{{ formatDate(order.created_at) }}</td>
-              </tr>
-              <tr v-if="!dashboard.recent_orders.length">
-                <td colspan="5" class="admin-empty">No orders for this hotel yet.</td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h2>Recent reservations</h2>
+            <router-link to="/admin/reservations" class="admin-btn admin-btn--ghost">All reservations</router-link>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Guest</th>
+                  <th>Type</th>
+                  <th>Details</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="reservation in dashboard.recent_reservations" :key="reservation.id">
+                  <td>{{ reservation.guest_name }}</td>
+                  <td>{{ reservationTypeLabel(reservation.type) }}</td>
+                  <td>{{ reservationDetails(reservation) }}</td>
+                  <td><span class="admin-badge admin-badge--pending">{{ reservation.status }}</span></td>
+                  <td>{{ formatDate(reservation.created_at) }}</td>
+                </tr>
+                <tr v-if="!dashboard.recent_reservations.length">
+                  <td colspan="5" class="admin-empty">No reservations for this hotel yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -137,7 +183,7 @@ import AdminTrendChart from '@/components/admin/AdminTrendChart.vue'
 import { fetchHotels, fetchStoreDashboard } from '@/api/admin'
 import { getApiError } from '@/api/client'
 import { adminBrand } from '@/config/admin'
-import type { AdminHotel, StoreDashboard } from '@/types/auth'
+import type { AdminHotel, AdminReservation, StoreDashboard } from '@/types/auth'
 import { CHART_COLORS } from '@/utils/adminCharts'
 import { formatPrice } from '@/utils/commerce'
 
@@ -160,14 +206,43 @@ const productRows = computed(() =>
   })),
 )
 
-const storeActivitySegments = computed(() => {
+const orderActivitySegments = computed(() => {
   if (!dashboard.value) return []
   return [
-    { label: 'Orders (30d)', value: dashboard.value.orders_last_30_days, color: CHART_COLORS[0] },
-    { label: 'Reservations', value: dashboard.value.reservations, color: CHART_COLORS[2] },
-    { label: 'Pending', value: dashboard.value.pending_orders + dashboard.value.pending_reservations, color: CHART_COLORS[4] },
+    { label: 'Last 30 days', value: dashboard.value.orders_last_30_days, color: CHART_COLORS[0] },
+    { label: 'Pending', value: dashboard.value.pending_orders, color: CHART_COLORS[4] },
   ]
 })
+
+const reservationActivitySegments = computed(() => {
+  if (!dashboard.value) return []
+  return [
+    { label: 'Total', value: dashboard.value.reservations, color: CHART_COLORS[2] },
+    { label: 'Pending', value: dashboard.value.pending_reservations, color: CHART_COLORS[4] },
+  ]
+})
+
+function orderTypeLabel(type: string) {
+  if (type === 'product') return 'Shop delivery'
+  if (type === 'food') return 'Room service'
+  return type
+}
+
+function reservationTypeLabel(type: string) {
+  if (type === 'hotel') return 'Room booking'
+  if (type === 'table') return 'Table booking'
+  return type
+}
+
+function reservationDetails(reservation: AdminReservation) {
+  if (reservation.type === 'hotel') {
+    const checkIn = reservation.check_in?.slice(0, 10) ?? '—'
+    const checkOut = reservation.check_out?.slice(0, 10) ?? '—'
+    return `${checkIn} → ${checkOut}`
+  }
+  const when = reservation.reservation_date?.slice(0, 16) ?? '—'
+  return `${when} · ${reservation.party_size ?? 0} guests`
+}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-GB', {
@@ -230,3 +305,16 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.admin-store-activity-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 1100px) {
+  .admin-store-activity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+</style>

@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchHotelBySlug, fetchProductsBySlug } from '@/api/hotels'
+import { fetchHotelBySlug, fetchProductsBySlug, recordHotelScanEvent } from '@/api/hotels'
 import { getApiError } from '@/api/client'
 import type { StorefrontHotel, StorefrontProduct } from '@/types/storefront'
+import { persistLastHotel, normalizeHotelChannel, readHotelScanTime, type HotelEntryChannel } from '@/utils/hotelContext'
 
 const REFERRAL_KEY = 'necha_hotel_referral'
 const REFERRAL_APPLIED_KEY = 'necha_referral_applied'
@@ -41,6 +42,7 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
   const loading = ref(false)
   const error = ref('')
   const roomNumber = ref('')
+  const channel = ref<HotelEntryChannel>('room')
   const referralApplied = ref(true)
 
   const referralCode = computed(() => hotel.value?.referral_code || refCode.value)
@@ -57,10 +59,11 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
     }
   }
 
-  async function load(slugValue: string, ref?: string) {
+  async function load(slugValue: string, ref?: string, entryChannel: HotelEntryChannel = 'room') {
     loading.value = true
     error.value = ''
     slug.value = slugValue
+    channel.value = normalizeHotelChannel(entryChannel)
     roomNumber.value = localStorage.getItem(roomStorageKey(slugValue)) || ''
     if (ref) {
       persistReferral(ref)
@@ -72,7 +75,18 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
     try {
       hotel.value = await fetchHotelBySlug(slugValue, ref || refCode.value || undefined)
       if (hotel.value.referral_code) persistReferral(hotel.value.referral_code)
+      persistLastHotel(
+        slugValue,
+        hotel.value.code,
+        hotel.value.referral_code || refCode.value || undefined,
+        channel.value,
+      )
       products.value = await fetchProductsBySlug(slugValue, true)
+      void recordHotelScanEvent(slugValue, {
+        ref: hotel.value.referral_code || hotel.value.code || ref || refCode.value || '',
+        channel: channel.value,
+        scanned_at: readHotelScanTime(slugValue, channel.value),
+      })
     } catch (e) {
       hotel.value = null
       products.value = []
@@ -106,6 +120,7 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
     loading,
     error,
     roomNumber,
+    channel,
     referralApplied,
     referralCode,
     load,

@@ -905,7 +905,7 @@ function tryDemo() {
 .btn-green {
   background: var(--color-necha-green) !important;
   border-radius: var(--radius-pill) !important;
-  color: var(--color-white) !important;
+  color: var(--color-on-dark, var(--color-white)) !important;
   text-transform: none;
   letter-spacing: 0.02em;
   font-size: 14px;
@@ -914,6 +914,28 @@ function tryDemo() {
 
 .btn-green:hover {
   background: var(--color-necha-green-dark) !important;
+  color: var(--color-on-dark, var(--color-white)) !important;
+}
+
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  color: var(--color-white) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--color-white) !important;
+}
+
+.section-title-sm {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-text);
 }
 
 /* Shared */
@@ -928,14 +950,6 @@ function tryDemo() {
 
 .eyebrow-light {
   color: var(--color-necha-green-light);
-}
-
-.section-title-sm {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
-  font-weight: 500;
-  line-height: 1.15;
 }
 
 .section-title-sm--center {
@@ -982,7 +996,10 @@ function tryDemo() {
 
 /* Category rail */
 .cat-rail-section {
-  background: var(--color-bg-soft);
+  background:
+    radial-gradient(120% 80% at 0% 100%, color-mix(in srgb, var(--color-necha-green) 7%, transparent), transparent 55%),
+    var(--color-bg-soft);
+  border-block: 1px solid var(--color-border);
 }
 
 .cat-rail {
@@ -1068,6 +1085,7 @@ function tryDemo() {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 500;
+  color: var(--color-text);
 }
 
 .cat-rail-card span {
@@ -1076,6 +1094,12 @@ function tryDemo() {
 }
 
 /* Promo */
+.promo-section {
+  background:
+    radial-gradient(90% 70% at 100% 15%, color-mix(in srgb, var(--color-necha-green) 9%, transparent), transparent 52%),
+    var(--color-bg);
+}
+
 .promo-card {
   display: grid;
   gap: 1.5rem;
@@ -1098,6 +1122,7 @@ function tryDemo() {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 500;
+  color: var(--color-text);
 }
 
 .promo-copy p {
@@ -1126,6 +1151,7 @@ function tryDemo() {
   font-family: var(--font-display);
   font-size: 1.75rem;
   font-weight: 500;
+  color: var(--color-text);
 }
 
 .promo-stats span {
@@ -1137,12 +1163,17 @@ function tryDemo() {
 
 /* Bestsellers */
 .bestsellers-section {
-  background: var(--color-bg);
+  background:
+    radial-gradient(85% 65% at 50% 0%, color-mix(in srgb, var(--color-necha-green) 6%, transparent), transparent 58%),
+    var(--color-bg);
+  border-block: 1px solid var(--color-border);
 }
 
 /* Hotel */
 .hotel-section {
-  background: var(--color-bg-soft);
+  background:
+    radial-gradient(100% 80% at 100% 50%, color-mix(in srgb, var(--color-necha-green) 6%, transparent), transparent 50%),
+    var(--color-bg-soft);
 }
 
 .hotel-card {
@@ -1224,6 +1255,12 @@ function tryDemo() {
   border-radius: var(--radius-pill);
   font-size: 15px;
   line-height: 1.5;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.hotel-input-row input::placeholder {
+  color: var(--color-muted);
 }
 
 .hotel-enter-btn {
@@ -1250,6 +1287,11 @@ function tryDemo() {
 }
 
 /* Why */
+.why-section {
+  background: var(--color-bg-warm);
+  border-block: 1px solid var(--color-border);
+}
+
 .why-grid-modern {
   display: grid;
   gap: 1rem;
@@ -1276,6 +1318,7 @@ function tryDemo() {
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 500;
+  color: var(--color-text);
 }
 
 .why-tile p {
@@ -1288,6 +1331,7 @@ function tryDemo() {
 /* Partner */
 .partner-strip {
   padding-block: clamp(2.5rem, 5vw, 4rem);
+  background: var(--color-bg);
 }
 
 .partner-band {
@@ -1328,6 +1372,8 @@ function tryDemo() {
   text-align: center;
   font-size: 13px;
   color: var(--color-body);
+  background: var(--color-bg-soft);
+  border-block: 1px solid var(--color-border);
 }
 
 .delivery-strip-modern a {
@@ -1336,6 +1382,12 @@ function tryDemo() {
 }
 
 /* Testimonials */
+.testimonials-section {
+  background:
+    radial-gradient(100% 75% at 0% 40%, color-mix(in srgb, var(--color-necha-green) 6%, transparent), transparent 55%),
+    var(--color-bg-soft);
+}
+
 .testimonials-row {
   display: grid;
   gap: 1rem;
@@ -1371,6 +1423,7 @@ function tryDemo() {
   font-family: var(--font-display);
   font-size: 1.15rem;
   line-height: 1.45;
+  color: var(--color-text);
 }
 
 .quote-card footer {
@@ -1379,6 +1432,10 @@ function tryDemo() {
 }
 
 /* CTA */
+.cta-section {
+  background: var(--color-bg);
+}
+
 .cta-band {
   text-align: center;
   padding: clamp(2.5rem, 5vw, 3.5rem);
@@ -1423,5 +1480,94 @@ function tryDemo() {
   .cta-actions .btn {
     width: auto;
   }
+}
+
+/* Dark mode — landing sections, buttons, text */
+[data-theme='dark'] .notice-banner {
+  background: color-mix(in srgb, var(--color-necha-green) 14%, var(--color-bg-soft));
+  color: var(--color-text);
+  border-bottom-color: var(--color-border);
+}
+
+[data-theme='dark'] .hero-showcase {
+  background: var(--color-bg);
+}
+
+[data-theme='dark'] .hero-brand-tab.on {
+  color: var(--color-necha-green);
+  background: color-mix(in srgb, var(--color-necha-green) 14%, var(--color-surface));
+}
+
+[data-theme='dark'] .homepage .eyebrow:not(.eyebrow-light) {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .btn-view {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .btn-view:hover {
+  color: var(--color-necha-green-dark);
+}
+
+[data-theme='dark'] .btn-green:hover {
+  background: color-mix(in srgb, var(--color-necha-green) 88%, var(--color-white)) !important;
+  color: var(--color-black) !important;
+}
+
+[data-theme='dark'] .text-link-sm {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .delivery-strip-modern a {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .promo-card {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-necha-green) 18%, var(--color-surface)),
+    var(--color-surface)
+  );
+  border-color: color-mix(in srgb, var(--color-necha-green) 28%, var(--color-border));
+}
+
+[data-theme='dark'] .hotel-card {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme='dark'] .hotel-input-row input {
+  background: var(--color-surface-inset);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .hotel-steps-list li {
+  background: var(--color-bg);
+}
+
+[data-theme='dark'] .why-tile {
+  background: var(--color-surface);
+}
+
+[data-theme='dark'] .quote-card.featured {
+  background: color-mix(in srgb, var(--color-necha-green) 10%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-necha-green) 35%, var(--color-border));
+}
+
+[data-theme='dark'] .cat-rail-section,
+[data-theme='dark'] .bestsellers-section,
+[data-theme='dark'] .testimonials-section,
+[data-theme='dark'] .delivery-strip-modern {
+  border-color: var(--color-border);
+}
+
+[data-theme='dark'] .cta-band {
+  background: linear-gradient(
+    160deg,
+    var(--color-bg-soft),
+    color-mix(in srgb, var(--color-necha-green) 22%, var(--color-black))
+  );
 }
 </style>

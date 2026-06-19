@@ -9,7 +9,13 @@
     />
 
     <aside class="admin-sidebar">
-      <router-link to="/admin" class="admin-brand" @click="navOpen = false">
+      <router-link
+        to="/admin"
+        class="admin-brand"
+        active-class=""
+        exact-active-class=""
+        @click="navOpen = false"
+      >
         <NechaLogo :alt="adminBrand.name" class="admin-brand-logo" :width="120" :height="32" on-dark />
         <span class="admin-brand-kicker">{{ adminBrand.console }}</span>
         <span class="admin-brand-tagline">{{ adminBrand.sidebarTagline }}</span>
@@ -17,22 +23,111 @@
 
       <nav class="admin-nav" aria-label="Admin navigation">
         <p class="admin-nav-label">Overview</p>
-        <router-link to="/admin" end @click="navOpen = false">Dashboard</router-link>
-        <router-link to="/admin/analytics" @click="navOpen = false">Analytics</router-link>
-        <router-link to="/admin/store" @click="navOpen = false">Store owner</router-link>
+        <router-link
+          to="/admin"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin', { exact: true }) }"
+          @click="navOpen = false"
+        >
+          Dashboard
+        </router-link>
+        <router-link
+          to="/admin/analytics"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/analytics') }"
+          @click="navOpen = false"
+        >
+          Analytics
+        </router-link>
+        <router-link
+          to="/admin/store"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/store') }"
+          @click="navOpen = false"
+        >
+          Store owner
+        </router-link>
 
         <p class="admin-nav-label">Commerce</p>
-        <router-link to="/admin/orders" @click="navOpen = false">Orders</router-link>
-        <router-link to="/admin/reservations" @click="navOpen = false">Reservations</router-link>
+        <router-link
+          to="/admin/orders"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/orders') || navActive('/admin/reservations') }"
+          @click="navOpen = false"
+        >
+          Orders &amp; bookings
+        </router-link>
+        <router-link
+          to="/admin/guest-stays"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/guest-stays', { exact: true }) }"
+          @click="navOpen = false"
+        >
+          Guest stays
+        </router-link>
 
         <p class="admin-nav-label">Partners</p>
-        <router-link to="/admin/hotels" @click="navOpen = false">Hotels</router-link>
-        <router-link to="/admin/discovery" @click="navOpen = false">Discovery Portal</router-link>
+        <router-link
+          to="/admin/hotels"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/hotels') }"
+          @click="navOpen = false"
+        >
+          Hotels
+        </router-link>
+        <router-link
+          to="/admin/import"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/import') }"
+          @click="navOpen = false"
+        >
+          CSV import
+        </router-link>
+        <router-link
+          to="/admin/discovery"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/discovery') }"
+          @click="navOpen = false"
+        >
+          Discovery Portal
+        </router-link>
 
         <p class="admin-nav-label">Engagement</p>
-        <router-link to="/admin/chat" @click="navOpen = false">Messages</router-link>
-        <router-link to="/admin/alerts" @click="navOpen = false">Alerts</router-link>
-        <router-link to="/admin/webhooks" @click="navOpen = false">Webhooks</router-link>
+        <router-link
+          to="/admin/chat"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/chat') }"
+          @click="navOpen = false"
+        >
+          Messages
+        </router-link>
+        <router-link
+          to="/admin/alerts"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/alerts', { exact: true }) }"
+          @click="navOpen = false"
+        >
+          Alerts
+        </router-link>
+        <router-link
+          to="/admin/webhooks"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/webhooks', { exact: true }) }"
+          @click="navOpen = false"
+        >
+          Webhooks
+        </router-link>
 
         <p class="admin-nav-label">Site</p>
         <router-link to="/" class="admin-nav-external" target="_blank" rel="noopener" @click="navOpen = false">
@@ -96,15 +191,27 @@ const titles: Record<string, string> = {
   'admin-products': 'Storefront products',
   'admin-product-new': 'Add product',
   'admin-product-edit': 'Edit product',
-  'admin-orders': 'Guest orders',
-  'admin-reservations': 'Reservations',
+  'admin-orders': 'Orders & bookings',
+  'admin-order-detail': 'Order detail',
+  'admin-guest-stays': 'Guest stays',
+  'admin-reservations': 'Orders & bookings',
+  'admin-reservation-detail': 'Booking detail',
   'admin-discovery': 'Discovery Portal',
   'admin-discovery-new': 'New listing',
   'admin-discovery-edit': 'Edit listing',
   'admin-chat': 'Messages',
   'admin-chat-detail': 'Messages',
   'admin-alerts': 'System alerts',
+  'admin-hotel-import': 'CSV import',
   'admin-webhooks': 'Webhooks',
+}
+
+function navActive(path: string, options?: { exact?: boolean }) {
+  const current = route.path
+  if (options?.exact) {
+    return current === path || current === `${path}/`
+  }
+  return current === path || current.startsWith(`${path}/`)
 }
 
 const title = computed(() => titles[String(route.name)] || adminBrand.console)

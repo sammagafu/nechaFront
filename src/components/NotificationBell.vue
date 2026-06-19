@@ -8,7 +8,7 @@
     <div v-if="open" class="bell-panel card card-elevated">
       <div class="bell-panel-head">
         <strong>Notifications</strong>
-        <button v-if="notifications.unreadCount" type="button" class="bell-mark" @click="markAllRead">Mark all read</button>
+        <button v-if="notifications.unreadCount" type="button" class="bell-mark" @click="markAllRead">Clear all</button>
       </div>
       <div v-if="notifications.loading" class="bell-empty">Loading…</div>
       <ul v-else-if="notifications.items.length" class="bell-list">
@@ -45,9 +45,7 @@ async function markAllRead() {
 }
 
 async function onOpen(item: Notification) {
-  if (!item.read_at) {
-    await notifications.markRead([item.id])
-  }
+  await notifications.markRead([item.id])
   open.value = false
 }
 
