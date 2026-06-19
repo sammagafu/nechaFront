@@ -42,19 +42,8 @@
       </div>
 
       <div class="checkout-section">
-        <div class="checkout-label">Payment method</div>
-        <div class="payment-grid">
-          <button
-            v-for="opt in paymentOptions"
-            :key="opt.id"
-            type="button"
-            class="payment-option"
-            :class="{ selected: payment === opt.id }"
-            @click="payment = opt.id"
-          >
-            {{ opt.label }}
-          </button>
-        </div>
+        <div class="checkout-label">Payment</div>
+        <p class="checkout-field-hint">You'll pay securely on Selcom — M-Pesa, Tigo Pesa, cards, and more.</p>
       </div>
 
       <div class="checkout-section">
@@ -78,7 +67,7 @@
       <div class="checkout-submit-wrap">
         <p v-if="submitError" class="checkout-field-error">{{ submitError }}</p>
         <button type="submit" class="sf-btn-primary sf-btn-primary--block" :disabled="submitting">
-          {{ submitting ? 'Placing order…' : 'Place order →' }}
+          {{ submitting ? 'Redirecting to Selcom…' : 'Pay with Selcom →' }}
         </button>
       </div>
     </form>
@@ -93,6 +82,7 @@ import { getApiError } from '@/api/client'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
 import { deliveryFee, formatTZS } from '@/composables/usePricing'
+import { handleOrderPayment } from '@/utils/checkoutPayment'
 
 const session = useHotelSessionStore()
 const cart = useCartStore()
@@ -102,16 +92,9 @@ const room = ref(session.roomNumber)
 const fullName = ref('')
 const phone = ref('')
 const email = ref('')
-const payment = ref('')
 const roomError = ref(false)
 const submitError = ref('')
 const submitting = ref(false)
-
-const paymentOptions = [
-  { id: 'mpesa', label: 'M-Pesa' },
-  { id: 'tigo', label: 'Tigo Pesa' },
-  { id: 'card', label: 'Card' },
-]
 
 const fee = computed(() => deliveryFee(cart.subtotal))
 const total = computed(() => cart.subtotal + fee.value)
@@ -124,7 +107,7 @@ function confirmRemoveReferral() {
 
 async function submit() {
   roomError.value = !room.value.trim()
-  if (roomError.value || !fullName.value.trim() || !phone.value.trim() || !payment.value) return
+  if (roomError.value || !fullName.value.trim() || !phone.value.trim()) return
   if (!session.hotel) return
 
   submitting.value = true
@@ -132,14 +115,19 @@ async function submit() {
   session.setRoomNumber(room.value.trim())
 
   try {
+    const base = window.location.origin
+    const slug = session.slug
     const order = await createProductOrder({
       hotel_code: session.hotel.code,
       customer_name: fullName.value.trim(),
       customer_phone: phone.value.trim(),
       customer_email: email.value.trim(),
       room_number: room.value.trim(),
-      payment_method: payment.value,
+      payment_method: 'selcom',
       currency: cart.items[0]?.currency || 'TZS',
+      delivery_fee: fee.value,
+      return_url: `${base}/hotel/${slug}/payment/return`,
+      cancel_url: `${base}/hotel/${slug}/checkout`,
       items: cart.items.map((item) => ({
         product_id: item.id,
         name: item.name,
@@ -148,6 +136,10 @@ async function submit() {
       })),
       notes: session.referralApplied ? `referral:${session.referralCode}` : '',
     })
+    if (handleOrderPayment(order)) {
+      cart.clear()
+      return
+    }
     cart.clear()
     router.push({
       path: `/hotel/${session.slug}/order-confirmed`,
@@ -186,6 +178,6 @@ async function submit() {
 }
 
 .checkout-submit-wrap {
-  padding: 0 20px 24px;
+  padding: 0 0 24px;
 }
 </style>

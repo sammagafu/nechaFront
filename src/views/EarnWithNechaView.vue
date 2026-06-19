@@ -24,7 +24,7 @@
     </p>
 
     <p>
-      Get started: <router-link to="/account">Create an account</router-link> or email
+      Get started: <router-link to="/sign-up">Create an account</router-link> or email
       <a :href="`mailto:${appConfig.email}`">{{ appConfig.email }}</a>.
     </p>
   </PageDocument>

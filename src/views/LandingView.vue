@@ -4,64 +4,112 @@
       That hotel link wasn't recognised. Browse below or enter your code.
     </p>
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-glow" aria-hidden="true" />
-      <div class="section-inner hero-grid">
-        <div class="hero-copy">
-          <span class="hero-badge">NECHA NATURALS · New collection</span>
-          <h1 class="hero-title">
-            Where hospitality<br />
-            <em>meets wellness</em>
-          </h1>
-          <p class="hero-lead">
-            Personal care, beauty and wellness — delivered to your hotel room or door across
-            Dar es Salaam. Shop products, order food, book spa and reserve dining in one place.
-          </p>
-          <div class="hero-cta">
-            <router-link to="/shop" class="btn btn-lg btn-green">Shop now →</router-link>
-            <router-link to="/brands" class="btn btn-lg btn-hero-secondary">Discover brands</router-link>
-          </div>
-          <div class="hero-chips">
-            <span v-for="t in trustTags" :key="t" class="hero-chip">{{ t }}</span>
-          </div>
-          <nav class="hero-quick" aria-label="Quick actions">
-            <router-link :to="hotelServicePath('food')">Order food</router-link>
-            <router-link :to="hotelServicePath('spa')">Book spa</router-link>
-            <a href="#enter-hotel" @click.prevent="scrollToHotel">Hotel portal</a>
-          </nav>
-        </div>
-
-        <div class="hero-visual">
-          <div class="hero-frame">
-            <img
-              class="hero-frame-main"
-              :src="heroMainImage"
-              alt="Necha wellness collection"
-              loading="eager"
-            />
-            <router-link
-              v-if="heroFeatured"
-              :to="heroFeatured.slug ? productPath(heroFeatured.slug) : '/shop'"
-              class="hero-float-card"
-            >
-              <img :src="heroFeatured.imageUrl" :alt="heroFeatured.name" loading="eager" />
-              <div>
-                <p class="hero-float-brand">{{ heroFeatured.brandName || 'NECHA NATURALS' }}</p>
-                <p class="hero-float-name">{{ heroFeatured.name }}</p>
-                <p class="hero-float-price">TZS {{ formatPrice(heroFeatured.price) }}</p>
+    <!-- Hero product slider -->
+    <section class="hero-showcase" aria-label="Featured products">
+      <div
+        class="hero-stage"
+        @pointerdown="onHeroPointerDown"
+        @pointerup="onHeroPointerUp"
+        @pointercancel="onHeroPointerUp"
+      >
+          <div
+            v-for="(slide, index) in heroSlides"
+            :key="slide.id"
+            class="hero-slide"
+            :class="{ 'hero-slide--active': heroIndex === index }"
+            :aria-hidden="heroIndex !== index"
+            :style="{ '--slide-tint': slide.tint }"
+          >
+            <div class="hero-slide-backdrop" aria-hidden="true">
+              <img
+                class="hero-slide-image"
+                :src="slide.image"
+                :alt="slide.imageAlt"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+            <div class="hero-slide-scrim" aria-hidden="true" />
+            <div class="hero-slide-words" aria-hidden="true">
+              <span class="hero-word hero-word--left">{{ slide.wordLeft }}</span>
+              <span class="hero-word hero-word--right">{{ slide.wordRight }}</span>
+            </div>
+            <div class="hero-slide-content">
+              <div class="hero-slide-copy">
+                <p class="hero-slide-brand">{{ slide.brand }} · {{ slide.label }}</p>
+                <p class="hero-slide-desc">{{ slide.description }}</p>
+                <router-link :to="slide.ctaTo" class="hero-slide-cta">
+                  {{ slide.cta }}
+                </router-link>
               </div>
-            </router-link>
-            <div class="hero-promo-ring" aria-hidden="true">
-              <strong>Free delivery</strong>
-              <span>Over TZS 180k</span>
-            </div>
-            <div class="hero-rating" aria-hidden="true">
-              <span class="hero-rating-stars">★★★★★</span>
-              <span>4.9 from hotel guests</span>
+              <router-link
+                v-if="slide.productSlug"
+                :to="productPath(slide.productSlug)"
+                class="hero-product-chip"
+              >
+                <img :src="slide.image" :alt="slide.imageAlt" loading="lazy" />
+                <span class="hero-product-chip-text">
+                  <span class="hero-product-chip-label">See product details</span>
+                  <span class="hero-product-chip-name">{{ slide.productName }}</span>
+                </span>
+                <Icon name="arrow-right" :size="18" class="hero-product-chip-arrow" />
+              </router-link>
             </div>
           </div>
-        </div>
+          <button
+            type="button"
+            class="hero-arr hero-arr--prev"
+            aria-label="Previous product"
+            @click="prevHeroSlide(true)"
+          >
+            <Icon name="chevron-left" :size="22" />
+          </button>
+          <button
+            type="button"
+            class="hero-arr hero-arr--next"
+            aria-label="Next product"
+            @click="nextHeroSlide(true)"
+          >
+            <Icon name="chevron-right" :size="22" />
+          </button>
+      </div>
+
+      <div class="section-inner hero-showcase-inner">
+        <nav class="hero-brand-nav" aria-label="Featured products">
+          <div class="hero-brand-progress" aria-hidden="true">
+            <span
+              v-for="(slide, index) in heroSlides"
+              :key="slide.id"
+              class="hero-brand-seg"
+              :class="{ on: heroIndex === index, past: index < heroIndex }"
+            >
+              <span
+                v-if="heroIndex === index && heroAutoplay"
+                :key="`progress-${heroIndex}`"
+                class="hero-brand-seg-fill"
+              />
+            </span>
+          </div>
+          <div class="hero-brand-tabs" role="tablist">
+            <button
+              v-for="(slide, index) in heroSlides"
+              :key="slide.id"
+              type="button"
+              class="hero-brand-tab"
+              :class="{ on: heroIndex === index }"
+              role="tab"
+              :aria-selected="heroIndex === index"
+              @click="goToHeroSlide(index)"
+            >
+              {{ slide.label }}
+            </button>
+          </div>
+          <p class="hero-brand-meta">
+            <span class="hero-brand-index">0{{ heroIndex + 1 }}</span>
+            <span class="hero-brand-of">/ 0{{ heroSlides.length }}</span>
+            · {{ heroSlides[heroIndex]?.productName }}
+          </p>
+        </nav>
       </div>
     </section>
 
@@ -83,7 +131,12 @@
             class="cat-rail-card"
           >
             <div class="cat-rail-image">
-              <img :src="cat.image" :alt="cat.label" loading="lazy" />
+              <div class="cat-rail-image-mask">
+                <img :src="cat.image" :alt="cat.label" loading="lazy" />
+              </div>
+              <span class="cat-rail-icon" aria-hidden="true">
+                <Icon :name="cat.icon" :size="18" />
+              </span>
             </div>
             <h3>{{ cat.label }}</h3>
             <span>{{ cat.count }} products</span>
@@ -133,8 +186,8 @@
           </div>
           <router-link to="/shop" class="btn-view">View all →</router-link>
         </header>
-        <div class="bestsellers-grid">
-          <BestsellerProductCard
+        <div class="product-grid">
+          <ProductCard
             v-for="product in showcaseProducts"
             :key="product.id"
             :product="product"
@@ -235,10 +288,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import BestsellerProductCard from '@/components/home/BestsellerProductCard.vue'
+import ProductCard from '@/components/ProductCard.vue'
+import Icon from '@/components/ui/Icon.vue'
 import VerticalFeatures from '@/components/home/VerticalFeatures.vue'
+import { heroSlideMeta, productImageBySlug, type HeroSlideMeta } from '@/config/brands'
 
 interface VerticalFeature {
   tag: string
@@ -258,8 +313,43 @@ const router = useRouter()
 const route = useRoute()
 const catalog = useCatalogStore()
 const code = ref('')
+const heroIndex = ref(0)
+const heroAutoplay = ref(
+  typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+)
+const HERO_INTERVAL_MS = 7000
+const heroSwipeStartX = ref<number | null>(null)
+let heroTimer: ReturnType<typeof setInterval> | undefined
 
-onMounted(() => catalog.load())
+interface HeroSlide extends HeroSlideMeta {
+  image: string
+  imageAlt: string
+  productName: string
+}
+
+const heroSlides = computed<HeroSlide[]>(() =>
+  heroSlideMeta
+    .map((meta) => {
+      const product = catalog.findBySlug(meta.productSlug)
+      const image = product?.imageUrl ?? productImageBySlug[meta.productSlug] ?? ''
+      return {
+        ...meta,
+        image,
+        imageAlt: product?.name ?? meta.label,
+        productName: product?.name ?? meta.label,
+      }
+    })
+    .filter((slide) => Boolean(slide.image)),
+)
+
+onMounted(async () => {
+  await catalog.load()
+  startHeroCarousel()
+})
+
+onUnmounted(() => {
+  stopHeroCarousel()
+})
 
 const showHotelError = computed(() => route.query.hotelError === '1')
 
@@ -269,18 +359,48 @@ const showcaseProducts = computed(() => {
   return catalog.commerceProducts.slice(0, 4)
 })
 
-const heroFeatured = computed(() => showcaseProducts.value[0] ?? null)
-
-const heroMainImage = computed(
-  () => heroFeatured.value?.imageUrl || siteImages.editorial,
-)
-
-function formatPrice(n: number) {
-  return n.toLocaleString('en-TZ')
+function stopHeroCarousel() {
+  if (heroTimer) clearInterval(heroTimer)
+  heroTimer = undefined
 }
 
-function scrollToHotel() {
-  document.querySelector('#enter-hotel')?.scrollIntoView({ behavior: 'smooth' })
+function startHeroCarousel() {
+  stopHeroCarousel()
+  if (!heroAutoplay.value || heroSlides.value.length < 2) return
+  heroTimer = setInterval(() => nextHeroSlide(), HERO_INTERVAL_MS)
+}
+
+function goToHeroSlide(index: number) {
+  if (index < 0 || index >= heroSlides.value.length) return
+  heroIndex.value = index
+  startHeroCarousel()
+}
+
+function nextHeroSlide(manual = false) {
+  const len = heroSlides.value.length
+  if (len < 1) return
+  heroIndex.value = (heroIndex.value + 1) % len
+  if (manual) startHeroCarousel()
+}
+
+function prevHeroSlide(manual = false) {
+  const len = heroSlides.value.length
+  if (len < 1) return
+  heroIndex.value = (heroIndex.value - 1 + len) % len
+  if (manual) startHeroCarousel()
+}
+
+function onHeroPointerDown(event: PointerEvent) {
+  heroSwipeStartX.value = event.clientX
+}
+
+function onHeroPointerUp(event: PointerEvent) {
+  if (heroSwipeStartX.value === null) return
+  const delta = event.clientX - heroSwipeStartX.value
+  heroSwipeStartX.value = null
+  if (Math.abs(delta) < 48) return
+  if (delta < 0) nextHeroSlide(true)
+  else prevHeroSlide(true)
 }
 
 const hotelServicePath = (segment: string) => {
@@ -295,6 +415,7 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Browse NECHA NATURALS and curated African wellness products.',
     action: 'Shop now',
     tint: '#5a8f28',
+    icon: 'sparkles',
     to: '/shop',
   },
   {
@@ -303,6 +424,7 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Room service and dining — burgers, local plates, drinks to your door.',
     action: 'View menu',
     tint: '#854f0b',
+    icon: 'gift',
     to: hotelServicePath('food'),
   },
   {
@@ -311,6 +433,7 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Book a massage, facial or in-room treatment at partner hotels.',
     action: 'Book session',
     tint: '#0f6e56',
+    icon: 'spa',
     to: hotelServicePath('spa'),
   },
   {
@@ -319,6 +442,7 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Lunch and dinner reservations at your hotel restaurant.',
     action: 'Reserve table',
     tint: '#534AB7',
+    icon: 'star',
     to: hotelServicePath('restaurant'),
   },
   {
@@ -327,6 +451,7 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Cocktail menu and lounge reservations without leaving your room.',
     action: 'View menu',
     tint: '#2c2c2a',
+    icon: 'spray',
     to: hotelServicePath('bar'),
   },
   {
@@ -335,15 +460,10 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     description: 'Enter your property code for the full guest commerce experience.',
     action: 'Enter code',
     tint: '#86bc42',
+    icon: 'scan',
     href: '#enter-hotel',
   },
 ])
-
-const trustTags = [
-  'African botanicals',
-  'Same-day delivery',
-  'No app required',
-]
 
 const hotelSteps = [
   'Scan the Necha QR in your room or lobby',
@@ -413,109 +533,372 @@ function tryDemo() {
   border-bottom: 1px solid var(--color-border);
 }
 
-/* Hero */
-.hero {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    var(--color-bg) 0%,
-    color-mix(in srgb, var(--color-necha-green-light) 55%, var(--color-bg)) 100%
-  );
-  border-bottom: 1px solid var(--color-border);
+/* Hero brand slider */
+.hero-showcase {
+  padding: 0 0 clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--color-bg);
 }
 
-.hero-glow {
+.hero-showcase-inner {
+  display: grid;
+  gap: 1.25rem;
+  --hero-interval: 7s;
+  padding-top: clamp(0.85rem, 2vw, 1.25rem);
+}
+
+.hero-stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-black);
+  width: 100%;
+  height: 75vh;
+  min-height: 75vh;
+  max-height: 75vh;
+  touch-action: pan-y;
+}
+
+.hero-slide {
   position: absolute;
-  top: -20%;
-  right: -10%;
-  width: min(60vw, 520px);
-  height: min(60vw, 520px);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-necha-green) 18%, transparent) 0%,
-    transparent 70%
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    opacity 0.65s ease,
+    visibility 0.65s ease,
+    transform 0.65s ease;
+  transform: scale(1.02);
+}
+
+.hero-slide--active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
+  transform: scale(1);
+}
+
+.hero-slide-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #10100f;
+}
+
+.hero-slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero-slide-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 8, 0.35) 0%,
+    rgba(8, 8, 8, 0.2) 35%,
+    rgba(8, 8, 8, 0.55) 68%,
+    rgba(8, 8, 8, 0.82) 100%
   );
   pointer-events: none;
 }
 
-.hero-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: clamp(2rem, 5vw, 3.5rem);
+.hero-slide-words {
+  position: absolute;
+  inset: 0;
+  display: flex;
   align-items: center;
-  padding-block: clamp(3.25rem, 8vw, 6rem);
+  justify-content: space-between;
+  padding: 0 clamp(0.5rem, 4vw, 3rem);
+  pointer-events: none;
+  overflow: hidden;
 }
 
-@media (min-width: 960px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1.05fr;
-    min-height: clamp(480px, 68vh, 620px);
+.hero-word {
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 16vw, 11rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.1);
+  user-select: none;
+  mix-blend-mode: overlay;
+}
+
+.hero-word--left {
+  align-self: center;
+  transform: translateY(-8%);
+}
+
+.hero-word--right {
+  align-self: center;
+  transform: translateY(8%);
+}
+
+.hero-slide-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+@media (min-width: 768px) {
+  .hero-slide-content {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
   }
 }
 
-.hero-copy {
-  max-width: 540px;
+.hero-slide-copy {
+  max-width: 36ch;
 }
 
-.hero-badge {
-  display: inline-block;
-  margin-bottom: 1.25rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid color-mix(in srgb, var(--color-necha-green) 35%, var(--color-border));
+.hero-slide-brand {
+  margin: 0 0 0.5rem;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: var(--tracking-caps);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-necha-green-dark);
+  color: rgba(255, 255, 255, 0.72);
 }
 
-.hero-title {
+.hero-slide-desc {
   margin: 0 0 1.15rem;
-  font-family: var(--font-display);
-  font-size: clamp(2.75rem, 6.5vw, 4.5rem);
-  font-weight: 400;
-  line-height: 1.04;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-slide-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-black);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hero-slide-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.hero-product-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1rem 0.65rem 0.65rem;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--color-black);
+  text-decoration: none;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  flex-shrink: 0;
+  max-width: min(100%, 320px);
+  transition: transform var(--transition-base);
+}
+
+.hero-product-chip:hover {
+  transform: translateY(-2px);
+}
+
+.hero-product-chip img {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.hero-product-chip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.hero-product-chip-label {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.hero-product-chip-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-product-chip-arrow {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.hero-arr {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  width: var(--touch-min);
+  height: var(--touch-min);
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(12, 12, 12, 0.45);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.hero-arr:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.65);
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+}
+
+.hero-arr:focus-visible {
+  outline: 2px solid var(--color-necha-green);
+  outline-offset: 2px;
+}
+
+.hero-arr--prev {
+  left: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+.hero-arr--next {
+  right: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+@media (max-width: 639px) {
+  .hero-arr {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hero-arr--prev {
+    left: 0.5rem;
+  }
+
+  .hero-arr--next {
+    right: 0.5rem;
+  }
+}
+
+.hero-brand-nav {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero-brand-progress {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.hero-brand-seg {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.hero-brand-seg.past {
+  background: var(--color-necha-green);
+}
+
+.hero-brand-seg-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-necha-green);
+  transform-origin: left center;
+  animation: hero-progress var(--hero-interval, 7s) linear forwards;
+}
+
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-brand-tabs {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-brand-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-brand-tab {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+
+.hero-brand-tab.on {
+  border-color: var(--color-necha-green);
+  color: var(--color-necha-green-dark);
+  background: color-mix(in srgb, var(--color-necha-green) 8%, var(--color-surface));
+}
+
+.hero-brand-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.hero-brand-index {
+  font-weight: 600;
   color: var(--color-text);
 }
 
-.hero-title em {
-  font-style: italic;
-  color: var(--color-necha-green-dark);
-}
-
-.hero-lead {
-  margin: 0 0 1.75rem;
-  font-size: 16px;
-  line-height: 1.75;
-  color: var(--color-body);
-  max-width: 46ch;
-}
-
-.hero-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  margin-bottom: 1.5rem;
-}
-
-.hero-cta .btn {
-  width: 100%;
-}
-
-@media (min-width: 480px) {
-  .hero-cta {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide {
+    transform: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
   }
 
-  .hero-cta .btn {
-    width: auto;
+  .hero-brand-seg-fill {
+    animation: none;
+    transform: scaleX(1);
   }
 }
 
@@ -531,205 +914,6 @@ function tryDemo() {
 
 .btn-green:hover {
   background: var(--color-necha-green-dark) !important;
-}
-
-.btn-hero-secondary {
-  border-radius: var(--radius-pill) !important;
-  text-transform: none;
-  font-size: 14px;
-  background: var(--color-surface) !important;
-  border: 1.5px solid var(--color-border) !important;
-  color: var(--color-text) !important;
-}
-
-.btn-hero-secondary:hover {
-  border-color: var(--color-necha-green) !important;
-  color: var(--color-necha-green-dark) !important;
-  background: var(--color-bg-soft) !important;
-}
-
-.hero-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.hero-chip {
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--color-body);
-}
-
-.hero-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.25rem;
-  font-size: 13px;
-}
-
-.hero-quick a {
-  color: var(--color-text);
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, var(--color-necha-green) 45%, transparent);
-}
-
-.hero-quick a:hover {
-  color: var(--color-necha-green-dark);
-}
-
-.hero-visual {
-  position: relative;
-}
-
-.hero-frame {
-  position: relative;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-premium);
-  min-height: 320px;
-}
-
-@media (min-width: 960px) {
-  .hero-frame {
-    min-height: 460px;
-  }
-}
-
-.hero-frame-main {
-  width: 100%;
-  height: 100%;
-  min-height: 320px;
-  object-fit: cover;
-  display: block;
-}
-
-@media (min-width: 960px) {
-  .hero-frame-main {
-    min-height: 460px;
-  }
-}
-
-.hero-float-card {
-  position: absolute;
-  left: 0.75rem;
-  bottom: 0.75rem;
-  right: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-overlay);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--color-border);
-  color: inherit;
-  text-decoration: none;
-  box-shadow: var(--shadow-md);
-  transition: transform var(--transition-base), border-color var(--transition-fast);
-}
-
-.hero-float-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-necha-green);
-}
-
-.hero-float-card img {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius);
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.hero-float-brand {
-  margin: 0;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.hero-float-name {
-  margin: 0.1rem 0 0;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 500;
-  color: var(--color-text);
-  line-height: 1.2;
-}
-
-.hero-float-price {
-  margin: 0.15rem 0 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-necha-green-dark);
-}
-
-.hero-promo-ring {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--color-black);
-  color: var(--color-white);
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  line-height: 1.25;
-}
-
-.hero-promo-ring strong {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.hero-promo-ring span {
-  font-size: 9px;
-  opacity: 0.85;
-}
-
-@media (min-width: 640px) {
-  .hero-promo-ring {
-    top: 1.25rem;
-    right: 1.25rem;
-    width: 96px;
-    height: 96px;
-  }
-}
-
-.hero-rating {
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-pill);
-  background: rgba(12, 12, 12, 0.72);
-  color: var(--color-white);
-  font-size: 10px;
-}
-
-.hero-rating-stars {
-  color: var(--color-necha-green);
-  letter-spacing: 0.06em;
-  font-size: 11px;
 }
 
 /* Shared */
@@ -836,15 +1020,44 @@ function tryDemo() {
 }
 
 .cat-rail-image {
+  position: relative;
   width: 88px;
   height: 88px;
   margin: 0 auto 0.85rem;
+  overflow: visible;
+}
+
+.cat-rail-image-mask {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   overflow: hidden;
   background: var(--color-necha-green-light);
 }
 
-.cat-rail-image img {
+.cat-rail-icon {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-necha-green-dark);
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
+
+.cat-rail-icon :deep(.ui-icon) {
+  display: block;
+}
+
+.cat-rail-image-mask img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -925,24 +1138,6 @@ function tryDemo() {
 /* Bestsellers */
 .bestsellers-section {
   background: var(--color-bg);
-}
-
-.bestsellers-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 480px) {
-  .bestsellers-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-  }
-}
-
-@media (min-width: 768px) {
-  .bestsellers-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
 }
 
 /* Hotel */

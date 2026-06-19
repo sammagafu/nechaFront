@@ -5,18 +5,6 @@
         <p class="kicker">Necha collection</p>
         <h1 class="page-title">{{ pageTitle }}</h1>
         <p class="shop-lead">{{ pageSubtitle }}</p>
-        <div class="shop-hero-actions">
-          <button
-            class="btn btn-lg btn-surprise"
-            type="button"
-            :disabled="!filteredProducts.length || catalog.loading"
-            @click="surpriseMe"
-          >
-            <Icon name="sparkles" :size="18" />
-            Surprise me
-          </button>
-          <router-link to="/shop" class="shop-hero-link" @click="clearSurprise">Browse all</router-link>
-        </div>
       </div>
       <img v-if="heroImage" :src="heroImage" alt="" class="shop-hero-image" loading="eager" />
     </header>
@@ -53,36 +41,41 @@
             Clear
           </button>
         </form>
-        <label class="shop-filter-sort">
-          <span class="sr-only">Sort by</span>
-          <select v-model="sortBy" aria-label="Sort products">
-            <option value="default">Featured</option>
-            <option value="price-asc">Price: low to high</option>
-            <option value="price-desc">Price: high to low</option>
-            <option value="name">Name A–Z</option>
-          </select>
-        </label>
+        <div class="shop-filter-actions">
+          <ProductViewToggle v-model="viewMode" />
+          <label class="shop-filter-sort">
+            <span class="sr-only">Sort by</span>
+            <select v-model="sortBy" aria-label="Sort products">
+              <option value="default">Featured</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <nav class="shop-cats" aria-label="Categories">
-        <router-link
-          to="/shop"
+        <button
+          type="button"
           class="shop-cat-pill"
           :class="{ active: !activeCategory }"
-          @click="clearSurprise"
+          @click="selectCategory()"
         >
+          <Icon name="sparkles" :size="16" />
           All
-        </router-link>
-        <router-link
+        </button>
+        <button
           v-for="cat in shopCategories"
           :key="cat.id"
-          :to="categoryShopLink(cat.id)"
+          type="button"
           class="shop-cat-pill"
           :class="{ active: activeCategory === cat.id }"
-          @click="clearSurprise"
+          @click="selectCategory(cat.id)"
         >
+          <Icon :name="cat.icon" :size="16" />
           {{ cat.label }}
-        </router-link>
+        </button>
       </nav>
 
       <p v-if="hasActiveFilters" class="shop-filter-meta">
@@ -92,51 +85,22 @@
       </p>
     </div>
 
-    <Transition name="surprise-reveal">
-      <section v-if="surprisePick" class="surprise-spotlight section-inner">
-        <div class="surprise-spotlight-inner">
-          <div class="surprise-spotlight-copy">
-            <p class="surprise-eyebrow">{{ surpriseTagline }}</p>
-            <h2>{{ surprisePick.name }}</h2>
-            <p>{{ surprisePick.description }}</p>
-            <div class="surprise-actions">
-              <router-link
-                v-if="surprisePick.slug"
-                :to="productPath(surprisePick.slug)"
-                class="btn btn-green"
-              >
-                View product →
-              </router-link>
-              <button class="btn btn-outline" type="button" @click="addSurpriseToCart">
-                <Icon name="cart" :size="16" />
-                Add to cart
-              </button>
-              <button class="btn-link surprise-again" type="button" @click="surpriseMe">
-                Pick another
-              </button>
-            </div>
-          </div>
-          <div v-if="surprisePick.imageUrl" class="surprise-visual">
-            <img :src="surprisePick.imageUrl" :alt="surprisePick.name" loading="lazy" />
-            <span class="surprise-ring" aria-hidden="true">Lucky pick</span>
-          </div>
-        </div>
-      </section>
-    </Transition>
-
     <div class="section-inner shop-body">
       <p v-if="catalog.loading" class="shop-status">Loading collection…</p>
       <p v-else-if="catalog.error" class="shop-status error">{{ catalog.error }}</p>
       <p v-else-if="!filteredProducts.length" class="shop-status">No products match your filters.</p>
 
-      <div v-else class="shop-grid">
+      <div
+        v-else
+        class="product-grid"
+        :class="viewMode === 'grid' ? 'product-grid--cols-4' : 'product-grid--cols-2 product-grid--list'"
+      >
         <ProductCard
           v-for="product in filteredProducts"
           :key="product.id"
           :product="product"
+          :layout="viewMode === 'list' ? 'list' : 'grid'"
           :to="product.slug ? productPath(product.slug) : undefined"
-          :highlighted="surprisePick?.id === product.id"
-          :card-id="surprisePick?.id === product.id ? 'surprise-pick' : undefined"
         />
       </div>
     </div>
@@ -144,40 +108,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Icon from '@/components/ui/Icon.vue'
 import ProductCard from '@/components/ProductCard.vue'
+import ProductViewToggle from '@/components/shop/ProductViewToggle.vue'
+import { useProductViewMode } from '@/composables/useProductViewMode'
 import { productPath } from '@/config/app'
 import { categoryShopLink, isValidCategoryId, shopCategories } from '@/config/categories'
 import { siteImages } from '@/config/images'
-import { useCartStore } from '@/stores/cart'
 import { useCatalogStore } from '@/stores/catalog'
+import { useCartStore } from '@/stores/cart'
+import { SHOP_CART_SCOPE } from '@/utils/cartScope'
 import { normalizeCategory } from '@/composables/useProductCategories'
-import type { CommerceProduct } from '@/types/commerce'
 
 const route = useRoute()
 const router = useRouter()
 const catalog = useCatalogStore()
 const cart = useCartStore()
+const { viewMode } = useProductViewMode()
 
 const localSearch = ref('')
 const sortBy = ref<'default' | 'price-asc' | 'price-desc' | 'name'>('default')
 let searchDebounce: ReturnType<typeof setTimeout> | undefined
 
-const surprisePick = ref<CommerceProduct | null>(null)
-
-const surpriseTaglines = [
-  'Your lucky pick',
-  'We think you will love this',
-  "Tonight's self-care suggestion",
-  'A guest favourite, just for you',
-  'Treat-yourself energy',
-]
-
-const surpriseTagline = ref(surpriseTaglines[0])
-
 onMounted(() => {
+  cart.setScope(SHOP_CART_SCOPE)
   catalog.load()
   syncSearchFromRoute()
 })
@@ -252,6 +208,15 @@ function shopRoutePath() {
   return activeCategory.value ? categoryShopLink(activeCategory.value) : '/shop'
 }
 
+function selectCategory(categoryId?: string) {
+  const path = categoryId ? categoryShopLink(categoryId) : '/shop'
+  const q = searchQuery.value ? { q: searchQuery.value } : {}
+  const currentQ = typeof route.query.q === 'string' ? route.query.q : ''
+  const nextQ = typeof q.q === 'string' ? q.q : ''
+  if (route.path === path && currentQ === nextQ) return
+  void router.push({ path, query: q })
+}
+
 function syncSearchFromRoute() {
   localSearch.value = searchQuery.value
 }
@@ -275,36 +240,7 @@ function clearSearch() {
 function resetFilters() {
   localSearch.value = ''
   sortBy.value = 'default'
-  clearSurprise()
   router.push('/shop')
-}
-
-function clearSurprise() {
-  surprisePick.value = null
-}
-
-function pickRandomProduct(list: CommerceProduct[]) {
-  if (!list.length) return null
-  if (list.length === 1) return list[0]
-  const others = list.filter((p) => p.id !== surprisePick.value?.id)
-  const pool = others.length ? others : list
-  return pool[Math.floor(Math.random() * pool.length)]
-}
-
-async function surpriseMe() {
-  const pick = pickRandomProduct(filteredProducts.value)
-  if (!pick) return
-
-  surprisePick.value = pick
-  surpriseTagline.value = surpriseTaglines[Math.floor(Math.random() * surpriseTaglines.length)]
-
-  await nextTick()
-  const el = document.getElementById('surprise-pick')
-  el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
-function addSurpriseToCart() {
-  if (surprisePick.value) cart.add(surprisePick.value)
 }
 
 watch(
@@ -312,7 +248,6 @@ watch(
   () => {
     if (!catalog.loaded) catalog.load()
     syncSearchFromRoute()
-    clearSurprise()
   },
 )
 
@@ -347,9 +282,9 @@ watch(searchQuery, syncSearchFromRoute)
   inset: 0;
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-black) 82%, transparent),
-    color-mix(in srgb, var(--color-black) 35%, transparent) 55%,
-    color-mix(in srgb, var(--color-black) 15%, transparent)
+    color-mix(in srgb, var(--color-brand) 88%, transparent),
+    color-mix(in srgb, var(--color-brand) 42%, transparent) 55%,
+    color-mix(in srgb, var(--color-brand) 18%, transparent)
   );
 }
 
@@ -379,65 +314,6 @@ watch(searchQuery, syncSearchFromRoute)
   line-height: 1.7;
 }
 
-.shop-hero-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.65rem;
-  margin-top: 1.35rem;
-}
-
-@media (min-width: 480px) {
-  .shop-hero-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.85rem 1.25rem;
-  }
-}
-
-.btn-surprise {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  border-radius: var(--radius-pill) !important;
-  background: var(--color-necha-green) !important;
-  border: none !important;
-  color: var(--color-white) !important;
-  text-transform: none;
-  letter-spacing: 0.02em;
-}
-
-.btn-surprise:hover:not(:disabled) {
-  background: var(--color-necha-green-dark) !important;
-  transform: translateY(-1px);
-}
-
-.btn-surprise:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-@media (min-width: 480px) {
-  .btn-surprise {
-    width: auto;
-  }
-}
-
-.shop-hero-link {
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.shop-hero-link:hover {
-  color: var(--color-white);
-}
-
 .shop-delivery-strip {
   padding-top: 1rem;
   border-bottom: 1px solid var(--color-border);
@@ -457,6 +333,8 @@ watch(searchQuery, syncSearchFromRoute)
 }
 
 .shop-toolbar {
+  position: relative;
+  z-index: 2;
   padding-top: 1.25rem;
   padding-bottom: 0.5rem;
 }
@@ -467,10 +345,21 @@ watch(searchQuery, syncSearchFromRoute)
   margin-bottom: 1rem;
 }
 
+.shop-filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
 @media (min-width: 640px) {
   .shop-filter-bar {
-    grid-template-columns: 1fr minmax(160px, 200px);
+    grid-template-columns: 1fr auto;
     align-items: center;
+  }
+
+  .shop-filter-actions {
+    justify-content: flex-end;
   }
 }
 
@@ -581,146 +470,36 @@ watch(searchQuery, syncSearchFromRoute)
 }
 
 .shop-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   flex-shrink: 0;
   touch-action: manipulation;
+  min-height: var(--touch-min, 44px);
   padding: 0.55rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
+  font-family: inherit;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-body);
   background: var(--color-surface);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 
 .shop-cat-pill:hover,
 .shop-cat-pill.active {
-  border-color: var(--color-necha-green);
-  color: var(--color-text);
-  background: color-mix(in srgb, var(--color-necha-green) 10%, var(--color-surface));
+  border-color: var(--color-brand);
+  color: var(--color-brand-ink);
+  background: color-mix(in srgb, var(--color-brand) 6%, var(--color-surface));
 }
 
-.surprise-spotlight {
-  padding-top: 1.5rem;
-}
-
-.surprise-spotlight-inner {
-  display: grid;
-  gap: 1.5rem;
-  align-items: center;
-  padding: clamp(1.25rem, 3vw, 1.75rem);
-  border-radius: var(--radius-2xl);
-  border: 1px solid color-mix(in srgb, var(--color-necha-green) 35%, var(--color-border));
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-necha-green-light) 45%, var(--color-bg)) 0%,
-    var(--color-surface) 100%
-  );
-  box-shadow: var(--shadow-premium);
-}
-
-@media (min-width: 768px) {
-  .surprise-spotlight-inner {
-    grid-template-columns: 1.2fr 0.8fr;
-  }
-}
-
-.surprise-eyebrow {
-  margin: 0 0 0.5rem;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-necha-green-dark);
-}
-
-.surprise-spotlight-copy h2 {
-  margin: 0 0 0.65rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 500;
-  line-height: 1.15;
-}
-
-.surprise-spotlight-copy p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--color-body);
-  max-width: 48ch;
-}
-
-.surprise-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.65rem 1rem;
-  margin-top: 1.25rem;
-}
-
-.btn-green {
-  background: var(--color-necha-green) !important;
-  border-radius: var(--radius-pill) !important;
-  color: var(--color-white) !important;
-  border: none !important;
-  text-transform: none;
-}
-
-.btn-green:hover {
-  background: var(--color-necha-green-dark) !important;
-}
-
-.surprise-again {
-  font-size: 13px;
-}
-
-.surprise-visual {
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-soft);
-}
-
-.surprise-visual img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.surprise-ring {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--color-black);
-  color: var(--color-white);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.2;
-  box-shadow: var(--shadow-lg);
-}
-
-.surprise-reveal-enter-active,
-.surprise-reveal-leave-active {
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-
-.surprise-reveal-enter-from,
-.surprise-reveal-leave-to {
-  opacity: 0;
-  transform: translateY(12px);
+.shop-cat-pill.active {
+  box-shadow: inset 0 -2px 0 var(--color-brand);
 }
 
 .shop-body {
@@ -741,25 +520,6 @@ watch(searchQuery, syncSearchFromRoute)
 
 .shop-status.error {
   color: var(--color-error);
-}
-
-.shop-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 480px) {
-  .shop-grid {
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
-  }
-}
-
-@media (min-width: 768px) {
-  .shop-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
 }
 
 .kicker {

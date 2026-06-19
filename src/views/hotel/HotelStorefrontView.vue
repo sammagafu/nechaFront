@@ -1,17 +1,15 @@
 <template>
   <div v-if="session.hotel">
-    <section class="hotel-hero sf-reveal">
-      <div class="hotel-avatar">
-        <img v-if="session.hotel.logo_url" :src="session.hotel.logo_url" :alt="session.hotel.name" />
-        <span v-else>{{ session.hotel.initials }}</span>
-      </div>
-      <div>
-        <h1>{{ session.hotel.name }}</h1>
-        <p>Personal care, beauty &amp; wellness — delivered to your room.</p>
-        <p class="delivery-note-live">{{ deliveryNote }}</p>
-        <span v-if="session.hotel.is_verified" class="verified-badge">Necha verified hotel partner</span>
-      </div>
-    </section>
+    <StorefrontPageHero
+      class="sf-reveal"
+      badge="Your hotel"
+      :title="session.hotel.name"
+      description="Personal care, beauty & wellness — delivered to your room."
+      :show-crumb="false"
+    >
+      <p class="discover-hero-extra">{{ deliveryNote }}</p>
+      <span v-if="session.hotel.is_verified" class="verified-badge">Necha verified hotel partner</span>
+    </StorefrontPageHero>
 
     <div class="delivery-strip sf-reveal sf-reveal-1">
       <div class="delivery-strip-track">
@@ -56,7 +54,7 @@
       <h2>Guest favourites</h2>
       <router-link :to="`/hotel/${session.slug}/shop`">View all →</router-link>
     </div>
-    <div v-if="filteredProducts.length" class="sf-product-grid sf-stagger">
+    <div v-if="filteredProducts.length" class="sf-product-grid sf-product-grid--cols-4 sf-stagger">
       <StorefrontProductCard
         v-for="product in filteredProducts"
         :key="product.id"
@@ -67,16 +65,15 @@
     </div>
     <p v-else class="category-empty">No products in this category yet.</p>
 
-    <div v-if="session.hotel.services?.length" class="sf-section-head sf-reveal" style="margin-top: 28px">
+    <div v-if="visibleServices.length" class="sf-section-head sf-reveal" style="margin-top: 28px">
       <h2>Hotel services</h2>
-      <router-link :to="`/hotel/${session.slug}/nearby`">See all →</router-link>
     </div>
-    <div v-if="session.hotel.services?.length" class="services-grid sf-stagger" style="margin-bottom: 16px">
+    <div v-if="visibleServices.length" class="services-grid sf-stagger" style="margin-bottom: 16px">
       <article v-for="svc in visibleServices" :key="svc.key" class="service-card">
         <div class="service-icon" :style="{ background: svc.colors.bg, color: svc.colors.fg }">{{ svc.iconLabel }}</div>
         <h3>{{ svc.heading }}</h3>
         <p>{{ svc.bodyText }}</p>
-        <router-link :to="`/hotel/${session.slug}/${svc.route}`">{{ svc.action }} →</router-link>
+        <router-link :to="hotelServicePath(svc.route)">{{ svc.action }} →</router-link>
       </article>
     </div>
 
@@ -85,7 +82,7 @@
         <h3>Earn Necha rewards on every purchase</h3>
         <p>Every order earns you points — redeem for a discount or withdraw as cash to your mobile money account.</p>
       </div>
-      <router-link to="/account" class="rewards-btn">Create account</router-link>
+      <router-link to="/sign-up" class="rewards-btn">Create account</router-link>
     </div>
   </div>
 </template>
@@ -97,7 +94,9 @@ import { useCartStore } from '@/stores/cart'
 import { useDeliveryNote } from '@/composables/useDeliveryNote'
 import { useProductCategoryFilter } from '@/composables/useProductCategories'
 import { storefrontConfig, hotelServices } from '@/config/storefront'
-import VerticalFeatures from '@/components/home/VerticalFeatures.vue'
+import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
+import VerticalFeatures, { type VerticalFeature } from '@/components/home/VerticalFeatures.vue'
+import type { IconName } from '@/components/ui/icons'
 import StorefrontProductCard from '@/components/storefront/StorefrontProductCard.vue'
 import CategoryPills from '@/components/storefront/CategoryPills.vue'
 import { toCommerceProduct } from '@/utils/storefront'
@@ -114,36 +113,41 @@ const serviceMeta: Record<string, string> = {
   spa: 'Spa',
   restaurant: 'Dine',
   bar: 'Bar',
-  nearby: 'Near',
   gym: 'Gym',
 }
 
 const hotelVerticalFeatures = computed(() => {
   const slug = session.slug
   const base = `/hotel/${slug}`
-  const features = [
-    { tag: 'Shop', label: 'Personal care', description: 'Wellness products delivered to your room.', action: 'Browse shop', tint: '#5a8f28', to: `${base}/shop`, service: 'shop' },
-    { tag: 'Food', label: 'Order food', description: 'Room service — meals and drinks to your door.', action: 'Order now', tint: '#854f0b', to: `${base}/food`, service: 'food' },
-    { tag: 'Spa', label: 'Spa & wellness', description: 'Book a massage, facial or treatment.', action: 'Book session', tint: '#0f6e56', to: `${base}/spa`, service: 'spa' },
-    { tag: 'Dine', label: 'Restaurant', description: 'Reserve lunch or dinner at the hotel.', action: 'Reserve', tint: '#534AB7', to: `${base}/restaurant`, service: 'restaurant' },
-    { tag: 'Bar', label: 'Bar & lounge', description: 'Cocktails and lounge reservations.', action: 'View menu', tint: '#2c2c2a', to: `${base}/bar`, service: 'bar' },
-    { tag: 'Near', label: 'Nearby', description: 'Restaurants and experiences around the hotel.', action: 'Explore', tint: '#444441', to: `${base}/nearby`, service: 'nearby' },
+  const features: Array<VerticalFeature & { service: string }> = [
+    { tag: 'Shop', label: 'Personal care', description: 'Wellness products delivered to your room.', action: 'Browse shop', tint: '#5a8f28', icon: 'sparkles' satisfies IconName, to: `${base}/shop`, service: 'shop' },
+    { tag: 'Food', label: 'Order food', description: 'Room service — meals and drinks to your door.', action: 'Order now', tint: '#854f0b', icon: 'gift' satisfies IconName, to: `${base}/food`, service: 'food' },
+    { tag: 'Spa', label: 'Spa & wellness', description: 'Book a massage, facial or treatment.', action: 'Book session', tint: '#0f6e56', icon: 'spa' satisfies IconName, to: `${base}/spa`, service: 'spa' },
+    { tag: 'Dine', label: 'Restaurant', description: 'Reserve lunch or dinner at the hotel.', action: 'Reserve', tint: '#534AB7', icon: 'star' satisfies IconName, to: `${base}/restaurant`, service: 'restaurant' },
+    { tag: 'Bar', label: 'Bar & lounge', description: 'Cocktails and lounge reservations.', action: 'View menu', tint: '#2c2c2a', icon: 'spray' satisfies IconName, to: `${base}/bar`, service: 'bar' },
   ]
   const active = new Set(session.hotel?.services || [])
-  return features.filter((f) => f.service === 'shop' || f.service === 'food' || active.has(f.service))
+  return features.filter((f) => {
+    if (f.service === 'shop' || f.service === 'food') return true
+    return active.has(f.service)
+  })
 })
 
 const visibleServices = computed(() => {
   const hotel = session.hotel
   if (!hotel) return []
   return (hotel.services || [])
-    .filter((s) => s in hotelServices)
+    .filter((s) => s in hotelServices && s !== 'discover' && s !== 'nearby')
     .map((s) => {
       const cfg = hotelServices[s as keyof typeof hotelServices]
-      const bodyText = s === 'nearby' ? cfg.body(hotel.location) : cfg.body(hotel.name)
-      return { key: s, ...cfg, iconLabel: serviceMeta[s], bodyText }
+      return { key: s, ...cfg, iconLabel: serviceMeta[s], bodyText: cfg.body(hotel.name) }
     })
 })
+
+function hotelServicePath(route: string) {
+  const base = `/hotel/${session.slug}`
+  return route ? `${base}/${route}` : base
+}
 
 function addProduct(product: StorefrontProduct) {
   if (!session.hotel) return
@@ -152,13 +156,8 @@ function addProduct(product: StorefrontProduct) {
 </script>
 
 <style scoped>
-.delivery-note-live {
-  font-style: italic;
-  opacity: 0.9;
-}
-
 .category-empty {
-  padding: 2rem 20px;
+  padding: 2rem 0;
   text-align: center;
   font-size: 13px;
   color: var(--sf-muted);

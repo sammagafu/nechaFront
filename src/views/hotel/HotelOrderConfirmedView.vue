@@ -25,7 +25,7 @@
         <router-link :to="`/hotel/${session.slug}`" class="sf-btn-primary sf-btn-primary--block confirm-cta">
           Browse more products →
         </router-link>
-        <router-link to="/account" class="sf-btn-ghost confirm-account">Create account</router-link>
+        <router-link to="/sign-up" class="sf-btn-ghost confirm-account">Create account</router-link>
       </div>
     </div>
   </div>
@@ -56,7 +56,7 @@ const pointsEarned = computed(() => (orderTotal.value ? Math.floor(orderTotal.va
 .confirm-wrap {
   display: flex;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 32px 0;
 }
 
 .confirm-card {

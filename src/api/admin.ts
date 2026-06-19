@@ -5,11 +5,23 @@ import type {
   AdminOrder,
   AdminProduct,
   AdminReservation,
+  AnalyticsOverview,
   DashboardStats,
+  StoreDashboard,
 } from '@/types/auth'
 
 export async function fetchDashboard() {
   const { data } = await client.get<ApiSuccess<DashboardStats>>('/admin/dashboard')
+  return data.data
+}
+
+export async function fetchAnalytics() {
+  const { data } = await client.get<ApiSuccess<AnalyticsOverview>>('/admin/analytics')
+  return data.data
+}
+
+export async function fetchStoreDashboard(hotelId: string) {
+  const { data } = await client.get<ApiSuccess<StoreDashboard>>(`/admin/store/${hotelId}/dashboard`)
   return data.data
 }
 

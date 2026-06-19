@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="admin-page">
     <div v-if="loading" class="admin-loading">Loading products…</div>
     <p v-else-if="error" class="admin-error">{{ error }}</p>
-    <template v-else>
-      <div class="admin-card" style="margin-bottom: 1rem">
+    <div v-else class="admin-stack">
+      <div class="admin-card">
         <div class="admin-card-head">
           <h2>{{ hotelName }} — Products</h2>
           <div class="admin-actions">
@@ -47,7 +47,7 @@
         </div>
         <p v-else class="admin-empty">No products for this hotel.</p>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 

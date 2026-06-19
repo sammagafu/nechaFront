@@ -4,7 +4,7 @@
       <div class="footer-inner">
         <div class="footer-col footer-col--brand">
           <router-link to="/" class="footer-logo-link">
-            <img :src="appConfig.logoUrl" alt="NECHA" class="footer-logo" width="120" height="32" />
+            <NechaLogo alt="NECHA" class="footer-logo" :width="120" :height="32" />
           </router-link>
           <p class="footer-about">
             Personal care, beauty and wellness — delivered across Dar es Salaam.
@@ -32,10 +32,11 @@
             <router-link to="/">Home</router-link>
             <router-link to="/shop">Shop</router-link>
             <router-link to="/about">About Us</router-link>
+            <router-link to="/discovery">Discovery</router-link>
             <router-link to="/hotel-partners">Hotel Partners</router-link>
             <router-link to="/earn-with-necha">Earn With Necha</router-link>
             <router-link to="/delivery">Delivery Information</router-link>
-            <router-link to="/account">Rewards</router-link>
+            <router-link to="/sign-up">Rewards</router-link>
             <router-link to="/terms">Terms &amp; Conditions</router-link>
             <router-link to="/contact">Contact</router-link>
           </nav>
@@ -44,7 +45,9 @@
         <div class="footer-col">
           <h4 class="footer-widget-title">My Account</h4>
           <nav class="footer-links">
-            <router-link to="/account">My Account</router-link>
+            <router-link to="/sign-in">Sign in</router-link>
+            <router-link to="/sign-up">Sign up</router-link>
+            <router-link to="/account">My account</router-link>
             <router-link to="/cart">Cart</router-link>
             <router-link to="/wishlist">Wishlist</router-link>
             <router-link to="/checkout">Checkout</router-link>
@@ -79,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import NechaLogo from '@/components/NechaLogo.vue'
 import Icon from '@/components/ui/Icon.vue'
 import { appConfig } from '@/config/app'
 
@@ -231,8 +235,8 @@ const year = new Date().getFullYear()
   padding: 0 1.35rem;
   border: none;
   border-radius: var(--radius-editorial);
-  background: var(--color-black);
-  color: var(--color-white);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: var(--tracking-caps);

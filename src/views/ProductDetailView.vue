@@ -19,7 +19,7 @@
             class="product-gallery-image"
           />
           <div v-else class="product-gallery-placeholder">
-            <Icon name="package" :size="48" />
+            <Icon name="sparkles" :size="48" />
           </div>
         </figure>
 
@@ -48,10 +48,12 @@
               {{ wishlist.has(product.id) ? 'Saved' : 'Save' }}
             </button>
           </div>
+          <p v-if="addedMessage" class="product-added-msg" role="status">{{ addedMessage }}</p>
 
           <ul class="product-perks">
             <li><Icon name="truck" :size="16" /> Same-day delivery in Dar es Salaam</li>
-            <li><Icon name="leaf" :size="16" /> Curated African brands</li>
+            <li><Icon name="sparkles" :size="16" /> Curated African beauty brands</li>
+            <li><Icon name="droplet" :size="16" /> Botanical personal care</li>
             <li><Icon name="shield" :size="16" /> Secure mobile payments</li>
           </ul>
         </div>
@@ -87,6 +89,8 @@ const wishlist = useWishlistStore()
 
 const product = ref<CommerceProduct | null>(null)
 const loading = ref(true)
+const addedMessage = ref('')
+let addedTimer: ReturnType<typeof setTimeout> | undefined
 
 function formatTzs(n: number) {
   return `TZS ${n.toLocaleString('en-TZ')}`
@@ -101,7 +105,13 @@ async function loadProduct() {
 }
 
 function addToCart() {
-  if (product.value) cart.add(product.value)
+  if (!product.value) return
+  cart.add(product.value)
+  addedMessage.value = 'Added to cart!'
+  clearTimeout(addedTimer)
+  addedTimer = setTimeout(() => {
+    addedMessage.value = ''
+  }, 2500)
 }
 
 onMounted(loadProduct)
@@ -223,7 +233,14 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.product-added-msg {
+  margin: 0 0 1.25rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-necha-green-dark);
 }
 
 .product-actions .btn {

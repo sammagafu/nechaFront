@@ -8,7 +8,7 @@
 
     <p v-if="loading" class="muted">Loading products...</p>
     <p v-else-if="error" class="error">{{ error }}</p>
-    <div v-else class="grid grid-2">
+    <div v-else class="product-grid">
       <ProductCard
         v-for="product in commerceProducts"
         :key="product.id"

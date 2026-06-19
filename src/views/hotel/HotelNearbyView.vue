@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="sf-page-hero">
-      <p class="breadcrumb">{{ session.hotel?.name }} / Nearby experiences</p>
-      <h1>Nearby experiences</h1>
-      <p>Curated restaurants, wellness spots and leisure experiences near {{ session.hotel?.name }}, {{ session.hotel?.location }}</p>
-    </div>
+    <StorefrontPageHero
+      badge="Discovery"
+      title="Nearby experiences"
+      :description="`Curated restaurants, wellness spots and leisure experiences near ${session.hotel?.name}, ${session.hotel?.location}`"
+    />
     <div class="category-pills" style="padding-top: 16px">
       <button
         v-for="cat in filters"
@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 
 const session = useHotelSessionStore()

@@ -1,5 +1,5 @@
 <template>
-  <form class="admin-form admin-card" style="padding: 1.25rem" @submit.prevent="submit">
+  <form class="admin-form admin-card" @submit.prevent="submit">
     <p v-if="error" class="admin-error">{{ error }}</p>
     <div class="admin-form-row">
       <label>Name *<input v-model="form.name" required /></label>

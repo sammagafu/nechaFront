@@ -1,7 +1,12 @@
+<script setup lang="ts">
+import NechaLogo from '@/components/NechaLogo.vue'
+</script>
+
 <template>
   <div class="hotel-loading">
     <div class="hotel-loading-orb hotel-loading-orb--1" />
     <div class="hotel-loading-orb hotel-loading-orb--2" />
+    <NechaLogo alt="Necha Africa" class="hotel-loading-logo" :width="140" :height="36" on-dark />
     <div class="hotel-loading-card">
       <div class="hotel-loading-avatar sf-skeleton-pulse" />
       <div class="hotel-loading-lines">
@@ -15,6 +20,15 @@
 </template>
 
 <style scoped>
+.hotel-loading-logo {
+  position: relative;
+  z-index: 1;
+  height: 32px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
 .hotel-loading {
   min-height: 100vh;
   display: flex;

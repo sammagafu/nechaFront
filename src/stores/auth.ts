@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchMe, login as apiLogin } from '@/api/auth'
+import {
+  fetchMe,
+  login as apiLogin,
+  loginWithApple as apiLoginWithApple,
+  loginWithGoogle as apiLoginWithGoogle,
+  register as apiRegister,
+} from '@/api/auth'
 import { getApiError } from '@/api/client'
 import type { User } from '@/types/auth'
 
@@ -13,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref('')
 
   const isAdmin = computed(() => user.value?.role === 'admin')
+  const isCustomer = computed(() => user.value?.role === 'customer')
   const isAuthenticated = computed(() => !!token.value)
 
   function setSession(accessToken: string, u: User) {
@@ -27,13 +34,78 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(TOKEN_KEY)
   }
 
-  async function login(email: string, password: string) {
+  async function loginAdmin(email: string, password: string) {
     loading.value = true
     error.value = ''
     try {
       const result = await apiLogin(email, password)
       if (result.user.role !== 'admin') {
         throw new Error('Admin access only')
+      }
+      setSession(result.access_token, result.user)
+    } catch (e) {
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loginCustomer(email: string, password: string) {
+    loading.value = true
+    error.value = ''
+    try {
+      const result = await apiLogin(email, password)
+      if (result.user.role !== 'customer') {
+        throw new Error('Customer account required')
+      }
+      setSession(result.access_token, result.user)
+    } catch (e) {
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function registerCustomer(payload: { email: string; password: string; full_name: string; phone?: string }) {
+    loading.value = true
+    error.value = ''
+    try {
+      const result = await apiRegister(payload)
+      setSession(result.access_token, result.user)
+    } catch (e) {
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loginWithGoogle(idToken: string) {
+    loading.value = true
+    error.value = ''
+    try {
+      const result = await apiLoginWithGoogle(idToken)
+      if (result.user.role !== 'customer') {
+        throw new Error('Customer account required')
+      }
+      setSession(result.access_token, result.user)
+    } catch (e) {
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loginWithApple(idToken: string, fullName?: string) {
+    loading.value = true
+    error.value = ''
+    try {
+      const result = await apiLoginWithApple(idToken, fullName)
+      if (result.user.role !== 'customer') {
+        throw new Error('Customer account required')
       }
       setSession(result.access_token, result.user)
     } catch (e) {
@@ -57,5 +129,20 @@ export const useAuthStore = defineStore('auth', () => {
     clearSession()
   }
 
-  return { token, user, loading, error, isAdmin, isAuthenticated, login, loadMe, logout }
+  return {
+    token,
+    user,
+    loading,
+    error,
+    isAdmin,
+    isCustomer,
+    isAuthenticated,
+    loginAdmin,
+    loginCustomer,
+    registerCustomer,
+    loginWithGoogle,
+    loginWithApple,
+    loadMe,
+    logout,
+  }
 })

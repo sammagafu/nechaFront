@@ -1,78 +1,177 @@
 <template>
-  <div v-if="session.hotel" class="hotel-food">
-    <header class="hotel-food-hero">
-      <p class="hotel-food-crumb">{{ session.hotel.name }} / Room service</p>
-      <h1>Order food &amp; drinks</h1>
-      <p>Delivered to your room at {{ session.hotel.name }} — pay via M-Pesa or card at checkout.</p>
-    </header>
+  <div v-if="session.hotel" class="food-page">
+    <StorefrontPageHero
+      badge="Room service"
+      title="Food & drinks"
+      description="Tap to add items — delivered to your room. Pay at checkout."
+    />
 
-    <form class="hotel-food-form sf-form-stack" @submit.prevent="submit">
-      <section class="checkout-section">
-        <div class="checkout-label">Your details</div>
-        <div class="sf-form-fields">
-          <input v-model="form.customer_name" placeholder="Full name *" required />
-          <input v-model="form.customer_phone" type="tel" placeholder="Phone number *" required />
-          <input v-model="form.room_number" placeholder="Room number *" required />
-        </div>
-      </section>
-
-      <section class="checkout-section">
-        <div class="checkout-label">Menu items</div>
-        <div class="sf-form-fields">
-          <div v-for="(item, index) in form.items" :key="index" class="food-item-row">
-            <input v-model="item.name" placeholder="Item name" required />
-            <input v-model.number="item.quantity" type="number" min="1" placeholder="Qty" required />
-            <input v-model.number="item.unit_price" type="number" min="0" placeholder="Price (TZS)" required />
-            <button v-if="form.items.length > 1" type="button" class="food-remove" @click="removeItem(index)">×</button>
-          </div>
-          <button type="button" class="food-add" @click="addItem">+ Add another item</button>
-        </div>
-      </section>
-
-      <section class="checkout-section">
-        <div class="checkout-label">Notes</div>
-        <textarea v-model="form.notes" rows="3" placeholder="Allergies, timing, special requests…" />
-      </section>
-
-      <p v-if="error" class="food-error">{{ error }}</p>
-      <p v-if="success" class="food-success">{{ success }}</p>
-
-      <button type="submit" class="sf-btn-primary sf-btn-primary--block hotel-food-submit" :disabled="submitting">
-        {{ submitting ? 'Sending…' : 'Place food order →' }}
+    <nav class="food-cats" aria-label="Menu categories">
+      <button
+        v-for="cat in foodMenuCategories"
+        :key="cat.id"
+        type="button"
+        class="food-cat"
+        :class="{ active: activeCategory === cat.id }"
+        @click="activeCategory = cat.id"
+      >
+        {{ cat.label }}
       </button>
-    </form>
+    </nav>
+
+    <div class="food-menu">
+      <article v-for="item in visibleItems" :key="item.id" class="food-card">
+        <div class="food-card-main">
+          <div class="food-card-head">
+            <h2>{{ item.name }}</h2>
+            <span v-if="item.tag" class="food-tag">{{ item.tag }}</span>
+          </div>
+          <p class="food-desc">{{ item.description }}</p>
+          <p class="food-price">{{ formatTZS(item.price) }}</p>
+        </div>
+        <div class="food-card-actions">
+          <button
+            v-if="!qty(item.id)"
+            type="button"
+            class="food-add"
+            aria-label="Add to order"
+            @click="addItem(item)"
+          >
+            +
+          </button>
+          <div v-else class="food-qty">
+            <button type="button" aria-label="Decrease" @click="changeQty(item.id, -1)">−</button>
+            <span>{{ qty(item.id) }}</span>
+            <button type="button" aria-label="Increase" @click="changeQty(item.id, 1)">+</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <aside v-if="orderLines.length" class="food-order-bar">
+      <div class="sf-container food-order-bar-inner">
+        <div class="food-order-summary">
+          <strong>{{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }}</strong>
+          <span>{{ formatTZS(orderTotal) }}</span>
+        </div>
+        <button type="button" class="food-order-btn" @click="checkoutOpen = true">
+          Review order
+        </button>
+      </div>
+    </aside>
+
+    <dialog ref="checkoutDialog" class="food-checkout" @close="checkoutOpen = false">
+      <form class="food-checkout-form" @submit.prevent="submit">
+        <header class="food-checkout-head">
+          <h2>Your order</h2>
+          <button type="button" class="food-checkout-close" aria-label="Close" @click="closeCheckout">×</button>
+        </header>
+
+        <ul class="food-checkout-lines">
+          <li v-for="line in orderLines" :key="line.id">
+            <span>{{ line.quantity }}× {{ line.name }}</span>
+            <span>{{ formatTZS(line.unit_price * line.quantity) }}</span>
+          </li>
+        </ul>
+
+        <div class="food-checkout-total">
+          <span>Total</span>
+          <strong>{{ formatTZS(orderTotal) }}</strong>
+        </div>
+
+        <div class="sf-form-fields food-checkout-fields">
+          <input v-model="form.customer_name" placeholder="Full name *" required />
+          <input v-model="form.customer_phone" type="tel" placeholder="Phone *" required />
+          <input v-model="form.room_number" placeholder="Room number *" required />
+          <textarea v-model="form.notes" rows="2" placeholder="Allergies or timing notes…" />
+        </div>
+
+        <p v-if="error" class="food-error">{{ error }}</p>
+        <p v-if="success" class="food-success">Order placed — reference {{ success }}</p>
+
+        <button type="submit" class="sf-btn-primary sf-btn-primary--block" :disabled="submitting">
+          {{ submitting ? 'Sending…' : 'Place order →' }}
+        </button>
+      </form>
+    </dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { createFoodOrder } from '@/api/orders'
 import { getApiError } from '@/api/client'
+import { formatTZS } from '@/composables/usePricing'
+import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
+import { foodMenuCategories, foodMenuItems, type FoodMenuItem } from '@/config/foodMenu'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 
 const session = useHotelSessionStore()
+const activeCategory = ref('all')
+const checkoutOpen = ref(false)
+const checkoutDialog = ref<HTMLDialogElement | null>(null)
 const submitting = ref(false)
 const error = ref('')
 const success = ref('')
+
+const cart = reactive<Record<string, { item: FoodMenuItem; quantity: number }>>({})
 
 const form = reactive({
   customer_name: '',
   customer_phone: '',
   room_number: session.roomNumber,
   notes: '',
-  items: [{ name: '', quantity: 1, unit_price: 0, notes: '' }],
 })
 
-function addItem() {
-  form.items.push({ name: '', quantity: 1, unit_price: 0, notes: '' })
+const visibleItems = computed(() =>
+  activeCategory.value === 'all'
+    ? foodMenuItems
+    : foodMenuItems.filter((i) => i.category === activeCategory.value),
+)
+
+const orderLines = computed(() =>
+  Object.values(cart).map(({ item, quantity }) => ({
+    id: item.id,
+    name: item.name,
+    quantity,
+    unit_price: item.price,
+  })),
+)
+
+const totalItems = computed(() => orderLines.value.reduce((n, l) => n + l.quantity, 0))
+const orderTotal = computed(() =>
+  orderLines.value.reduce((sum, l) => sum + l.unit_price * l.quantity, 0),
+)
+
+watch(checkoutOpen, (open) => {
+  const el = checkoutDialog.value
+  if (!el) return
+  if (open && !el.open) el.showModal()
+  if (!open && el.open) el.close()
+})
+
+function qty(id: string) {
+  return cart[id]?.quantity ?? 0
 }
 
-function removeItem(index: number) {
-  form.items.splice(index, 1)
+function addItem(item: FoodMenuItem) {
+  cart[item.id] = { item, quantity: 1 }
+}
+
+function changeQty(id: string, delta: number) {
+  const row = cart[id]
+  if (!row) return
+  const next = row.quantity + delta
+  if (next <= 0) delete cart[id]
+  else row.quantity = next
+}
+
+function closeCheckout() {
+  checkoutOpen.value = false
 }
 
 async function submit() {
-  if (!session.hotel) return
+  if (!session.hotel || !orderLines.value.length) return
   submitting.value = true
   error.value = ''
   success.value = ''
@@ -84,15 +183,15 @@ async function submit() {
       customer_name: form.customer_name.trim(),
       customer_phone: form.customer_phone.trim(),
       room_number: form.room_number.trim(),
-      items: form.items.map((i) => ({
-        name: i.name,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        notes: i.notes,
+      items: orderLines.value.map((l) => ({
+        name: l.name,
+        quantity: l.quantity,
+        unit_price: l.unit_price,
       })),
-      notes: form.notes,
+      notes: form.notes.trim() || undefined,
     })
     success.value = order.id
+    Object.keys(cart).forEach((k) => delete cart[k])
   } catch (e) {
     error.value = getApiError(e)
   } finally {
@@ -102,84 +201,261 @@ async function submit() {
 </script>
 
 <style scoped>
-.hotel-food {
-  padding: 0 20px 100px;
+.food-page {
+  padding: 0 0 120px;
 }
 
-.hotel-food-hero {
-  padding: 1.5rem 0 1.25rem;
-  border-bottom: 0.5px solid var(--sf-warm-grey);
-  margin-bottom: 1.25rem;
+.food-cats {
+  display: flex;
+  gap: 0.45rem;
+  padding: 12px 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.hotel-food-crumb {
-  margin: 0 0 0.35rem;
+.food-cats::-webkit-scrollbar {
+  display: none;
+}
+
+.food-cat {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  border: 0.5px solid var(--sf-warm-grey);
+  border-radius: var(--radius-pill);
+  background: var(--sf-white);
+  font-family: inherit;
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sf-text-muted);
+  cursor: pointer;
+}
+
+.food-cat.active {
+  background: #000;
+  border-color: transparent;
+  color: var(--sf-cream);
+}
+
+.food-menu {
+  display: grid;
+  gap: 0.65rem;
+  padding: 8px 0 0;
+}
+
+.food-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+  background: var(--sf-white);
+  border: 0.5px solid var(--sf-warm-grey);
+  box-shadow: var(--shadow-xs);
+}
+
+.food-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.food-card h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.food-tag {
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-necha-green) 16%, var(--sf-white));
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sf-green-dark);
+}
+
+.food-desc {
+  margin: 0.25rem 0 0.35rem;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--sf-muted);
 }
 
-.hotel-food-hero h1 {
-  margin: 0 0 0.35rem;
-  font-size: 20px;
-  font-weight: 500;
-}
-
-.hotel-food-hero p {
+.food-price {
   margin: 0;
   font-size: 13px;
-  color: var(--sf-muted);
+  font-weight: 600;
+  color: inherit;
 }
 
-.hotel-food-form {
-  padding: 0 0 1rem;
+.food-add {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: #000;
+  color: var(--sf-cream);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
 }
 
-.hotel-food-form .checkout-section {
-  margin-inline: 0;
-}
-
-.food-item-row {
-  display: grid;
-  grid-template-columns: 1fr 72px 100px auto;
-  gap: 0.65rem;
+.food-qty {
+  display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--sf-cream);
+  border: 0.5px solid var(--sf-warm-grey);
 }
 
-.food-remove {
+.food-qty button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--sf-white);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.food-qty span {
+  min-width: 1.25rem;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.food-order-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  z-index: 300;
+  padding-block: 0 8px;
+  pointer-events: none;
+}
+
+.food-order-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 12px 14px;
+  border-radius: var(--radius-xl);
+  background: rgba(0, 0, 0, 0.92);
+  color: var(--sf-cream);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
+.food-order-summary {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 12px;
+}
+
+.food-order-summary strong {
+  font-size: 14px;
+}
+
+.food-order-btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0.65rem 1.1rem;
+  background: var(--color-necha-green);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.food-checkout {
+  width: min(100%, 420px);
+  margin: auto;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-xl);
+  background: var(--sf-white);
+  box-shadow: var(--shadow-lg);
+}
+
+.food-checkout::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.food-checkout-form {
+  padding: 1.25rem;
+}
+
+.food-checkout-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.food-checkout-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.food-checkout-close {
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 50%;
   background: var(--sf-cream);
+  font-size: 20px;
   cursor: pointer;
 }
 
-.food-add {
-  justify-self: start;
-  border: none;
-  background: none;
-  font-size: 12px;
-  color: var(--sf-purple);
-  cursor: pointer;
-  padding: 0.25rem 0;
-  margin: 0;
+.food-checkout-lines {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 13px;
+}
+
+.food-checkout-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.food-checkout-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin-bottom: 0.75rem;
+  border-top: 0.5px solid var(--sf-warm-grey);
+  border-bottom: 0.5px solid var(--sf-warm-grey);
+  font-size: 14px;
+}
+
+.food-checkout-fields {
+  margin-bottom: 0.75rem;
 }
 
 .food-error {
   color: #c00;
   font-size: 12px;
-  margin: 0;
-  padding: 0 2px;
 }
 
 .food-success {
   color: var(--sf-green-checkout);
   font-size: 12px;
-  margin: 0;
-  padding: 0 2px;
-}
-
-.hotel-food-submit {
-  margin-top: 0.25rem;
 }
 </style>

@@ -4,6 +4,7 @@ export interface User {
   full_name: string
   phone: string
   role: string
+  auth_provider?: string
 }
 
 export interface AuthResponse {
@@ -18,6 +19,56 @@ export interface DashboardStats {
   reservations: number
   pending_orders: number
   pending_reservations: number
+}
+
+export interface DailyMetric {
+  date: string
+  count: number
+  revenue: number
+}
+
+export interface StatusCount {
+  status: string
+  count: number
+}
+
+export interface HotelPerformance {
+  hotel_id: string
+  hotel_name: string
+  order_count: number
+  revenue: number
+}
+
+export interface AnalyticsOverview {
+  total_revenue: number
+  currency: string
+  orders_last_30_days: number
+  reservations_last_30_days: number
+  order_trend: DailyMetric[]
+  orders_by_status: StatusCount[]
+  top_hotels: HotelPerformance[]
+}
+
+export interface ProductPerformance {
+  product_id: string
+  name: string
+  quantity: number
+  revenue: number
+}
+
+export interface StoreDashboard {
+  hotel: AdminHotel
+  total_revenue: number
+  currency: string
+  orders: number
+  reservations: number
+  pending_orders: number
+  pending_reservations: number
+  orders_last_30_days: number
+  revenue_last_30_days: number
+  order_trend: DailyMetric[]
+  top_products: ProductPerformance[]
+  recent_orders: AdminOrder[]
 }
 
 export interface AdminHotel {

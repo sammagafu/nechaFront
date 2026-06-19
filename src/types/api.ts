@@ -122,6 +122,9 @@ export interface ProductOrderRequest {
   room_number?: string
   payment_method?: string
   currency?: string
+  delivery_fee?: number
+  return_url?: string
+  cancel_url?: string
   items: ProductOrderItem[]
   notes?: string
 }
@@ -146,6 +149,11 @@ export interface Order {
     notes?: string
   }>
   notes?: string
+  payment_provider?: string
+  payment_status?: string
+  payment_ref?: string
+  payment_required?: boolean
+  payment_url?: string
   created_at: string
 }
 

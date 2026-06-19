@@ -1,76 +1,66 @@
 <template>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <RouteLoadingBar :active="navigating && !booting" />
 
   <AppLoadingScreen v-if="booting" />
 
+  <SystemAlertBanner v-if="!route.path.startsWith('/admin')" />
+
   <div class="app-shell">
     <template v-if="!isStandaloneRoute">
       <SiteHeader />
-      <main class="app-main" :class="{ 'app-main--full': isFullWidth }">
+      <main id="main-content" class="app-main" :class="{ 'app-main--full': isFullWidth }">
         <router-view />
       </main>
       <AppFooter />
     </template>
     <router-view v-else />
-    <button v-show="showTop && !isStandaloneRoute" class="back-to-top" type="button" aria-label="Back to top" @click="scrollTop">
-      ↑
-    </button>
+    <CartToast v-if="showShopCartToast" />
+    <ChatWidget v-if="showChat" :hotel-slug="hotelSlug" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppFooter from '@/components/AppFooter.vue'
 import AppLoadingScreen from '@/components/AppLoadingScreen.vue'
+import ChatWidget from '@/components/ChatWidget.vue'
+import CartToast from '@/components/storefront/CartToast.vue'
 import RouteLoadingBar from '@/components/RouteLoadingBar.vue'
 import SiteHeader from '@/components/SiteHeader.vue'
+import SystemAlertBanner from '@/components/SystemAlertBanner.vue'
 import { useAppBoot } from '@/composables/useAppBoot'
 import { useRouteLoading } from '@/composables/useRouteLoading'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const route = useRoute()
 const { booting } = useAppBoot()
 const { navigating } = useRouteLoading()
+const notifications = useNotificationsStore()
 
 const isFullWidth = computed(() => route.meta.fullWidth === true)
-const isStandaloneRoute = computed(() => route.path.startsWith('/hotel/') || route.path.startsWith('/admin'))
-const showTop = ref(false)
+const isStandaloneRoute = computed(
+  () =>
+    route.path.startsWith('/hotel/') ||
+    route.path.startsWith('/admin') ||
+    route.meta.standalone === true,
+)
+const showChat = computed(() => !route.path.startsWith('/admin'))
+const showShopCartToast = computed(
+  () => !route.path.startsWith('/admin') && !route.path.startsWith('/hotel/') && route.meta.standalone !== true,
+)
+const hotelSlug = computed(() => (route.params.slug as string) || '')
 
-function onScroll() {
-  showTop.value = window.scrollY > 400
-}
+onMounted(() => {
+  notifications.startPolling()
+})
+onUnmounted(() => {
+  notifications.stopPolling()
+})
 
-function scrollTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-onMounted(() => window.addEventListener('scroll', onScroll))
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
+watch(
+  () => localStorage.getItem('access_token'),
+  () => notifications.loadNotifications(),
+)
 </script>
-
-<style scoped>
-.back-to-top {
-  position: fixed;
-  right: max(var(--space-4), env(safe-area-inset-right, 0px));
-  bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px));
-  z-index: 250;
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 50%;
-  background: var(--color-black);
-  color: var(--color-white);
-  font-family: var(--font-body);
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: var(--shadow-premium);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.back-to-top:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-</style>

@@ -72,9 +72,9 @@
           <span>Total</span>
           <strong>{{ formatPrice(cart.subtotal, currency) }}</strong>
         </div>
-        <p class="payment-note muted">Orders are saved to the Necha API. Payment capture is not yet live.</p>
+        <p class="payment-note muted">Pay securely with Selcom — M-Pesa, Tigo Pesa, cards, and more.</p>
         <button class="btn btn-block" type="submit" :disabled="submitting">
-          {{ submitting ? 'Placing order...' : 'Place order' }}
+          {{ submitting ? 'Redirecting to payment...' : 'Pay with Selcom' }}
         </button>
         <p v-if="submitError" class="error">{{ submitError }}</p>
         <router-link to="/cart" class="btn-link back-link">← Back to cart</router-link>
@@ -90,6 +90,7 @@ import { getApiError } from '@/api/client'
 import { catalogConfig } from '@/config/app'
 import { useCartStore } from '@/stores/cart'
 import { formatPrice } from '@/utils/commerce'
+import { handleOrderPayment } from '@/utils/checkoutPayment'
 
 const cart = useCartStore()
 const submitting = ref(false)
@@ -124,6 +125,8 @@ async function placeOrder() {
       city: form.city,
       country: form.country,
       currency: currency.value,
+      return_url: `${window.location.origin}/payment/return`,
+      cancel_url: `${window.location.origin}/payment/cancel`,
       items: cart.items.map((item) => ({
         product_id: item.id,
         name: item.name,
@@ -132,6 +135,10 @@ async function placeOrder() {
       })),
       notes: form.notes,
     })
+    if (handleOrderPayment(order)) {
+      cart.clear()
+      return
+    }
     orderId.value = order.id
     orderRef.value = order.id.slice(0, 8).toUpperCase()
     cart.clear()

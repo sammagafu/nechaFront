@@ -17,6 +17,19 @@ client.interceptors.request.use((config) => {
   return config
 })
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      const path = window.location.pathname
+      if (!path.startsWith('/admin') && !path.startsWith('/sign-in') && !path.startsWith('/sign-up')) {
+        localStorage.removeItem('access_token')
+      }
+    }
+    return Promise.reject(error)
+  },
+)
+
 export function getApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as ApiError | undefined

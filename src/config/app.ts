@@ -1,4 +1,5 @@
-import logoUrl from '@/assets/necha-logo.png'
+/** Bundled brand mark — prefer `<NechaLogo />` in Vue; `logoUrl` for legacy/static refs. */
+import logoUrl from '@/assets/necha-logo.svg'
 
 /** Main ecommerce catalogue (sitewide shop). */
 export const catalogConfig = {

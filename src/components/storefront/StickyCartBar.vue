@@ -1,21 +1,23 @@
 <template>
   <div class="sticky-cart-bar">
-    <div>
-      <div v-if="count === 0" style="font-size: 12px; color: var(--sf-cream)">Your cart is empty</div>
-      <div v-else style="font-size: 12px; color: var(--sf-cream)">{{ count }} {{ count === 1 ? 'item' : 'items' }} in your cart</div>
-      <div style="font-size: 10px; color: var(--sf-muted); margin-top: 2px">
-        {{ count === 0 ? 'Add products above to get started' : formatTZS(total) }}
+    <div class="sf-container sticky-cart-bar-inner">
+      <div>
+        <div v-if="count === 0" style="font-size: 12px; color: var(--sf-cream)">Your cart is empty</div>
+        <div v-else style="font-size: 12px; color: var(--sf-cream)">{{ count }} {{ count === 1 ? 'item' : 'items' }} in your cart</div>
+        <div style="font-size: 10px; color: var(--sf-muted); margin-top: 2px">
+          {{ count === 0 ? 'Add products above to get started' : formatTZS(total) }}
+        </div>
       </div>
+      <router-link
+        :to="checkoutLink"
+        class="checkout-btn"
+        :class="count > 0 ? 'active' : 'disabled'"
+        :aria-disabled="count === 0"
+        @click.prevent="count > 0 ? $router.push(checkoutLink) : undefined"
+      >
+        Go to checkout →
+      </router-link>
     </div>
-    <router-link
-      :to="checkoutLink"
-      class="checkout-btn"
-      :class="count > 0 ? 'active' : 'disabled'"
-      :aria-disabled="count === 0"
-      @click.prevent="count > 0 ? $router.push(checkoutLink) : undefined"
-    >
-      Go to checkout →
-    </router-link>
   </div>
 </template>
 

@@ -1,5 +1,8 @@
 <template>
-  <article class="sf-product-card" :class="{ 'sf-product-card--pop': justAdded }">
+  <article
+    class="sf-product-card"
+    :class="{ 'sf-product-card--pop': justAdded, 'sf-product-card--list': layout === 'list' }"
+  >
     <router-link :to="productLink" class="sf-product-image">
       <img v-if="product.image_url" :src="product.image_url" :alt="product.name" loading="lazy" />
       <div v-else class="sf-product-placeholder" />
@@ -26,10 +29,14 @@ import { formatTZS, formatUSD } from '@/composables/usePricing'
 import { badgeLabel } from '@/utils/storefront'
 import { useCartStore } from '@/stores/cart'
 
-const props = defineProps<{
-  product: StorefrontProduct
-  hotelSlug: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    product: StorefrontProduct
+    hotelSlug: string
+    layout?: 'grid' | 'list'
+  }>(),
+  { layout: 'grid' },
+)
 
 const emit = defineEmits<{ add: [product: StorefrontProduct] }>()
 const cart = useCartStore()
@@ -56,6 +63,10 @@ function onAdd() {
 .sf-product-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, #f1efe8, #e8e4db);
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--color-necha-green-light) 35%, var(--color-bg-soft)),
+    var(--color-bg-warm)
+  );
 }
 </style>

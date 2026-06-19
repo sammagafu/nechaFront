@@ -1,5 +1,5 @@
 <template>
-  <form class="admin-form admin-card" style="padding: 1.25rem" @submit.prevent="submit">
+  <form class="admin-form admin-card" @submit.prevent="submit">
     <p v-if="error" class="admin-error">{{ error }}</p>
     <div class="admin-form-row">
       <label>Name *<input v-model="form.name" required /></label>
@@ -24,7 +24,7 @@
       <label>Logo URL<input v-model="form.logo_url" /></label>
     </div>
     <label>Services (comma-separated)
-      <input v-model="servicesText" placeholder="spa, restaurant, bar, gym, nearby" />
+      <input v-model="servicesText" placeholder="spa, restaurant, bar, gym, discover" />
     </label>
     <label>Kkooapp ID<input v-model="form.kkooapp_id" /></label>
     <label style="flex-direction: row; align-items: center; gap: 0.5rem">
@@ -58,7 +58,7 @@ const form = reactive({
   logo_url: '', kkooapp_id: '', is_verified: true, is_active: true,
 })
 
-const servicesText = ref('spa, restaurant, bar, gym, nearby')
+const servicesText = ref('spa, restaurant, bar, gym, discover')
 
 onMounted(async () => {
   if (!isEdit.value) return

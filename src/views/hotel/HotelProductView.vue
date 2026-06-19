@@ -1,24 +1,19 @@
 <template>
-  <div v-if="product" style="padding: 20px">
-    <p class="breadcrumb" style="font-size: 11px; color: var(--sf-muted); margin-bottom: 12px">
-      <router-link :to="`/hotel/${session.slug}`">{{ session.hotel?.name }}</router-link> / {{ product.name }}
-    </p>
-    <div style="display: grid; gap: 20px; max-width: 720px; margin: 0 auto">
-      <div class="sf-product-image" style="border-radius: 8px; overflow: hidden">
+  <div v-if="product" class="hotel-product-page">
+    <StorefrontPageHero
+      badge="Product"
+      :title="product.name"
+      :description="product.description"
+    />
+    <div class="hotel-product-body">
+      <div class="sf-product-image hotel-product-image">
         <img v-if="product.image_url" :src="product.image_url" :alt="product.name" />
       </div>
       <div>
         <p v-if="product.brand_name" class="sf-brand">{{ product.brand_name }}</p>
-        <h1 style="font-size: 20px; font-weight: 500; margin: 0 0 8px">{{ product.name }}</h1>
-        <p style="font-size: 13px; color: var(--sf-muted); margin-bottom: 12px">{{ product.description }}</p>
-        <div class="sf-price-tzs" style="font-size: 18px">{{ formatTZS(product.price) }}</div>
+        <div class="sf-price-tzs hotel-product-price">{{ formatTZS(product.price) }}</div>
         <div class="sf-price-usd">{{ formatUSD(product.price) }}</div>
-        <button
-          type="button"
-          class="sf-add-btn"
-          style="width: auto; padding: 10px 20px; border-radius: 6px; margin-top: 16px; font-size: 13px"
-          @click="addToCart"
-        >
+        <button type="button" class="sf-btn-primary hotel-product-add" @click="addToCart">
           Add to cart
         </button>
       </div>
@@ -31,6 +26,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { fetchProductBySlug } from '@/api/hotels'
+import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
 import { formatTZS, formatUSD } from '@/composables/usePricing'
@@ -53,3 +49,27 @@ function addToCart() {
   cart.add(toCommerceProduct(product.value, session.slug, session.hotel.code))
 }
 </script>
+
+<style scoped>
+.hotel-product-body {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.25rem 0 2rem;
+}
+
+.hotel-product-image {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hotel-product-price {
+  font-size: 18px;
+  margin-top: 0.5rem;
+}
+
+.hotel-product-add {
+  margin-top: 1rem;
+}
+</style>

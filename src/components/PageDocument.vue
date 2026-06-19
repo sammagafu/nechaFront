@@ -63,8 +63,12 @@ defineProps<{
 }
 
 .page-document-body :deep(a) {
-  color: var(--color-black);
+  color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.page-document-body :deep(a:hover) {
+  color: var(--color-interactive-hover);
 }
 </style>

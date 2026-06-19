@@ -1,7 +1,7 @@
 <template>
   <div class="app-loading" role="status" aria-live="polite" aria-label="Loading">
     <div class="app-loading-inner">
-      <img :src="appConfig.logoUrl" alt="NECHA" class="app-loading-logo" width="160" height="48" />
+      <NechaLogo alt="NECHA" class="app-loading-logo" :width="160" :height="48" on-dark />
       <div class="app-loading-track" aria-hidden="true">
         <span class="app-loading-bar" />
       </div>
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { appConfig } from '@/config/app'
+import NechaLogo from '@/components/NechaLogo.vue'
 
 withDefaults(
   defineProps<{

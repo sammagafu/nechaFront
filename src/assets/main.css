@@ -1,4 +1,5 @@
 @import './necha-theme.css';
+@import './product-cards.css';
 
 :root {
   --font-family: var(--font-body);
@@ -27,6 +28,23 @@ body {
   margin: 0;
   background: var(--bg);
   overflow-x: hidden;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 10000;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 body::before {

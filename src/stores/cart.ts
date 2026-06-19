@@ -1,24 +1,24 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { CartItem, CommerceProduct } from '@/types/commerce'
+import { SHOP_CART_SCOPE, cartStorageKey } from '@/utils/cartScope'
 
-const STORAGE_KEY = 'necha_cart'
-
-function load(): CartItem[] {
+function loadScope(scope: string): CartItem[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(cartStorageKey(scope))
     return raw ? JSON.parse(raw) : []
   } catch {
     return []
   }
 }
 
-function save(items: CartItem[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+function saveScope(scope: string, items: CartItem[]) {
+  localStorage.setItem(cartStorageKey(scope), JSON.stringify(items))
 }
 
 export const useCartStore = defineStore('cart', () => {
-  const items = ref<CartItem[]>(load())
+  const scope = ref(SHOP_CART_SCOPE)
+  const items = ref<CartItem[]>(loadScope(SHOP_CART_SCOPE))
   const lastAdded = ref<{ id: string; name: string } | null>(null)
   const cartPulse = ref(0)
 
@@ -27,17 +27,29 @@ export const useCartStore = defineStore('cart', () => {
     items.value.reduce((sum, i) => sum + i.price * i.quantity, 0),
   )
 
+  function setScope(nextScope: string) {
+    if (scope.value === nextScope) return
+    saveScope(scope.value, items.value)
+    scope.value = nextScope
+    items.value = loadScope(nextScope)
+  }
+
   function persist() {
-    save(items.value)
+    saveScope(scope.value, items.value)
   }
 
   function add(product: CommerceProduct, quantity = 1) {
-    const existing = items.value.find((i) => i.id === product.id)
-    if (existing) {
-      existing.quantity += quantity
+    if (!product?.id) return
+
+    const idx = items.value.findIndex((i) => i.id === product.id)
+    if (idx >= 0) {
+      items.value = items.value.map((item, i) =>
+        i === idx ? { ...item, quantity: item.quantity + quantity } : item,
+      )
     } else {
-      items.value.push({ ...product, quantity })
+      items.value = [...items.value, { ...product, quantity }]
     }
+
     lastAdded.value = { id: product.id, name: product.name }
     cartPulse.value += 1
     persist()
@@ -64,5 +76,5 @@ export const useCartStore = defineStore('cart', () => {
     persist()
   }
 
-  return { items, count, subtotal, lastAdded, cartPulse, add, updateQuantity, remove, clear }
+  return { scope, items, count, subtotal, lastAdded, cartPulse, setScope, add, updateQuantity, remove, clear }
 })

@@ -1,5 +1,5 @@
 <template>
-  <header class="site-header" :class="{ 'site-header--scrolled': scrolled, 'site-header--menu-open': menuOpen }">
+  <header class="site-header" :class="{ 'site-header--scrolled': scrolled, 'site-header--menu-open': isMobileOverlayOpen }">
     <!-- Hara-style top announcement bar -->
     <div class="header-topbar">
       <div class="header-topbar-inner">
@@ -26,8 +26,20 @@
           <Icon :name="menuOpen ? 'close' : 'menu'" :size="22" />
         </button>
 
-        <router-link to="/" class="header-logo" @click="closeMenus">
-          <img :src="appConfig.logoUrl" alt="NECHA" class="header-logo-img" width="120" height="32" />
+        <button
+          type="button"
+          class="header-cats-mobile"
+          :aria-expanded="categoriesOpen"
+          aria-controls="mobile-category-sheet"
+          aria-label="Browse shop categories"
+          @click="toggleCategoriesMobile"
+        >
+          <Icon name="grid" :size="18" />
+          <span>Categories</span>
+        </button>
+
+        <router-link to="/" class="header-logo" aria-label="Necha Africa home" @click="closeMenus">
+          <NechaLogo alt="NECHA" class="header-logo-img" :width="120" :height="32" />
         </router-link>
 
         <form class="header-search" role="search" @submit.prevent="onSearch">
@@ -55,7 +67,7 @@
             <span class="utility-label">Wishlist</span>
           </router-link>
 
-          <router-link to="/account" class="utility-link" @click="closeMenus">
+          <router-link :to="accountPath" class="utility-link" @click="closeMenus">
             <span class="utility-icon" aria-hidden="true">
               <Icon name="user" :size="22" />
             </span>
@@ -94,33 +106,41 @@
             <Icon class="categories-chevron" name="chevron-down" :size="14" />
           </button>
 
-          <div v-show="categoriesOpen" class="category-mega" role="menu">
-            <div class="category-mega-grid">
-              <router-link
-                v-for="cat in shopCategories"
-                :key="cat.id"
-                :to="categoryShopLink(cat.id)"
-                class="category-mega-item"
-                role="menuitem"
-                @click="closeMenus"
-              >
-                <span class="category-mega-name">{{ cat.label }}</span>
-                <span class="category-mega-count">({{ cat.count }})</span>
+          <div
+            v-show="categoriesOpen"
+            class="category-mega"
+            role="menu"
+            @mouseenter="onCategoriesEnter"
+            @mouseleave="onCategoriesLeave"
+          >
+            <div class="category-mega-panel">
+              <div class="category-mega-grid">
+                <router-link
+                  v-for="cat in shopCategories"
+                  :key="cat.id"
+                  :to="categoryShopLink(cat.id)"
+                  class="category-mega-item"
+                  role="menuitem"
+                  @click="closeMenus"
+                >
+                  <Icon :name="cat.icon" :size="18" class="category-mega-icon" />
+                  <span class="category-mega-name">{{ cat.label }}</span>
+                  <span class="category-mega-count">({{ cat.count }})</span>
+                </router-link>
+              </div>
+              <router-link to="/shop" class="category-mega-all" @click="closeMenus">
+                View all products →
               </router-link>
             </div>
-            <router-link to="/shop" class="category-mega-all" @click="closeMenus">
-              View all products →
-            </router-link>
           </div>
         </div>
 
         <nav class="main-nav" aria-label="Primary">
-          <router-link to="/" :class="{ active: route.name === 'landing' }" @click="closeMenus">Home</router-link>
+          <router-link to="/" :class="{ active: route.name === 'home' }" @click="closeMenus">Home</router-link>
           <router-link to="/about" :class="{ active: route.name === 'about' }" @click="closeMenus">About</router-link>
           <router-link to="/shop" :class="{ active: isShopRoute }" @click="closeMenus">Shop</router-link>
           <router-link to="/brands" :class="{ active: route.name === 'brands' }" @click="closeMenus">Brands</router-link>
           <router-link to="/contact" :class="{ active: route.name === 'contact' }" @click="closeMenus">Contact</router-link>
-          <router-link to="/hotel-partners" :class="{ active: route.name === 'hotel-partners' }" @click="closeMenus">Hotel Partners</router-link>
           <router-link to="/earn-with-necha" :class="{ active: route.name === 'earn-with-necha' }" @click="closeMenus">Earn With Necha</router-link>
         </nav>
 
@@ -139,15 +159,14 @@
         </form>
 
         <nav class="mobile-nav" aria-label="Mobile">
-          <router-link to="/" :class="{ active: route.name === 'landing' }" @click="closeMenus">Home</router-link>
+          <router-link to="/" :class="{ active: route.name === 'home' }" @click="closeMenus">Home</router-link>
           <router-link to="/shop" :class="{ active: isShopRoute }" @click="closeMenus">Shop</router-link>
           <router-link to="/brands" @click="closeMenus">Brands</router-link>
           <router-link to="/contact" @click="closeMenus">Contact</router-link>
-          <router-link to="/hotel-partners" @click="closeMenus">Hotel Partners</router-link>
           <router-link to="/earn-with-necha" @click="closeMenus">Earn With Necha</router-link>
           <router-link to="/wishlist" @click="closeMenus">Wishlist</router-link>
           <router-link to="/cart" @click="closeMenus">Cart</router-link>
-          <router-link to="/account" @click="closeMenus">Account</router-link>
+          <router-link :to="accountPath" @click="closeMenus">Account</router-link>
           <router-link to="/about" @click="closeMenus">About</router-link>
           <a href="#enter-hotel" @click.prevent="navigateTo('#enter-hotel')">Hotel Portal</a>
         </nav>
@@ -155,6 +174,9 @@
         <div class="mobile-categories">
           <p class="mobile-categories-label">All Categories</p>
           <div class="mobile-category-list">
+            <router-link to="/shop" class="mobile-category-row" @click="closeMenus">
+              <span>All products</span>
+            </router-link>
             <router-link
               v-for="cat in shopCategories"
               :key="cat.id"
@@ -162,7 +184,10 @@
               class="mobile-category-row"
               @click="closeMenus"
             >
-              <span>{{ cat.label }}</span>
+              <span class="mobile-category-row-label">
+                <Icon :name="cat.icon" :size="18" />
+                {{ cat.label }}
+              </span>
               <span class="mobile-category-count">{{ cat.count }}</span>
             </router-link>
           </div>
@@ -170,11 +195,44 @@
       </div>
     </Transition>
 
+    <Transition name="mobile-menu">
+      <div
+        v-if="categoriesOpen && !menuOpen"
+        id="mobile-category-sheet"
+        class="mobile-category-sheet"
+        role="dialog"
+        aria-label="Shop categories"
+      >
+        <div class="mobile-category-sheet-head">
+          <p class="mobile-category-sheet-title">All categories</p>
+          <button type="button" class="mobile-category-sheet-close" aria-label="Close categories" @click="closeMenus">
+            <Icon name="close" :size="20" />
+          </button>
+        </div>
+        <router-link to="/shop" class="mobile-category-all" @click="closeMenus">All products</router-link>
+        <div class="mobile-category-sheet-grid">
+          <router-link
+            v-for="cat in shopCategories"
+            :key="cat.id"
+            :to="categoryShopLink(cat.id)"
+            class="mobile-category-chip"
+            @click="closeMenus"
+          >
+            <span class="mobile-category-chip-label">
+              <Icon :name="cat.icon" :size="18" />
+              {{ cat.label }}
+            </span>
+            <span class="mobile-category-count">{{ cat.count }}</span>
+          </router-link>
+        </div>
+      </div>
+    </Transition>
+
     <button
-      v-if="menuOpen"
+      v-if="menuOpen || (categoriesOpen && !menuOpen)"
       type="button"
       class="mobile-backdrop"
-      aria-label="Close menu"
+      :aria-label="menuOpen ? 'Close menu' : 'Close categories'"
       @click="closeMenus"
     />
   </header>
@@ -184,23 +242,29 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { appConfig, shopPath } from '@/config/app'
+import NechaLogo from '@/components/NechaLogo.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import { categoryShopLink, shopCategories } from '@/config/categories'
 import { storefrontConfig } from '@/config/storefront'
 import Icon from '@/components/ui/Icon.vue'
+import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
 import { useWishlistStore } from '@/stores/wishlist'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const cart = useCartStore()
 const wishlist = useWishlistStore()
 const scrolled = ref(false)
 const menuOpen = ref(false)
 const categoriesOpen = ref(false)
 const searchQuery = ref('')
+let savedScrollY = 0
 
 const isShopRoute = computed(() => route.name === 'shop' || route.name === 'shop-category' || route.name === 'product')
+const isMobileOverlayOpen = computed(() => menuOpen.value || categoriesOpen.value)
+const accountPath = computed(() => (auth.isCustomer ? '/account' : '/sign-in'))
 
 function formatTzs(n: number) {
   return n.toLocaleString('en-US')
@@ -211,7 +275,26 @@ function onScroll() {
 }
 
 function setBodyScroll(locked: boolean) {
-  document.body.style.overflow = locked ? 'hidden' : ''
+  const html = document.documentElement
+  if (locked) {
+    savedScrollY = window.scrollY
+    html.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${savedScrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.style.width = '100%'
+    document.body.style.overflow = 'hidden'
+    return
+  }
+  html.style.overflow = ''
+  document.body.style.position = ''
+  document.body.style.top = ''
+  document.body.style.left = ''
+  document.body.style.right = ''
+  document.body.style.width = ''
+  document.body.style.overflow = ''
+  window.scrollTo(0, savedScrollY)
 }
 
 function closeMenus() {
@@ -228,6 +311,20 @@ function toggleMenu() {
 
 function toggleCategories() {
   categoriesOpen.value = !categoriesOpen.value
+  if (categoriesOpen.value) menuOpen.value = false
+  if (window.matchMedia('(max-width: 991px)').matches) {
+    setBodyScroll(categoriesOpen.value)
+  }
+}
+
+function toggleCategoriesMobile() {
+  categoriesOpen.value = !categoriesOpen.value
+  if (categoriesOpen.value) {
+    menuOpen.value = false
+    setBodyScroll(true)
+  } else {
+    setBodyScroll(false)
+  }
 }
 
 function onCategoriesEnter() {
@@ -244,8 +341,10 @@ function onCategoriesLeave() {
 
 function navigateTo(hash: string) {
   closeMenus()
-  if (route.name !== 'landing') {
-    router.push({ path: '/', hash })
+  const scrollOnPage = route.name === 'home'
+  if (!scrollOnPage) {
+    const path = '/'
+    router.push({ path, hash })
     return
   }
   document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
@@ -297,10 +396,10 @@ onUnmounted(() => {
 
 /* Top bar */
 .header-topbar {
-  background: transparent;
-  color: var(--color-muted);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   font-size: 11px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
 }
 
 .header-topbar-inner {
@@ -318,6 +417,7 @@ onUnmounted(() => {
   line-height: 1.55;
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 @media (min-width: 640px) {
@@ -340,13 +440,13 @@ onUnmounted(() => {
 
   .topbar-contact {
     display: inline;
-    opacity: 0.85;
-    color: inherit;
+    opacity: 0.92;
+    color: rgba(255, 255, 255, 0.92);
     text-decoration: none;
   }
 
   .topbar-contact:hover {
-    color: var(--color-text);
+    color: var(--color-necha-green-light);
   }
 }
 
@@ -361,11 +461,11 @@ onUnmounted(() => {
   padding: 0.85rem max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-areas:
-    'menu logo'
-    'search search'
-    'utils utils';
+    'menu logo cats'
+    'search search search'
+    'utils utils utils';
   align-items: center;
   gap: 0.75rem 1rem;
 }
@@ -596,7 +696,8 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.25rem 0;
+  min-height: var(--touch-min, 44px);
+  padding: 0.35rem 0.5rem 0.35rem 0;
   border: none;
   background: none;
   color: var(--color-text);
@@ -620,15 +721,19 @@ onUnmounted(() => {
 
 .category-mega {
   position: absolute;
-  top: calc(100% + 10px);
+  top: 100%;
   left: 0;
   width: min(520px, calc(100vw - 40px));
+  padding-top: 8px;
+  z-index: 310;
+}
+
+.category-mega-panel {
   padding: var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-premium);
-  z-index: 310;
 }
 
 .category-mega-grid {
@@ -640,12 +745,15 @@ onUnmounted(() => {
 .category-mega-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.55rem 0.65rem;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  min-height: var(--touch-min, 44px);
   border-radius: 6px;
   font-size: 13px;
   color: var(--color-body);
+  text-decoration: none;
+  cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
@@ -654,23 +762,151 @@ onUnmounted(() => {
   color: var(--color-text);
 }
 
+.category-mega-icon {
+  flex-shrink: 0;
+  color: var(--color-necha-green);
+}
+
 .category-mega-name {
+  flex: 1;
   font-weight: 500;
 }
 
 .category-mega-count {
+  margin-left: auto;
   font-size: 12px;
   color: var(--color-muted);
+}
+
+.mobile-category-row-label,
+.mobile-category-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-necha-green);
 }
 
 .category-mega-all {
   display: block;
   margin-top: 0.65rem;
-  padding-top: 0.75rem;
+  padding: 0.65rem 0.75rem 0;
   border-top: 1px solid var(--color-border);
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text);
+  text-decoration: none;
+}
+
+.header-cats-mobile {
+  grid-area: cats;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-self: end;
+  min-height: var(--touch-min, 44px);
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (min-width: 992px) {
+  .header-cats-mobile {
+    display: none;
+  }
+}
+
+.mobile-category-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 295;
+  height: 100dvh;
+  height: 100svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(var(--header-topbar-height) + var(--header-main-height) + env(safe-area-inset-top, 0px) + 0.75rem)
+    max(var(--page-gutter), env(safe-area-inset-left, 0px))
+    max(1.25rem, env(safe-area-inset-bottom, 0px));
+  padding-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 992px) {
+  .mobile-category-sheet {
+    display: none;
+  }
+}
+
+.mobile-category-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.mobile-category-sheet-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.mobile-category-sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min, 44px);
+  height: var(--touch-min, 44px);
+  border: none;
+  border-radius: 50%;
+  background: var(--color-bg-soft);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.mobile-category-all {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-min, 44px);
+  margin-bottom: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-necha-green) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-necha-green) 35%, var(--color-border));
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.mobile-category-sheet-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mobile-category-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: var(--touch-min, 44px);
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  color: var(--color-body);
+  text-decoration: none;
+  background: var(--color-bg);
 }
 
 .main-nav {
@@ -710,11 +946,11 @@ onUnmounted(() => {
 .mobile-backdrop {
   position: fixed;
   inset: 0;
-  top: calc(var(--header-topbar-height) + var(--header-main-height));
   border: none;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 280;
   cursor: pointer;
+  touch-action: none;
 }
 
 @media (min-width: 992px) {
@@ -724,17 +960,21 @@ onUnmounted(() => {
 }
 
 .mobile-panel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  max-height: calc(100dvh - var(--header-topbar-height) - var(--header-main-height));
-  overflow-y: auto;
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  box-shadow: var(--shadow-lg);
+  position: fixed;
+  inset: 0;
   z-index: 290;
-  padding: 1rem max(var(--page-gutter), env(safe-area-inset-left, 0px)) 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  padding: calc(var(--header-topbar-height) + var(--header-main-height) + env(safe-area-inset-top, 0px) + 0.75rem)
+    max(var(--page-gutter), env(safe-area-inset-left, 0px))
+    max(1.5rem, env(safe-area-inset-bottom, 0px));
   padding-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
 }
 
@@ -836,6 +1076,5 @@ onUnmounted(() => {
 .mobile-menu-enter-from,
 .mobile-menu-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
 }
 </style>

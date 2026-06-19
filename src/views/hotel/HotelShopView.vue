@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div class="sf-page-hero">
-      <p class="breadcrumb">{{ session.hotel?.name }} / {{ activeCategoryLabel }}</p>
-      <h1>Shop</h1>
-      <p>Personal care, beauty &amp; wellness — delivered to your room.</p>
-    </div>
+    <StorefrontPageHero
+      badge="In-room shop"
+      title="Shop"
+      description="Personal care, beauty & wellness — delivered to your room."
+    />
+
     <div class="shop-filter-toolbar">
       <form class="shop-filter-search" role="search" @submit.prevent>
         <input
@@ -18,21 +19,33 @@
           Clear
         </button>
       </form>
-      <CategoryPills
-        v-model="activeCategory"
-        :categories="visibleCategories"
-        :products="session.products"
-      />
+
+      <div class="shop-toolbar-row">
+        <CategoryPills
+          v-model="activeCategory"
+          :categories="visibleCategories"
+          :products="session.products"
+        />
+        <ProductViewToggle v-model="viewMode" class="shop-view-toggle" />
+      </div>
     </div>
+
     <p v-if="searchTerm" class="shop-filter-count">
       {{ displayProducts.length }} {{ displayProducts.length === 1 ? 'result' : 'results' }}
     </p>
-    <div v-if="displayProducts.length" class="sf-product-grid" style="padding-bottom: 24px">
+
+    <div
+      v-if="displayProducts.length"
+      class="sf-product-grid"
+      :class="viewMode === 'grid' ? 'sf-product-grid--cols-4' : 'sf-product-grid--cols-2 sf-product-grid--list'"
+      style="padding-bottom: 24px"
+    >
       <StorefrontProductCard
         v-for="product in displayProducts"
         :key="product.id"
         :product="product"
         :hotel-slug="session.slug"
+        :layout="viewMode === 'list' ? 'list' : 'grid'"
         @add="addProduct"
       />
     </div>
@@ -46,16 +59,19 @@ import { useRoute } from 'vue-router'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
 import { isValidCategoryId } from '@/config/categories'
-import { productCategories } from '@/config/storefront'
 import { useProductCategoryFilter } from '@/composables/useProductCategories'
+import { useProductViewMode } from '@/composables/useProductViewMode'
+import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
 import StorefrontProductCard from '@/components/storefront/StorefrontProductCard.vue'
 import CategoryPills from '@/components/storefront/CategoryPills.vue'
+import ProductViewToggle from '@/components/shop/ProductViewToggle.vue'
 import { toCommerceProduct } from '@/utils/storefront'
 import type { StorefrontProduct } from '@/types/storefront'
 
 const route = useRoute()
 const session = useHotelSessionStore()
 const cart = useCartStore()
+const { viewMode } = useProductViewMode()
 
 onMounted(() => {
   session.loadAllProducts()
@@ -76,11 +92,6 @@ const displayProducts = computed(() => {
       p.description.toLowerCase().includes(needle) ||
       (p.brand_name?.toLowerCase().includes(needle) ?? false),
   )
-})
-
-const activeCategoryLabel = computed(() => {
-  const match = productCategories.find((c) => c.id === activeCategory.value)
-  return match?.label ?? 'All products'
 })
 
 watch(
@@ -104,11 +115,25 @@ function addProduct(product: StorefrontProduct) {
 
 <style scoped>
 .shop-filter-toolbar {
-  padding: 16px 20px 0;
+  padding: 16px 0 0;
 }
 
-.shop-filter-toolbar :deep(.category-pills) {
+.shop-toolbar-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.shop-toolbar-row :deep(.category-pills) {
+  flex: 1;
+  min-width: 0;
   padding-inline: 0;
+}
+
+.shop-view-toggle {
+  flex-shrink: 0;
+  margin-bottom: 16px;
 }
 
 .shop-filter-search {
@@ -131,7 +156,7 @@ function addProduct(product: StorefrontProduct) {
   padding: 8px 0;
   font-family: inherit;
   font-size: 13px;
-  color: var(--sf-charcoal);
+  color: inherit;
 }
 
 .shop-filter-search input:focus {
@@ -150,13 +175,13 @@ function addProduct(product: StorefrontProduct) {
 
 .shop-filter-count {
   margin: 0;
-  padding: 0 20px 8px;
+  padding: 0 0 8px;
   font-size: 11px;
   color: var(--sf-muted);
 }
 
 .category-empty {
-  padding: 2rem 20px;
+  padding: 2rem 0;
   text-align: center;
   font-size: 13px;
   color: var(--sf-muted);

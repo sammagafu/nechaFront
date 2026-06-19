@@ -1,7 +1,8 @@
 <template>
   <div v-if="loading" class="admin-loading">Loading hotels…</div>
   <p v-else-if="error" class="admin-error">{{ error }}</p>
-  <div v-else class="admin-card">
+  <div v-else class="admin-page">
+    <div class="admin-card">
     <div class="admin-card-head">
       <h2>All hotels</h2>
       <router-link to="/admin/hotels/new" class="admin-btn admin-btn--primary">+ Add hotel</router-link>
@@ -39,6 +40,7 @@
       </table>
     </div>
     <p v-else class="admin-empty">No hotels yet.</p>
+    </div>
   </div>
 </template>
 

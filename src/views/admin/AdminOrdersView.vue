@@ -1,7 +1,8 @@
 <template>
   <div v-if="loading" class="admin-loading">Loading orders…</div>
   <p v-else-if="error" class="admin-error">{{ error }}</p>
-  <div v-else class="admin-card">
+  <div v-else class="admin-page">
+    <div class="admin-card">
     <div v-if="orders.length" class="admin-table-wrap">
       <table class="admin-table">
         <thead>
@@ -37,6 +38,7 @@
       </table>
     </div>
     <p v-else class="admin-empty">No orders yet.</p>
+    </div>
   </div>
 </template>
 

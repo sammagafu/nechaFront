@@ -22,6 +22,9 @@
             :style="{ '--vf-tint': item.tint }"
           >
             <span class="vf-card-accent" aria-hidden="true" />
+            <span v-if="item.icon" class="vf-card-icon" aria-hidden="true">
+              <Icon :name="item.icon" :size="22" />
+            </span>
             <span class="vf-card-tag">{{ item.tag }}</span>
             <h3 class="vf-card-title">{{ item.label }}</h3>
             <p class="vf-card-desc">{{ item.description }}</p>
@@ -39,6 +42,9 @@
             @click="onHashClick($event, item.href)"
           >
             <span class="vf-card-accent" aria-hidden="true" />
+            <span v-if="item.icon" class="vf-card-icon" aria-hidden="true">
+              <Icon :name="item.icon" :size="22" />
+            </span>
             <span class="vf-card-tag">{{ item.tag }}</span>
             <h3 class="vf-card-title">{{ item.label }}</h3>
             <p class="vf-card-desc">{{ item.description }}</p>
@@ -55,6 +61,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import Icon from '@/components/ui/Icon.vue'
+import type { IconName } from '@/components/ui/icons'
 
 export interface VerticalFeature {
   tag: string
@@ -62,6 +70,7 @@ export interface VerticalFeature {
   description: string
   action: string
   tint: string
+  icon?: IconName
   to?: string
   href?: string
 }
@@ -209,6 +218,17 @@ function onHashClick(event: MouseEvent, href?: string) {
   background: var(--vf-tint);
   opacity: 0;
   transition: opacity var(--transition-fast);
+}
+
+.vf-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--vf-tint) 14%, var(--color-surface));
+  color: var(--vf-tint);
 }
 
 .vf-card:hover {

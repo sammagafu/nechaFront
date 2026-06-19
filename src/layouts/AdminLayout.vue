@@ -9,22 +9,44 @@
     />
 
     <aside class="admin-sidebar">
-      <div class="admin-brand">
-        <strong>NECHA Admin</strong>
-        <span>Platform control</span>
-      </div>
-      <nav class="admin-nav">
-        <router-link to="/admin" @click="navOpen = false">Dashboard</router-link>
-        <router-link to="/admin/hotels" @click="navOpen = false">Hotels</router-link>
+      <router-link to="/admin" class="admin-brand" @click="navOpen = false">
+        <NechaLogo :alt="adminBrand.name" class="admin-brand-logo" :width="120" :height="32" on-dark />
+        <span class="admin-brand-kicker">{{ adminBrand.console }}</span>
+        <span class="admin-brand-tagline">{{ adminBrand.sidebarTagline }}</span>
+      </router-link>
+
+      <nav class="admin-nav" aria-label="Admin navigation">
+        <p class="admin-nav-label">Overview</p>
+        <router-link to="/admin" end @click="navOpen = false">Dashboard</router-link>
+        <router-link to="/admin/analytics" @click="navOpen = false">Analytics</router-link>
+        <router-link to="/admin/store" @click="navOpen = false">Store owner</router-link>
+
+        <p class="admin-nav-label">Commerce</p>
         <router-link to="/admin/orders" @click="navOpen = false">Orders</router-link>
         <router-link to="/admin/reservations" @click="navOpen = false">Reservations</router-link>
-        <router-link to="/about" target="_blank" rel="noopener">About page</router-link>
-        <router-link to="/terms" target="_blank" rel="noopener">Terms page</router-link>
-        <router-link to="/" target="_blank" rel="noopener">View site</router-link>
+
+        <p class="admin-nav-label">Partners</p>
+        <router-link to="/admin/hotels" @click="navOpen = false">Hotels</router-link>
+        <router-link to="/admin/discovery" @click="navOpen = false">Discovery Portal</router-link>
+
+        <p class="admin-nav-label">Engagement</p>
+        <router-link to="/admin/chat" @click="navOpen = false">Messages</router-link>
+        <router-link to="/admin/alerts" @click="navOpen = false">Alerts</router-link>
+        <router-link to="/admin/webhooks" @click="navOpen = false">Webhooks</router-link>
+
+        <p class="admin-nav-label">Site</p>
+        <router-link to="/" class="admin-nav-external" target="_blank" rel="noopener" @click="navOpen = false">
+          View necha.africa
+        </router-link>
+        <router-link to="/shop" class="admin-nav-external" target="_blank" rel="noopener" @click="navOpen = false">
+          Shop
+        </router-link>
       </nav>
+
       <div class="admin-sidebar-foot">
-        <p>{{ auth.user?.email }}</p>
-        <button type="button" class="admin-btn admin-btn--ghost admin-btn--sidebar" @click="logout">
+        <p>{{ auth.user?.full_name || 'Signed in' }}</p>
+        <small>{{ auth.user?.email }}</small>
+        <button type="button" class="admin-btn admin-btn--sidebar" @click="logout">
           Sign out
         </button>
       </div>
@@ -38,7 +60,10 @@
           </button>
           <h1>{{ title }}</h1>
         </div>
-        <slot name="actions" />
+        <div class="admin-topbar-actions">
+          <NotificationBell />
+          <slot name="actions" />
+        </div>
       </header>
       <main class="admin-content">
         <router-view />
@@ -50,6 +75,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import NechaLogo from '@/components/NechaLogo.vue'
+import NotificationBell from '@/components/NotificationBell.vue'
+import { adminBrand } from '@/config/admin'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -59,17 +87,27 @@ const navOpen = ref(false)
 
 const titles: Record<string, string> = {
   'admin-dashboard': 'Dashboard',
-  'admin-hotels': 'Hotels',
-  'admin-hotel-new': 'New hotel',
+  'admin-analytics': 'Analytics',
+  'admin-store': 'Store owner',
+  'admin-store-hotel': 'Store owner',
+  'admin-hotels': 'Partner hotels',
+  'admin-hotel-new': 'Add hotel',
   'admin-hotel-edit': 'Edit hotel',
-  'admin-products': 'Products',
-  'admin-product-new': 'New product',
+  'admin-products': 'Storefront products',
+  'admin-product-new': 'Add product',
   'admin-product-edit': 'Edit product',
-  'admin-orders': 'Orders',
+  'admin-orders': 'Guest orders',
   'admin-reservations': 'Reservations',
+  'admin-discovery': 'Discovery Portal',
+  'admin-discovery-new': 'New listing',
+  'admin-discovery-edit': 'Edit listing',
+  'admin-chat': 'Messages',
+  'admin-chat-detail': 'Messages',
+  'admin-alerts': 'System alerts',
+  'admin-webhooks': 'Webhooks',
 }
 
-const title = computed(() => titles[String(route.name)] || 'Admin')
+const title = computed(() => titles[String(route.name)] || adminBrand.console)
 
 watch(
   () => route.fullPath,

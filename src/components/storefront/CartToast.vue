@@ -6,19 +6,23 @@
       </span>
       <div>
         <strong>{{ message }}</strong>
-        <span>Added to your room cart</span>
+        <span>{{ subtitle }}</span>
       </div>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useCartStore } from '@/stores/cart'
+import { SHOP_CART_SCOPE } from '@/utils/cartScope'
 
 const cart = useCartStore()
 const visible = ref(false)
 const message = ref('')
+const subtitle = computed(() =>
+  cart.scope === SHOP_CART_SCOPE ? 'Added to your cart' : 'Added to your room cart',
+)
 let timer: ReturnType<typeof setTimeout> | undefined
 
 watch(

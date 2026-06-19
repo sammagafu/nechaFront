@@ -23,4 +23,17 @@ export const siteImages = {
     baobab: '/assets/assets-5.jpg',
     clove: '/assets/1.jpg',
   },
+  partnerLanding: {
+    heroA: '/assets/banner-2.jpg',
+    heroB: '/assets/assets-5.jpg',
+    platform: '/assets/assets-3.jpg',
+    showcase: '/assets/assets-4.jpg',
+    why: '/assets/2.jpg',
+    steps: ['/assets/banner-2.jpg', '/assets/1.jpg', '/assets/2.jpg', '/assets/assets-3.jpg'] as const,
+    brands: '/assets/3.jpg',
+    founding: '/assets/assets-5.jpg',
+    calculator: '/assets/assets-4.jpg',
+    discovery: '/assets/1.jpg',
+    mosaic: ['/assets/assets-3.jpg', '/assets/assets-4.jpg', '/assets/assets-5.jpg'] as const,
+  },
 } as const

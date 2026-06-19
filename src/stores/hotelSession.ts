@@ -6,7 +6,10 @@ import type { StorefrontHotel, StorefrontProduct } from '@/types/storefront'
 
 const REFERRAL_KEY = 'necha_hotel_referral'
 const REFERRAL_APPLIED_KEY = 'necha_referral_applied'
-const ROOM_KEY = 'necha_hotel_room'
+
+function roomStorageKey(slug: string) {
+  return `necha_hotel_room_${slug}`
+}
 
 function readReferralApplied(slug: string): boolean {
   try {
@@ -37,7 +40,7 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
   const products = ref<StorefrontProduct[]>([])
   const loading = ref(false)
   const error = ref('')
-  const roomNumber = ref(localStorage.getItem(ROOM_KEY) || '')
+  const roomNumber = ref('')
   const referralApplied = ref(true)
 
   const referralCode = computed(() => hotel.value?.referral_code || refCode.value)
@@ -49,13 +52,16 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
 
   function setRoomNumber(value: string) {
     roomNumber.value = value
-    localStorage.setItem(ROOM_KEY, value)
+    if (slug.value) {
+      localStorage.setItem(roomStorageKey(slug.value), value)
+    }
   }
 
   async function load(slugValue: string, ref?: string) {
     loading.value = true
     error.value = ''
     slug.value = slugValue
+    roomNumber.value = localStorage.getItem(roomStorageKey(slugValue)) || ''
     if (ref) {
       persistReferral(ref)
       referralApplied.value = true
