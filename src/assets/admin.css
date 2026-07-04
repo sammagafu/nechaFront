@@ -273,6 +273,26 @@
   color: var(--color-body, #5f5e5a);
 }
 
+.admin-page-head {
+  margin: 0 0 var(--admin-gap-stack);
+  max-width: 58ch;
+}
+
+.admin-page-head h1 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.admin-page-head p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-body, #5f5e5a);
+}
+
 .admin-commerce-shell {
   display: grid;
   gap: 1rem;
@@ -605,6 +625,11 @@
 .admin-badge--confirmed {
   background: color-mix(in srgb, var(--color-necha-green-light) 55%, #fff);
   color: var(--color-necha-green-dark, #1a1a1a);
+}
+
+.admin-muted {
+  font-size: 12px;
+  color: var(--color-muted, #8a8985);
 }
 
 .admin-btn {

@@ -61,10 +61,11 @@
 
           <p v-if="loading" class="hp-lead">Loading experiences…</p>
           <div v-else-if="filteredItems.length" class="hp-discovery-rail" aria-label="Discovery experiences">
-            <article
+            <router-link
               v-for="item in filteredItems"
               :key="item.id"
-              class="hp-discovery-item"
+              :to="discoveryPath(item.slug)"
+              class="hp-discovery-item discovery-item-link"
             >
               <div class="hp-discovery-item-media">
                 <img v-if="item.image_url" :src="item.image_url" :alt="item.name" loading="lazy" />
@@ -74,17 +75,9 @@
               <div class="hp-discovery-item-body">
                 <h3>{{ item.name }}</h3>
                 <p class="hp-discovery-item-meta">{{ itemMeta(item) }}</p>
-                <a
-                  v-if="itemLink(item)"
-                  :href="itemLink(item)!"
-                  class="hp-discovery-item-action"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ itemCta(item) }} →
-                </a>
+                <span class="hp-discovery-item-action">View details →</span>
               </div>
-            </article>
+            </router-link>
           </div>
           <p v-else class="hp-lead">Discovery listings will appear here once published.</p>
         </div>
@@ -98,6 +91,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { fetchDiscoveryPortal } from '@/api/discovery'
 import { appConfig } from '@/config/app'
 import {
+  discoveryPath,
   discoverySections,
   eventSubcategories,
   restaurantSubcategories,
@@ -172,20 +166,6 @@ function itemMeta(item: DiscoveryItem) {
     )
   }
   return parts.slice(0, 3).join(' · ')
-}
-
-function itemLink(item: DiscoveryItem) {
-  return item.ticket_url || item.website || (item.phone ? `tel:${item.phone.replace(/\s/g, '')}` : '')
-}
-
-function itemCta(item: DiscoveryItem) {
-  if (item.ticket_url) {
-    if (item.ticket_mode === 'platform') return 'Get tickets'
-    if (item.ticket_mode === 'referral') return 'View tickets'
-    return 'Book now'
-  }
-  if (item.phone) return 'Call to book'
-  return 'Learn more'
 }
 
 onMounted(async () => {

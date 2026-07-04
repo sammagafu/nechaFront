@@ -59,12 +59,22 @@ export const useHotelSessionStore = defineStore('hotelSession', () => {
     }
   }
 
-  async function load(slugValue: string, ref?: string, entryChannel: HotelEntryChannel = 'room') {
+  async function load(
+    slugValue: string,
+    ref?: string,
+    entryChannel: HotelEntryChannel = 'room',
+    roomFromQuery?: string,
+  ) {
     loading.value = true
     error.value = ''
     slug.value = slugValue
     channel.value = normalizeHotelChannel(entryChannel)
-    roomNumber.value = localStorage.getItem(roomStorageKey(slugValue)) || ''
+    const storedRoom = localStorage.getItem(roomStorageKey(slugValue)) || ''
+    const qrRoom = roomFromQuery?.trim() || ''
+    roomNumber.value = qrRoom || storedRoom
+    if (qrRoom) {
+      localStorage.setItem(roomStorageKey(slugValue), qrRoom)
+    }
     if (ref) {
       persistReferral(ref)
       referralApplied.value = true

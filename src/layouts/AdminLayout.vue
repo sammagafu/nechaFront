@@ -100,6 +100,44 @@
           Discovery Portal
         </router-link>
 
+        <router-link
+          to="/admin/inquiries"
+          class="admin-nav-link"
+          :class="{ 'router-link-active': navActive('/admin/inquiries') }"
+          @click="navOpen = false"
+        >
+          Inquiries
+        </router-link>
+
+        <p class="admin-nav-label">Finance</p>
+        <router-link
+          to="/admin/influencers"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/influencers') }"
+          @click="navOpen = false"
+        >
+          Influencers
+        </router-link>
+        <router-link
+          to="/admin/catalogue"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/catalogue') }"
+          @click="navOpen = false"
+        >
+          Catalogue
+        </router-link>
+        <router-link
+          to="/admin/payouts"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/payouts') }"
+          @click="navOpen = false"
+        >
+          Payouts
+        </router-link>
+
         <p class="admin-nav-label">Engagement</p>
         <router-link
           to="/admin/chat"
@@ -132,9 +170,6 @@
         <p class="admin-nav-label">Site</p>
         <router-link to="/" class="admin-nav-external" target="_blank" rel="noopener" @click="navOpen = false">
           View necha.africa
-        </router-link>
-        <router-link to="/shop" class="admin-nav-external" target="_blank" rel="noopener" @click="navOpen = false">
-          Shop
         </router-link>
       </nav>
 
@@ -204,6 +239,9 @@ const titles: Record<string, string> = {
   'admin-alerts': 'System alerts',
   'admin-hotel-import': 'CSV import',
   'admin-webhooks': 'Webhooks',
+  'admin-influencers': 'Influencers',
+  'admin-catalogue': 'Central catalogue',
+  'admin-payouts': 'Payout batches',
 }
 
 function navActive(path: string, options?: { exact?: boolean }) {

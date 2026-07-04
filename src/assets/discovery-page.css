@@ -194,3 +194,194 @@
 .btn-view:hover {
   text-decoration: underline;
 }
+
+.discovery-item-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.discovery-item-link:hover {
+  transform: translateY(-2px);
+}
+
+.discovery-item-link:focus-visible {
+  outline: 2px solid var(--color-necha-green-dark);
+  outline-offset: 2px;
+}
+
+.discovery-detail-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 1rem 0 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.discovery-detail-hero {
+  position: relative;
+  margin-top: 0.75rem;
+  min-height: clamp(220px, 40vw, 420px);
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+.discovery-detail-hero-media,
+.discovery-detail-hero-placeholder {
+  position: absolute;
+  inset: 0;
+}
+
+.discovery-detail-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.discovery-detail-hero-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.discovery-detail-hero-overlay {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(220px, 40vw, 420px);
+  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.72) 100%);
+  color: #fff;
+}
+
+.discovery-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.discovery-detail-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.discovery-detail-badge--soft {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a1a1a;
+}
+
+.discovery-detail-badge--featured {
+  background: var(--color-necha-green-dark, #5a8f2a);
+}
+
+.discovery-detail-title {
+  margin: 0;
+  max-width: 14ch;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.discovery-detail-lead {
+  margin: 0.75rem 0 0;
+  max-width: 52ch;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.discovery-detail-body {
+  padding: clamp(1.5rem, 3vw, 2.5rem) 0 3rem;
+}
+
+.discovery-detail-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .discovery-detail-layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+    align-items: start;
+  }
+}
+
+.discovery-detail-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.discovery-detail-description {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.discovery-detail-card {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border, #e8e6e0);
+  border-radius: 16px;
+  background: var(--color-surface, #fff);
+}
+
+.discovery-detail-facts {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 1.25rem;
+}
+
+.discovery-detail-facts div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.discovery-detail-facts dt {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.discovery-detail-facts dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.discovery-detail-actions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.discovery-detail-back {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 13px;
+  color: var(--color-necha-green-dark);
+  text-decoration: none;
+}
+
+.discovery-detail-back:hover {
+  text-decoration: underline;
+}

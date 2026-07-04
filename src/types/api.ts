@@ -41,6 +41,7 @@ export interface Product {
   price: number
   currency: string
   image_url: string
+  images?: string[]
   stock: number
   is_featured?: boolean
 }
@@ -63,6 +64,7 @@ export interface HotelMenuItem {
   description: string
   price: number
   tag?: string
+  menu_kind?: string
 }
 
 export interface HotelMenuResponse {
@@ -148,6 +150,7 @@ export interface ProductOrderRequest {
   payment_method?: string
   currency?: string
   delivery_fee?: number
+  delivery_zone_code?: string
   return_url?: string
   cancel_url?: string
   items: ProductOrderItem[]

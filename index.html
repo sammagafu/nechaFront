@@ -18,14 +18,14 @@
         var theme = dark ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.colorScheme = theme;
-        var bg = dark ? '#0c0c0c' : '#faf9f7';
+        var bg = dark ? '#0a0a0a' : '#faf9f7';
         document.documentElement.style.background = bg;
         document.body && (document.body.style.background = bg);
       })();
     </script>
     <style>
       html, body { background: #faf9f7; }
-      html[data-theme='dark'], html[data-theme='dark'] body { background: #0c0c0c; }
+      html[data-theme='dark'], html[data-theme='dark'] body { background: #0a0a0a; }
       #app:empty::before {
         content: '';
         position: fixed;
@@ -35,7 +35,7 @@
       html[data-theme='dark'] #app:empty::before {
         background:
           radial-gradient(ellipse 70% 45% at 50% 100%, rgba(134, 188, 66, 0.14), transparent 72%),
-          #0c0c0c;
+          #0a0a0a;
       }
     </style>
   </head>

@@ -12,6 +12,11 @@ export async function fetchDiscoveryPortal(slug: string) {
   return data.data
 }
 
+export async function fetchDiscoveryItem(slug: string) {
+  const { data } = await client.get<ApiSuccess<DiscoveryItem>>(`/discovery/items/${encodeURIComponent(slug)}`)
+  return data.data
+}
+
 export async function submitDiscoveryEvent(payload: SubmitDiscoveryEventPayload) {
   const { data } = await client.post<ApiSuccess<DiscoveryItem>>('/discovery/events/submit', payload)
   return data.data

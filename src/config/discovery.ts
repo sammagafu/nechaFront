@@ -45,3 +45,11 @@ export function subcategoryLabel(section: DiscoverySectionId, id: string) {
   }[section]
   return map.find((c) => c.id === id)?.label ?? id.replace(/_/g, ' ')
 }
+
+export function sectionLabel(section: DiscoverySectionId) {
+  return discoverySections.find((s) => s.id === section)?.label ?? section
+}
+
+export function discoveryPath(slug: string) {
+  return `/discovery/${encodeURIComponent(slug)}`
+}

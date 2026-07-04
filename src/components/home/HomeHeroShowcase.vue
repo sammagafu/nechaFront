@@ -833,3 +833,20 @@ defineExpose({ goTo, next, prev, pause, resume })
   }
 }
 </style>
+
+<style>
+/* Theme-aware nav below hero — must be unscoped (used on partner landing + elsewhere) */
+[data-theme='dark'] .hero-showcase {
+  background: var(--color-bg);
+}
+
+[data-theme='dark'] .hero-brand-tab.on {
+  border-color: var(--color-necha-green);
+  color: var(--color-necha-green);
+  background: color-mix(in srgb, var(--color-necha-green) 14%, var(--color-surface));
+}
+
+[data-theme='dark'] .hero-brand-meta {
+  color: var(--color-muted);
+}
+</style>

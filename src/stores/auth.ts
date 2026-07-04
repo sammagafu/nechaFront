@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAdmin = computed(() => user.value?.role === 'admin')
   const isCustomer = computed(() => user.value?.role === 'customer')
+  const isPartner = computed(() => user.value?.role === 'partner')
   const isAuthenticated = computed(() => !!token.value)
 
   function setSession(accessToken: string, u: User) {
@@ -42,6 +43,23 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await apiLogin(email, password)
       if (result.user.role !== 'admin') {
         throw new Error('Admin access only')
+      }
+      setSession(result.access_token, result.user)
+    } catch (e) {
+      error.value = getApiError(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loginPartner(email: string, password: string) {
+    loading.value = true
+    error.value = ''
+    try {
+      const result = await apiLogin(email, password)
+      if (result.user.role !== 'partner') {
+        throw new Error('Partner access only')
       }
       setSession(result.access_token, result.user)
     } catch (e) {
@@ -143,8 +161,10 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     isAdmin,
     isCustomer,
+    isPartner,
     isAuthenticated,
     loginAdmin,
+    loginPartner,
     loginCustomer,
     registerCustomer,
     loginWithGoogle,

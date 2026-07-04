@@ -10,8 +10,8 @@
         <p><strong>Estimated delivery:</strong><br>{{ deliveryEstimate }}</p>
         <p><strong>Order reference:</strong><br>#{{ orderId }}</p>
         <p v-if="orderTotal">
-          <strong>Total paid:</strong><br>{{ formatTZS(orderTotal) }}
-          <span v-if="orderTotal" class="confirm-usd">≈ {{ formatUSD(orderTotal) }}</span>
+          <strong>Total paid:</strong><br>
+          <DualPrice :amount-tzs="orderTotal" stack />
         </p>
         <p v-if="pointsEarned">
           Your order earns you {{ pointsEarned }} Necha points. Create an account to track your points and earn on future orders.
@@ -35,7 +35,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDeliveryEstimate } from '@/composables/useDeliveryEstimate'
-import { formatTZS, formatUSD } from '@/composables/usePricing'
+import DualPrice from '@/components/storefront/DualPrice.vue'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { storefrontConfig } from '@/config/storefront'
 

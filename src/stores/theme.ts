@@ -13,11 +13,10 @@ function getInitialTheme(): ThemeMode {
 }
 
 function applyTheme(mode: ThemeMode) {
-  const bg = mode === 'dark' ? '#0c0c0c' : '#faf9f7'
   document.documentElement.setAttribute('data-theme', mode)
   document.documentElement.style.colorScheme = mode
-  document.documentElement.style.background = bg
-  if (document.body) document.body.style.background = bg
+  document.documentElement.style.removeProperty('background')
+  document.body?.style.removeProperty('background')
 }
 
 export const useThemeStore = defineStore('theme', () => {

@@ -7,6 +7,7 @@ export interface PartnerHotelCard {
   location: string
   initials: string
   slug: string
+  logo_url?: string
 }
 
 export interface PartnersLandingData {

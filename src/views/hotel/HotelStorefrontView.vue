@@ -77,6 +77,8 @@
       </article>
     </div>
 
+    <GuestRequestForm class="sf-reveal" />
+
     <div class="rewards-banner sf-reveal">
       <div>
         <h3>Earn Necha rewards on every purchase</h3>
@@ -99,6 +101,7 @@ import VerticalFeatures, { type VerticalFeature } from '@/components/home/Vertic
 import type { IconName } from '@/components/ui/icons'
 import StorefrontProductCard from '@/components/storefront/StorefrontProductCard.vue'
 import CategoryPills from '@/components/storefront/CategoryPills.vue'
+import GuestRequestForm from '@/components/storefront/GuestRequestForm.vue'
 import { toCommerceProduct } from '@/utils/storefront'
 import type { StorefrontProduct } from '@/types/storefront'
 
@@ -121,14 +124,15 @@ const hotelVerticalFeatures = computed(() => {
   const base = `/hotel/${slug}`
   const features: Array<VerticalFeature & { service: string }> = [
     { tag: 'Shop', label: 'Personal care', description: 'Wellness products delivered to your room.', action: 'Browse shop', tint: '#5a8f28', icon: 'sparkles' satisfies IconName, to: `${base}/shop`, service: 'shop' },
-    { tag: 'Food', label: 'Order food', description: 'Room service — meals and drinks to your door.', action: 'Order now', tint: '#854f0b', icon: 'gift' satisfies IconName, to: `${base}/food`, service: 'food' },
+    { tag: 'Discover', label: 'Discover Tanzania', description: 'Restaurants, tours, events and hotel services.', action: 'Explore', tint: '#534AB7', icon: 'star' satisfies IconName, to: `${base}/discover`, service: 'discover' },
+    { tag: 'Food', label: 'Food & bar', description: 'Room service — meals, drinks and bar menu to your door.', action: 'Order now', tint: '#854f0b', icon: 'gift' satisfies IconName, to: `${base}/food`, service: 'food' },
     { tag: 'Spa', label: 'Spa & wellness', description: 'Book a massage, facial or treatment.', action: 'Book session', tint: '#0f6e56', icon: 'spa' satisfies IconName, to: `${base}/spa`, service: 'spa' },
-    { tag: 'Dine', label: 'Restaurant', description: 'Reserve lunch or dinner at the hotel.', action: 'Reserve', tint: '#534AB7', icon: 'star' satisfies IconName, to: `${base}/restaurant`, service: 'restaurant' },
-    { tag: 'Bar', label: 'Bar & lounge', description: 'Cocktails and lounge reservations.', action: 'View menu', tint: '#2c2c2a', icon: 'spray' satisfies IconName, to: `${base}/bar`, service: 'bar' },
   ]
   const active = new Set(session.hotel?.services || [])
   return features.filter((f) => {
-    if (f.service === 'shop' || f.service === 'food') return true
+    if (f.service === 'shop') return true
+    if (f.service === 'discover') return active.has('discover') || active.has('nearby')
+    if (f.service === 'food') return active.has('restaurant') || active.has('bar')
     return active.has(f.service)
   })
 })

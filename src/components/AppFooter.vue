@@ -4,11 +4,11 @@
       <div class="footer-inner">
         <div class="footer-col footer-col--brand">
           <router-link to="/" class="footer-logo-link">
-            <NechaLogo alt="NECHA" class="footer-logo" :width="120" :height="32" />
+            <NechaLogo alt="Necha Africa" class="footer-logo" :width="120" :height="32" />
           </router-link>
           <p class="footer-about">
             Personal care, beauty and wellness — delivered across Dar es Salaam.
-            Shop curated African brands or scan your hotel QR to order to your room.
+            Scan your hotel QR to order to your room.
           </p>
           <ul class="footer-contact-list">
             <li>
@@ -30,13 +30,13 @@
           <h4 class="footer-widget-title">Information</h4>
           <nav class="footer-links">
             <router-link to="/">Home</router-link>
-            <router-link to="/shop">Shop</router-link>
             <router-link to="/about">About Us</router-link>
-            <router-link to="/discovery">Discovery</router-link>
-            <router-link to="/hotel-partners">Hotel Partners</router-link>
+            <router-link to="/discovery">Discover Tanzania</router-link>
+            <router-link to="/#form-sec">Become a partner</router-link>
+            <router-link to="/brands">Brands</router-link>
             <router-link to="/earn-with-necha">Earn With Necha</router-link>
             <router-link to="/delivery">Delivery Information</router-link>
-            <router-link to="/sign-up">Rewards</router-link>
+            <router-link to="/rewards">Rewards</router-link>
             <router-link to="/terms">Terms &amp; Conditions</router-link>
             <router-link to="/contact">Contact</router-link>
           </nav>
@@ -46,12 +46,7 @@
           <h4 class="footer-widget-title">My Account</h4>
           <nav class="footer-links">
             <router-link to="/sign-in">Sign in</router-link>
-            <router-link to="/sign-up">Sign up</router-link>
             <router-link to="/account">My account</router-link>
-            <router-link to="/cart">Cart</router-link>
-            <router-link to="/wishlist">Wishlist</router-link>
-            <router-link to="/checkout">Checkout</router-link>
-            <router-link to="/admin/login">Admin Login</router-link>
           </nav>
         </div>
 

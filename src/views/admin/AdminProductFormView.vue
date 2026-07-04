@@ -32,8 +32,11 @@
           <option value="new">New</option>
         </select>
       </label>
-      <label>Image URL<input v-model="form.image_url" /></label>
+      <label>Main image URL<input v-model="form.image_url" /></label>
     </div>
+    <label>Additional image URLs (one per line)
+      <textarea v-model="extraImages" rows="3" placeholder="https://…/image-2.jpg&#10;https://…/image-3.jpg" />
+    </label>
     <label style="flex-direction: row; align-items: center; gap: 0.5rem">
       <input v-model="form.is_featured" type="checkbox" /> Featured (guest favourites)
     </label>
@@ -64,22 +67,34 @@ const form = reactive({
   name: '', slug: '', brand_name: 'NECHA NATURALS', description: '', category: 'skin_care',
   badge: '', price: 0, currency: 'TZS', image_url: '', stock: 0, is_featured: false, is_active: true,
 })
+const extraImages = ref('')
 
 onMounted(async () => {
   if (!isEdit.value) return
   const products = await fetchProducts(hotelId)
   const product = products.find((p) => p.id === route.params.productId)
-  if (product) Object.assign(form, product)
+  if (product) {
+    Object.assign(form, product)
+    extraImages.value = (product.images ?? []).join('\n')
+  }
 })
+
+function parseImages() {
+  return extraImages.value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+}
 
 async function submit() {
   saving.value = true
   error.value = ''
   try {
+    const payload = { ...form, images: parseImages() }
     if (isEdit.value) {
-      await updateProduct(route.params.productId as string, { ...form })
+      await updateProduct(route.params.productId as string, payload)
     } else {
-      await createProduct(hotelId, { ...form })
+      await createProduct(hotelId, payload)
     }
     router.push(`/admin/hotels/${hotelId}/products`)
   } catch (e) {

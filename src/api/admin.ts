@@ -64,6 +64,41 @@ export async function updateProduct(id: string, payload: Partial<AdminProduct>) 
   return data.data
 }
 
+export interface AdminMenuItem {
+  id: string
+  slug: string
+  category: string
+  name: string
+  description: string
+  price: number
+  currency: string
+  tag: string
+  menu_kind: string
+  sort_order: number
+  is_active: boolean
+}
+
+export async function fetchMenuItems(hotelId: string, kind?: string) {
+  const { data } = await client.get<ApiSuccess<AdminMenuItem[]>>(`/admin/hotels/${hotelId}/menu-items`, {
+    params: kind ? { kind } : undefined,
+  })
+  return data.data
+}
+
+export async function createMenuItem(hotelId: string, payload: Partial<AdminMenuItem>) {
+  const { data } = await client.post<ApiSuccess<AdminMenuItem>>(`/admin/hotels/${hotelId}/menu-items`, payload)
+  return data.data
+}
+
+export async function updateMenuItem(id: string, payload: Partial<AdminMenuItem>) {
+  const { data } = await client.patch<ApiSuccess<AdminMenuItem>>(`/admin/menu-items/${id}`, payload)
+  return data.data
+}
+
+export async function deleteMenuItem(id: string) {
+  await client.delete(`/admin/menu-items/${id}`)
+}
+
 export async function fetchOrders() {
   const { data } = await client.get<ApiSuccess<AdminOrder[]>>('/admin/orders')
   return data.data
@@ -116,5 +151,33 @@ export async function importHotelCSV(
     form,
     { headers: { 'Content-Type': 'multipart/form-data' } },
   )
+  return data.data
+}
+
+export interface InquiryRecord {
+  id: string
+  type: string
+  status: string
+  name?: string
+  email: string
+  phone?: string
+  company?: string
+  role?: string
+  location?: string
+  category?: string
+  message?: string
+  metadata?: string
+  created_at: string
+}
+
+export async function fetchInquiries(status?: string, type?: string) {
+  const { data } = await client.get<ApiSuccess<InquiryRecord[]>>('/admin/inquiries', {
+    params: { status: status || undefined, type: type || undefined },
+  })
+  return data.data
+}
+
+export async function updateInquiryStatus(id: string, status: string) {
+  const { data } = await client.patch<ApiSuccess<InquiryRecord>>(`/admin/inquiries/${id}/status`, { status })
   return data.data
 }

@@ -516,3 +516,36 @@
     transform: scale(0.85);
   }
 }
+
+/* Dark mode — shared homepage / partner sections */
+[data-theme='dark'] .hp-section--soft {
+  background: var(--color-bg-soft);
+}
+
+[data-theme='dark'] .hp-promo {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-necha-green) 18%, var(--color-surface)),
+    var(--color-surface)
+  );
+  border-color: color-mix(in srgb, var(--color-necha-green) 28%, var(--color-border));
+}
+
+[data-theme='dark'] .hp-discovery-tab.on {
+  border-color: var(--color-necha-green);
+  color: var(--color-necha-green);
+  background: color-mix(in srgb, var(--color-necha-green) 14%, var(--color-surface));
+}
+
+[data-theme='dark'] .hp-discovery-item-action {
+  color: var(--color-necha-green);
+}
+
+[data-theme='dark'] .hp-feature-item {
+  border-color: var(--color-border);
+}
+
+[data-theme='dark'] .hp-platform-visual-cap {
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  border-color: var(--color-border);
+}

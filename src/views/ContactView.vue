@@ -20,7 +20,7 @@
         </p>
       </aside>
 
-      <form class="contact-form form-stack card card-elevated" @submit.prevent="submitted = true">
+      <form class="contact-form form-stack card card-elevated" @submit.prevent="submit">
         <div class="field">
           <label for="contact-type">I am a</label>
           <select id="contact-type" v-model="form.type" required>
@@ -50,8 +50,11 @@
           <label for="contact-message">How can we help you?</label>
           <textarea id="contact-message" v-model="form.message" rows="5" required />
         </div>
+        <p v-if="error" class="error">{{ error }}</p>
         <p v-if="submitted" class="success">Thank you — we'll be in touch shortly.</p>
-        <button v-else class="btn btn-block" type="submit">Send Message</button>
+        <button v-else class="btn btn-block" type="submit" :disabled="submitting">
+          {{ submitting ? 'Sending…' : 'Send Message' }}
+        </button>
       </form>
     </div>
   </div>
@@ -61,8 +64,12 @@
 import { reactive, ref } from 'vue'
 import { appConfig } from '@/config/app'
 import { siteImages } from '@/config/images'
+import { submitInquiry } from '@/api/inquiries'
+import { getApiError } from '@/api/client'
 
 const submitted = ref(false)
+const submitting = ref(false)
+const error = ref('')
 const form = reactive({
   type: '',
   name: '',
@@ -70,6 +77,26 @@ const form = reactive({
   email: '',
   message: '',
 })
+
+async function submit() {
+  submitting.value = true
+  error.value = ''
+  try {
+    await submitInquiry({
+      type: 'contact',
+      name: form.name,
+      email: form.email,
+      phone: form.phone || undefined,
+      category: form.type || undefined,
+      message: form.message,
+    })
+    submitted.value = true
+  } catch (e) {
+    error.value = getApiError(e)
+  } finally {
+    submitting.value = false
+  }
+}
 </script>
 
 <style scoped>

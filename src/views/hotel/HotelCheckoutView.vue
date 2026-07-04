@@ -2,7 +2,7 @@
   <div v-if="session.hotel" class="checkout-page">
     <div class="checkout-header">
       <span style="font-size: 14px; font-weight: 500">Checkout</span>
-      <span style="font-size: 11px; color: var(--sf-muted)">{{ cart.count }} items · {{ formatTZS(cart.subtotal) }}</span>
+      <span style="font-size: 11px; color: var(--sf-muted)">{{ cart.count }} items · <DualPrice :amount-tzs="cart.subtotal" /></span>
     </div>
 
     <form class="sf-form-stack" @submit.prevent="submit">
@@ -53,17 +53,18 @@
         <div class="checkout-label">Order summary</div>
         <div v-for="item in cart.items" :key="item.id" style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px">
           <span style="color: var(--sf-text-muted)">{{ item.name }} × {{ item.quantity }}</span>
-          <span>{{ formatTZS(item.price * item.quantity) }}</span>
+          <DualPrice :amount-tzs="item.price * item.quantity" />
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 8px">
-          <span>Subtotal</span><span>{{ formatTZS(cart.subtotal) }}</span>
+          <span>Subtotal</span><DualPrice :amount-tzs="cart.subtotal" />
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px">
           <span>Delivery fee (Zone {{ session.hotel.zone }} — {{ session.hotel.location }})</span>
-          <span :style="{ color: fee === 0 ? 'var(--sf-green-checkout)' : undefined }">{{ fee === 0 ? 'Free' : formatTZS(fee) }}</span>
+          <span v-if="fee === 0" :style="{ color: 'var(--sf-green-checkout)' }">Free</span>
+          <DualPrice v-else :amount-tzs="fee" />
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--sf-warm-grey)">
-          <span>Total</span><span>{{ formatTZS(total) }}</span>
+          <span>Total</span><DualPrice :amount-tzs="total" />
         </div>
       </div>
 
@@ -83,14 +84,16 @@ import { useRouter } from 'vue-router'
 import { createProductOrder } from '@/api/orders'
 import { fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
+import DualPrice from '@/components/storefront/DualPrice.vue'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
-import { deliveryFee, formatTZS } from '@/composables/usePricing'
 import { handleOrderPayment } from '@/utils/checkoutPayment'
 
 const session = useHotelSessionStore()
 const cart = useCartStore()
 const router = useRouter()
+const { ensureLoaded, deliveryFeeForSubtotal } = usePlatformSettings()
 
 const room = ref(session.roomNumber)
 const fullName = ref('')
@@ -101,10 +104,11 @@ const submitError = ref('')
 const submitting = ref(false)
 const roomOptions = ref<string[]>([])
 
-const fee = computed(() => deliveryFee(cart.subtotal))
+const fee = computed(() => deliveryFeeForSubtotal(cart.subtotal, session.hotel?.zone))
 const total = computed(() => cart.subtotal + fee.value)
 
 onMounted(() => {
+  void ensureLoaded()
   void loadRooms()
 })
 
@@ -155,6 +159,7 @@ async function submit() {
       payment_method: 'selcom',
       currency: cart.items[0]?.currency || 'TZS',
       delivery_fee: fee.value,
+      delivery_zone_code: session.hotel.zone,
       return_url: `${base}/hotel/${slug}/payment/return`,
       cancel_url: `${base}/hotel/${slug}/checkout`,
       items: cart.items.map((item) => ({

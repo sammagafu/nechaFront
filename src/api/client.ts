@@ -22,7 +22,12 @@ client.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       const path = window.location.pathname
-      if (!path.startsWith('/admin') && !path.startsWith('/sign-in') && !path.startsWith('/sign-up')) {
+      if (
+        !path.startsWith('/admin') &&
+        !path.startsWith('/partner') &&
+        !path.startsWith('/sign-in') &&
+        !path.startsWith('/sign-up')
+      ) {
         localStorage.removeItem('access_token')
       }
     }

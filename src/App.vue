@@ -4,7 +4,7 @@
 
   <AppLoadingScreen v-if="booting" />
 
-  <SystemAlertBanner v-if="!route.path.startsWith('/admin')" />
+  <SystemAlertBanner v-if="!route.path.startsWith('/admin') && !route.path.startsWith('/partner')" />
 
   <div class="app-shell">
     <template v-if="!isStandaloneRoute">
@@ -44,11 +44,16 @@ const isStandaloneRoute = computed(
   () =>
     route.path.startsWith('/hotel/') ||
     route.path.startsWith('/admin') ||
+    route.path.startsWith('/partner') ||
     route.meta.standalone === true,
 )
-const showChat = computed(() => !route.path.startsWith('/admin'))
+const showChat = computed(() => !route.path.startsWith('/admin') && !route.path.startsWith('/partner'))
 const showShopCartToast = computed(
-  () => !route.path.startsWith('/admin') && !route.path.startsWith('/hotel/') && route.meta.standalone !== true,
+  () =>
+    !route.path.startsWith('/admin') &&
+    !route.path.startsWith('/partner') &&
+    !route.path.startsWith('/hotel/') &&
+    route.meta.standalone !== true,
 )
 const hotelSlug = computed(() => (route.params.slug as string) || '')
 

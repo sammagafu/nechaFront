@@ -2,26 +2,22 @@
   <div ref="pageRef" class="pl-page">
     <p v-if="showHotelError" class="pl-notice">
       That hotel link wasn't recognised.
-      <router-link to="/shop">Browse the shop</router-link>
+      <router-link to="/#form-sec">Become a partner</router-link>
       or enter your property code on the demo portal.
     </p>
 
     <h2 class="sr-only">
-      Full Necha Africa hotel partner landing page with two hero slides, how it works steps,
-      interactive earnings calculator, founding cohort urgency section, brand partner flow, six
-      platform features including branded storefront, and dual hotel and brand sign-up form.
+      Necha Africa hotel partner landing — featured product showcase, how it works, earnings
+      calculator, founding cohort, brand partner flow, platform features, and sign-up form.
     </h2>
 
     <HomeHeroShowcase
-      ref="heroRef"
       v-model="heroIndex"
-      :slides="partnerHeroSlides"
-      :interval-ms="6000"
+      :slides="heroSlides"
+      :interval-ms="7000"
       :autoplay="!prefersReducedMotion"
-      content-layout="center"
-      aria-label="Hotel partner showcase"
-      nav-aria-label="Partner slides"
-      @slide-change="onHeroSlideChange"
+      aria-label="Featured products"
+      nav-aria-label="Featured products"
     />
 
     <nav class="pl-jump" aria-label="On this page">
@@ -291,22 +287,21 @@ import HomeHeroShowcase, { type HeroShowcaseSlide } from '@/components/home/Home
 import DiscoveryShowcase from '@/components/partners/DiscoveryShowcase.vue'
 import HotelEarningsCalculator from '@/components/partners/HotelEarningsCalculator.vue'
 import PartnerSignupForm from '@/components/partners/PartnerSignupForm.vue'
-import { catalogConfig } from '@/config/app'
+import { appConfig, catalogConfig } from '@/config/app'
+import { heroSlideMeta, productImageBySlug } from '@/config/brands'
 import { siteImages } from '@/config/images'
+import { useCatalogStore } from '@/stores/catalog'
 import '@/assets/partner-landing.css'
 import '@/assets/home-sections.css'
 
 const route = useRoute()
+const catalog = useCatalogStore()
 const pageRef = ref<HTMLElement | null>(null)
-const heroRef = ref<InstanceType<typeof HomeHeroShowcase> | null>(null)
 const heroIndex = ref(0)
 
 const activeSection = ref('how-sec')
 const partnerHotels = ref<PartnerHotelCard[]>([])
-const surpriseUnlocked = ref(false)
 const revealed = reactive({ how: false, calc: false, why: false })
-
-const slidesSeen = new Set<number>()
 const FOUNDING_RING_C = 2 * Math.PI * 42
 
 const jumpLinks = [
@@ -345,101 +340,48 @@ const foundingRingOffset = computed(
   () => FOUNDING_RING_C * (1 - foundingSpotsTaken.value / Math.max(foundingSpotsTotal.value, 1)),
 )
 
-const heroSlidesBase = [
-  {
-    id: 'a',
-    theme: 'slide-a',
-    kicker: 'Zero risk',
-    image: siteImages.partnerLanding.heroA,
-    imageAlt: 'Necha hotel commerce in Dar es Salaam',
-    title: 'Turn your hotel rooms<br>into <em>a revenue stream.</em>',
-    subtitle:
-      'Guests scan, order, and receive. You earn commission on every delivery — no investment, no stock, nothing extra for your team.',
-    primaryCta: 'Secure your founding spot',
-    secondaryCta: 'See what you would earn',
-    secondaryTarget: 'calc-sec',
-    primaryTarget: 'form-sec',
-    primaryClass: 'pl-bp',
-    stats: [
-      { value: 'TZS 0', label: 'to join', amber: false },
-      { value: '48 hrs', label: 'to go live', amber: false },
-      { value: '50%', label: 'founding commission', amber: false },
-    ],
-  },
-  {
-    id: 'b',
-    theme: 'slide-b',
-    kicker: 'Your earnings',
-    image: siteImages.partnerLanding.heroB,
-    imageAlt: 'Hotel guest ordering wellness products to their room',
-    title: 'Your rooms.<br><em class="amb">TZS 351,000</em> a month.<br>Zero investment.',
-    subtitle:
-      '40 rooms · 60% occupancy · 15% guest conversion. A QR storefront in every room. We deliver. You get paid on the first of every month.',
-    primaryCta: 'Claim your earnings',
-    secondaryCta: 'Calculate for my hotel',
-    secondaryTarget: 'calc-sec',
-    primaryTarget: 'form-sec',
-    primaryClass: 'pl-bamb',
-    stats: [
-      { value: 'TZS 0', label: 'upfront cost', amber: true },
-      { value: 'TZS 4.2M', label: 'projected year 1', amber: true },
-      { value: '10 spots', label: 'founding rate', amber: true },
-    ],
-  },
-]
-
-const heroSlideDiscovery = {
-  id: 'c',
-  theme: 'slide-c',
-  kicker: 'Discovery',
-  image: siteImages.partnerLanding.showcase,
-  imageAlt: 'Guests exploring Dar es Salaam from their hotel room',
-  title: 'Your guests.<br><em>Explore Dar</em> from bed.',
-  subtitle:
-    'Events, dining, and tours — curated under your hotel brand. A Discovery portal guests actually use.',
-  primaryCta: 'Explore Discovery',
-  secondaryCta: 'Become a partner',
-  secondaryTarget: 'form-sec',
-  primaryTarget: '/discovery',
-  primaryClass: 'pl-bp',
-  stats: [
-    { value: '3', label: 'experience categories', amber: false },
-    { value: '60 min', label: 'EV delivery', amber: false },
-    { value: '1', label: 'co-branded portal', amber: false },
-  ],
+function demoProductPath(productSlug: string) {
+  const { hotelSlug } = appConfig.demoHotel
+  return `/hotel/${hotelSlug}/product/${productSlug}`
 }
 
-function mapPartnerHeroSlide(slide: (typeof heroSlidesBase)[number] | typeof heroSlideDiscovery, isNew = false): HeroShowcaseSlide {
-  const words =
-    slide.id === 'a'
-      ? { wordLeft: 'Revenue', wordRight: 'Rooms' }
-      : slide.id === 'b'
-        ? { wordLeft: 'Earn', wordRight: 'More' }
-        : { wordLeft: 'Explore', wordRight: 'Dar' }
+/** Large hero overlay words from the original hotel-partners carousel */
+const partnerCarouselWords = [
+  { wordLeft: 'Revenue', wordRight: 'Rooms' },
+  { wordLeft: 'Earn', wordRight: 'More' },
+  { wordLeft: 'Explore', wordRight: 'Dar' },
+  { wordLeft: 'Brand', wordRight: 'Guests' },
+] as const
 
-  return {
-    id: slide.id,
-    image: slide.image,
-    imageAlt: slide.imageAlt,
-    ...words,
-    eyebrow: `Founding cohort · ${foundingSpotsTotal.value} hotel spots · DSM 2026`,
-    headlineHtml: slide.title,
-    description: slide.subtitle,
-    navLabel: slide.kicker,
-    navMeta: slide.stats.map((s) => `${s.value} ${s.label}`).join(' · '),
-    stats: slide.stats.map((s) => ({ value: s.value, label: s.label, accent: s.amber })),
-    primary: slide.primaryTarget.startsWith('/')
-      ? { type: 'route', to: slide.primaryTarget, label: slide.primaryCta }
-      : { type: 'scroll', target: slide.primaryTarget, label: slide.primaryCta },
-    secondary: { type: 'scroll', target: slide.secondaryTarget, label: slide.secondaryCta },
-    isNew,
-  }
-}
-
-const partnerHeroSlides = computed(() => {
-  const slides = heroSlidesBase.map((slide) => mapPartnerHeroSlide(slide))
-  if (surpriseUnlocked.value) {
-    slides.push(mapPartnerHeroSlide(heroSlideDiscovery, true))
+const heroSlides = computed(() => {
+  const total = heroSlideMeta.length
+  const slides: HeroShowcaseSlide[] = []
+  for (let index = 0; index < heroSlideMeta.length; index++) {
+    const meta = heroSlideMeta[index]!
+    const words = partnerCarouselWords[index] ?? partnerCarouselWords[0]
+    const product = catalog.findBySlug(meta.productSlug)
+    const image = product?.imageUrl ?? productImageBySlug[meta.productSlug] ?? ''
+    const productName = product?.name ?? meta.label
+    if (!image) continue
+    slides.push({
+      id: meta.id,
+      image,
+      imageAlt: productName,
+      wordLeft: words.wordLeft,
+      wordRight: words.wordRight,
+      eyebrow: `${meta.brand} · ${meta.label}`,
+      description: meta.description,
+      navLabel: meta.label,
+      navMeta: `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')} · ${productName}`,
+      primary: { type: 'route', to: meta.ctaTo, label: meta.cta },
+      chip: {
+        image,
+        imageAlt: productName,
+        label: 'See product details',
+        name: productName,
+        to: demoProductPath(meta.productSlug),
+      },
+    })
   }
   return slides
 })
@@ -548,21 +490,6 @@ const platformFeatures = [
   },
 ]
 
-function unlockSurprise() {
-  if (surpriseUnlocked.value) return
-  surpriseUnlocked.value = true
-  if (!prefersReducedMotion.value) {
-    setTimeout(() => heroRef.value?.goTo(heroSlidesBase.length), 700)
-  }
-}
-
-function onHeroSlideChange(index: number) {
-  slidesSeen.add(index)
-  if (!surpriseUnlocked.value && slidesSeen.has(0) && slidesSeen.has(1)) {
-    unlockSurprise()
-  }
-}
-
 function burstConfetti(x: number, y: number) {
   if (prefersReducedMotion.value || !pageRef.value) return
   const colors = ['#74c69d', '#ef9f27', '#0f6e56', '#9fe1cb', '#ffffff']
@@ -651,6 +578,7 @@ function openBrandForm() {
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  void catalog.load()
   void loadLandingData()
   setupSectionObserver()
   setupRevealObserver()

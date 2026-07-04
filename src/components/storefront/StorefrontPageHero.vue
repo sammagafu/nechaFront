@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Icon from '@/components/ui/Icon.vue'
+import HotelBrandMark from '@/components/HotelBrandMark.vue'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 
 const props = withDefaults(
@@ -13,10 +14,12 @@ const props = withDefaults(
     crumbTo?: string
     showCrumb?: boolean
     crumbLink?: boolean
+    showHotelBrand?: boolean
   }>(),
   {
     showCrumb: true,
     crumbLink: true,
+    showHotelBrand: true,
   },
 )
 
@@ -42,6 +45,14 @@ const crumbHref = computed(() => props.crumbTo ?? discoverPath.value)
         <Icon name="map-pin" :size="14" />
         {{ crumbText }}
       </span>
+      <HotelBrandMark
+        v-if="showHotelBrand && session.hotel"
+        class="discover-hero-brand"
+        :name="session.hotel.name"
+        :initials="session.hotel.initials"
+        :logo-url="session.hotel.logo_url"
+        size="lg"
+      />
       <span v-if="badge" class="discover-hero-badge">{{ badge }}</span>
       <h1>{{ title }}</h1>
       <p v-if="description">{{ description }}</p>

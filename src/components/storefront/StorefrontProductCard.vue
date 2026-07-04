@@ -13,8 +13,7 @@
       <router-link :to="productLink" class="sf-product-name">{{ product.name }}</router-link>
       <div class="sf-price-row">
         <div>
-          <div class="sf-price-tzs">{{ formatTZS(product.price) }}</div>
-          <div class="sf-price-usd">{{ formatUSD(product.price) }}</div>
+          <DualPrice :amount-tzs="product.price" stack />
         </div>
         <button type="button" class="sf-add-btn" aria-label="Add to cart" @click="onAdd">+</button>
       </div>
@@ -25,7 +24,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { StorefrontProduct } from '@/types/storefront'
-import { formatTZS, formatUSD } from '@/composables/usePricing'
+import DualPrice from '@/components/storefront/DualPrice.vue'
 import { badgeLabel } from '@/utils/storefront'
 import { useCartStore } from '@/stores/cart'
 

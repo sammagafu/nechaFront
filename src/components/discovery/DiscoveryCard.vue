@@ -1,5 +1,5 @@
 <template>
-  <article class="discovery-card">
+  <router-link :to="discoveryPath(item.slug)" class="discovery-card discovery-card-link">
     <div class="discovery-card-media">
       <img v-if="item.image_url" :src="item.image_url" :alt="item.name" loading="lazy" />
       <div v-else class="discovery-card-placeholder" aria-hidden="true">
@@ -19,44 +19,25 @@
         <li v-if="item.price_hint">{{ item.price_hint }}</li>
       </ul>
       <div class="discovery-actions">
+        <span class="discovery-btn discovery-btn--primary">View details</span>
         <a
           v-if="item.ticket_url"
           :href="item.ticket_url"
-          class="discovery-btn discovery-btn--primary"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ ticketCta }}
-        </a>
-        <a v-else-if="item.phone" :href="`tel:${item.phone.replace(/\s/g, '')}`" class="discovery-btn discovery-btn--primary">
-          Call to book
-        </a>
-        <a
-          v-else-if="item.website"
-          :href="item.website"
-          class="discovery-btn discovery-btn--primary"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn more
-        </a>
-        <a
-          v-if="item.website && item.ticket_url"
-          :href="item.website"
           class="discovery-btn discovery-btn--ghost"
           target="_blank"
           rel="noopener noreferrer"
+          @click.stop
         >
-          Website
+          {{ ticketCta }}
         </a>
       </div>
     </div>
-  </article>
+  </router-link>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { subcategoryLabel as labelFor } from '@/config/discovery'
+import { discoveryPath, subcategoryLabel as labelFor } from '@/config/discovery'
 import type { DiscoveryItem } from '@/types/discovery'
 
 const props = defineProps<{
@@ -84,6 +65,13 @@ const ticketCta = computed(() => {
 </script>
 
 <style scoped>
+.discovery-card-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
 .discovery-card {
   display: flex;
   flex-direction: column;

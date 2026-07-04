@@ -5,7 +5,7 @@
         <p class="eyebrow">Discovery</p>
         <h1 class="discovery-page-title">Explore Dar es Salaam</h1>
         <p class="discovery-page-lead">
-          Events, places to eat, experiences, partner hotels, and shop deals — curated for guests and locals.
+          Restaurants, activities &amp; events, local tours, and hotel services — curated for guests and locals.
         </p>
       </div>
     </header>
@@ -41,14 +41,19 @@
         >
           <header class="hp-head-row">
             <div>
-              <h2 class="hp-title">Events</h2>
-              <p class="hp-lead">What is happening in Dar this week</p>
+              <h2 class="hp-title">Activities &amp; Events</h2>
+              <p class="hp-lead">Ticketed events to book on Necha, plus free listings to discover</p>
             </div>
           </header>
           <div class="discovery-page-grid">
-            <article v-for="item in filteredEvents" :key="item.id" class="hp-discovery-item">
+            <router-link
+              v-for="item in filteredEvents"
+              :key="item.id"
+              :to="discoveryPath(item.slug)"
+              class="hp-discovery-item discovery-item-link"
+            >
               <DiscoveryItemBody :item="item" />
-            </article>
+            </router-link>
           </div>
         </section>
 
@@ -64,9 +69,14 @@
             </div>
           </header>
           <div class="discovery-page-grid">
-            <article v-for="item in filteredRestaurants" :key="item.id" class="hp-discovery-item">
+            <router-link
+              v-for="item in filteredRestaurants"
+              :key="item.id"
+              :to="discoveryPath(item.slug)"
+              class="hp-discovery-item discovery-item-link"
+            >
               <DiscoveryItemBody :item="item" />
-            </article>
+            </router-link>
           </div>
         </section>
 
@@ -77,14 +87,19 @@
         >
           <header class="hp-head-row">
             <div>
-              <h2 class="hp-title">Tours &amp; experiences</h2>
-              <p class="hp-lead">Things to do during your stay</p>
+              <h2 class="hp-title">Local Tours &amp; Experiences</h2>
+              <p class="hp-lead">Tours fulfilled by partner operators — book on Necha</p>
             </div>
           </header>
           <div class="discovery-page-grid">
-            <article v-for="item in filteredTours" :key="item.id" class="hp-discovery-item">
+            <router-link
+              v-for="item in filteredTours"
+              :key="item.id"
+              :to="discoveryPath(item.slug)"
+              class="hp-discovery-item discovery-item-link"
+            >
               <DiscoveryItemBody :item="item" />
-            </article>
+            </router-link>
           </div>
         </section>
 
@@ -92,8 +107,8 @@
         <section v-if="showSection('hotels') && filteredHotels.length" id="hotels" class="discovery-page-section">
           <header class="hp-head-row">
             <div>
-              <h2 class="hp-title">Partner hotels</h2>
-              <p class="hp-lead">Order to your room or browse the in-hotel shop</p>
+              <h2 class="hp-title">Partner Hotels</h2>
+              <p class="hp-lead">Scan the QR at your property to order to your room</p>
             </div>
           </header>
           <div class="discovery-hotel-grid">
@@ -103,32 +118,18 @@
               :to="hotelPortalPath(hotel.slug)"
               class="discovery-hotel-card"
             >
-              <span class="discovery-hotel-initials">{{ hotel.initials }}</span>
+              <HotelBrandMark
+                :name="hotel.name"
+                :initials="hotel.initials"
+                :logo-url="hotel.logo_url"
+                size="md"
+              />
               <div>
                 <h3>{{ hotel.name }}</h3>
                 <p>{{ hotel.location }}</p>
               </div>
               <span class="discovery-hotel-go" aria-hidden="true">→</span>
             </router-link>
-          </div>
-        </section>
-
-        <!-- Deals -->
-        <section v-if="showSection('deals') && filteredDeals.length" id="deals" class="discovery-page-section">
-          <header class="hp-head-row">
-            <div>
-              <h2 class="hp-title">Shop deals</h2>
-              <p class="hp-lead">Wellness favourites — delivered by electric vehicle</p>
-            </div>
-            <router-link to="/shop" class="btn-view">View shop →</router-link>
-          </header>
-          <div class="discovery-deals-grid">
-            <ProductCard
-              v-for="product in filteredDeals"
-              :key="product.id"
-              :product="product"
-              :to="product.slug ? productPath(product.slug) : undefined"
-            />
           </div>
         </section>
 
@@ -157,28 +158,24 @@
 import { computed, defineComponent, h, onMounted, ref } from 'vue'
 import { fetchDiscoveryPortal } from '@/api/discovery'
 import { fetchPartnersLanding, type PartnerHotelCard } from '@/api/partners'
-import ProductCard from '@/components/ProductCard.vue'
 import EventSubmitForm from '@/components/discovery/EventSubmitForm.vue'
-import { catalogConfig, productPath } from '@/config/app'
-import { subcategoryLabel } from '@/config/discovery'
-import { useCatalogStore } from '@/stores/catalog'
-import type { CommerceProduct } from '@/types/commerce'
+import HotelBrandMark from '@/components/HotelBrandMark.vue'
+import { catalogConfig } from '@/config/app'
+import { discoveryPath, subcategoryLabel } from '@/config/discovery'
 import type { DiscoveryItem } from '@/types/discovery'
 import '@/assets/home-sections.css'
 import '@/assets/discovery-page.css'
 
-type DiscoveryTab = 'all' | 'events' | 'restaurants' | 'tours' | 'hotels' | 'deals'
+type DiscoveryTab = 'all' | 'events' | 'restaurants' | 'tours' | 'hotels'
 
 const tabs: { id: DiscoveryTab; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'events', label: 'Events' },
+  { id: 'events', label: 'Activities & Events' },
   { id: 'restaurants', label: 'Restaurants' },
-  { id: 'tours', label: 'Experiences' },
+  { id: 'tours', label: 'Tours & Experiences' },
   { id: 'hotels', label: 'Hotels' },
-  { id: 'deals', label: 'Deals' },
 ]
 
-const catalog = useCatalogStore()
 const loading = ref(true)
 const activeTab = ref<DiscoveryTab>('all')
 const searchQuery = ref('')
@@ -187,7 +184,6 @@ const events = ref<DiscoveryItem[]>([])
 const restaurants = ref<DiscoveryItem[]>([])
 const tours = ref<DiscoveryItem[]>([])
 const hotels = ref<PartnerHotelCard[]>([])
-const deals = ref<CommerceProduct[]>([])
 
 const DiscoveryItemBody = defineComponent({
   props: { item: { type: Object as () => DiscoveryItem, required: true } },
@@ -195,7 +191,6 @@ const DiscoveryItemBody = defineComponent({
     return () => {
       const item = props.item
       const tag = item.subcategory ? subcategoryLabel(item.section, item.subcategory) : ''
-      const link = item.ticket_url || item.website || (item.phone ? `tel:${item.phone.replace(/\s/g, '')}` : '')
       const meta = [item.venue, item.location, item.distance ? `${item.distance} from hotel` : '', item.price_hint]
         .filter(Boolean)
         .slice(0, 3)
@@ -211,18 +206,7 @@ const DiscoveryItemBody = defineComponent({
         h('div', { class: 'hp-discovery-item-body' }, [
           h('h3', item.name),
           meta ? h('p', { class: 'hp-discovery-item-meta' }, meta) : null,
-          link
-            ? h(
-                'a',
-                {
-                  class: 'hp-discovery-item-action',
-                  href: link,
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
-                },
-                'View details →',
-              )
-            : null,
+          h('span', { class: 'hp-discovery-item-action' }, 'View details →'),
         ]),
       ])
     }
@@ -255,29 +239,23 @@ const filteredTours = computed(() => filterDiscoveryItems(tours.value))
 const filteredHotels = computed(() =>
   hotels.value.filter((h) => matchesSearch(`${h.name} ${h.location}`)),
 )
-const filteredDeals = computed(() =>
-  deals.value.filter((p) => matchesSearch(`${p.name} ${p.description ?? ''}`)),
-)
 
 const hasVisibleResults = computed(() => {
   if (activeTab.value === 'events') return filteredEvents.value.length > 0
   if (activeTab.value === 'restaurants') return filteredRestaurants.value.length > 0
   if (activeTab.value === 'tours') return filteredTours.value.length > 0
   if (activeTab.value === 'hotels') return filteredHotels.value.length > 0
-  if (activeTab.value === 'deals') return filteredDeals.value.length > 0
   return (
     filteredEvents.value.length +
       filteredRestaurants.value.length +
       filteredTours.value.length +
-      filteredHotels.value.length +
-      filteredDeals.value.length >
+      filteredHotels.value.length >
     0
   )
 })
 
 onMounted(async () => {
   try {
-    await catalog.load()
     const [portal, landing] = await Promise.all([
       fetchDiscoveryPortal(catalogConfig.hotelSlug),
       fetchPartnersLanding(catalogConfig.hotelSlug),
@@ -286,9 +264,8 @@ onMounted(async () => {
     restaurants.value = portal.restaurants ?? []
     tours.value = portal.tours ?? []
     hotels.value = landing.partner_hotels ?? []
-    deals.value = catalog.featuredProducts.slice(0, 8)
   } catch {
-    deals.value = catalog.featuredProducts.slice(0, 8)
+    /* portal may be unavailable */
   } finally {
     loading.value = false
   }

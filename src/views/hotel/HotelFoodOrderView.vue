@@ -3,7 +3,7 @@
     <StorefrontPageHero
       badge="Room service"
       title="Food & drinks"
-      description="Tap to add items — delivered to your room. Pay at checkout."
+      description="Tap to add items — room service and bar menu delivered to your room. Place order with no upfront payment."
     />
 
     <nav class="food-cats" aria-label="Menu categories">
@@ -27,7 +27,7 @@
             <span v-if="item.tag" class="food-tag">{{ item.tag }}</span>
           </div>
           <p class="food-desc">{{ item.description }}</p>
-          <p class="food-price">{{ formatTZS(item.price) }}</p>
+          <p class="food-price"><DualPrice :amount-tzs="item.price" /></p>
         </div>
         <div class="food-card-actions">
           <button
@@ -52,7 +52,7 @@
       <div class="sf-container food-order-bar-inner">
         <div class="food-order-summary">
           <strong>{{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }}</strong>
-          <span>{{ formatTZS(orderTotal) }}</span>
+          <DualPrice :amount-tzs="orderTotal" />
         </div>
         <button type="button" class="food-order-btn" @click="checkoutOpen = true">
           Review order
@@ -70,13 +70,13 @@
         <ul class="food-checkout-lines">
           <li v-for="line in orderLines" :key="line.id">
             <span>{{ line.quantity }}× {{ line.name }}</span>
-            <span>{{ formatTZS(line.unit_price * line.quantity) }}</span>
+            <DualPrice :amount-tzs="line.unit_price * line.quantity" />
           </li>
         </ul>
 
         <div class="food-checkout-total">
           <span>Total</span>
-          <strong>{{ formatTZS(orderTotal) }}</strong>
+          <DualPrice :amount-tzs="orderTotal" />
         </div>
 
         <div class="sf-form-fields food-checkout-fields">
@@ -105,7 +105,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { createFoodOrder } from '@/api/orders'
 import { fetchHotelMenu, fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
-import { formatTZS } from '@/composables/usePricing'
+import DualPrice from '@/components/storefront/DualPrice.vue'
 import StorefrontPageHero from '@/components/storefront/StorefrontPageHero.vue'
 import { foodMenuCategories, foodMenuItems, type FoodMenuItem } from '@/config/foodMenu'
 import { useHotelSessionStore } from '@/stores/hotelSession'

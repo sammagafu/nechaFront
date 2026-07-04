@@ -54,7 +54,9 @@
         <span>Phone (optional — for faster response)</span>
         <input v-model="hotelForm.phone" type="tel" placeholder="+255 7xx xxx xxx" />
       </label>
-      <button type="submit" class="sub-btn">Request a partnership call ↗</button>
+      <button type="submit" class="sub-btn" :disabled="submitting">{{ submitting ? 'Sending…' : 'Request a partnership call ↗' }}</button>
+      <p v-if="error" class="form-msg form-msg--error">{{ error }}</p>
+      <p v-if="success" class="form-msg form-msg--success">Thank you — we'll be in touch within 24 hours.</p>
     </form>
 
     <form v-else @submit.prevent="submitBrand">
@@ -84,7 +86,9 @@
           <input v-model="brandForm.price" type="number" min="1" placeholder="25000" required />
         </label>
       </div>
-      <button type="submit" class="sub-btn">Apply to list your brand ↗</button>
+      <button type="submit" class="sub-btn" :disabled="submitting">{{ submitting ? 'Sending…' : 'Apply to list your brand ↗' }}</button>
+      <p v-if="error" class="form-msg form-msg--error">{{ error }}</p>
+      <p v-if="success" class="form-msg form-msg--success">Application received — our team will follow up shortly.</p>
     </form>
 
     <p class="trust">
@@ -99,7 +103,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { appConfig } from '@/config/app'
+import { submitInquiry, type InquiryType, type SubmitInquiryPayload } from '@/api/inquiries'
+import { getApiError } from '@/api/client'
 
 const props = defineProps<{
   initialTab?: 'hotel' | 'brand'
@@ -107,6 +112,9 @@ const props = defineProps<{
 }>()
 
 const activeTab = ref<'hotel' | 'brand'>(props.initialTab ?? 'hotel')
+const submitting = ref(false)
+const error = ref('')
+const success = ref(false)
 
 watch(
   () => props.initialTab,
@@ -148,47 +156,43 @@ const brandForm = ref({
   price: '',
 })
 
-function openMailto(subject: string, body: string) {
-  window.location.href = `mailto:${appConfig.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-}
-
 function submitHotel() {
-  const f = hotelForm.value
-  openMailto(
-    'Hotel partnership request — Necha Africa',
-    [
-      'Hotel partnership request',
-      '',
-      `Hotel: ${f.name}`,
-      `Location: ${f.location}`,
-      `Rooms: ${f.rooms}`,
-      `Role: ${f.role}`,
-      `Email: ${f.email}`,
-      f.phone ? `Phone: ${f.phone}` : '',
-      '',
-      'I manage a hotel in Dar es Salaam and want to become a founding partner.',
-    ]
-      .filter(Boolean)
-      .join('\n'),
-  )
+  void postInquiry('hotel_partner', {
+    name: hotelForm.value.email.split('@')[0],
+    email: hotelForm.value.email,
+    phone: hotelForm.value.phone || undefined,
+    company: hotelForm.value.name,
+    location: hotelForm.value.location,
+    role: hotelForm.value.role,
+    rooms: Number(hotelForm.value.rooms) || undefined,
+    message: 'Hotel partnership request from website.',
+  })
 }
 
 function submitBrand() {
-  const f = brandForm.value
-  openMailto(
-    'Brand listing application — Necha Africa',
-    [
-      'Brand listing application',
-      '',
-      `Brand: ${f.name}`,
-      `Category: ${f.category}`,
-      `Email: ${f.email}`,
-      `Monthly units: ${f.units}`,
-      `Avg retail price (TZS): ${f.price}`,
-      '',
-      'Please share the brand onboarding process and timeline.',
-    ].join('\n'),
-  )
+  void postInquiry('brand_partner', {
+    name: brandForm.value.name,
+    email: brandForm.value.email,
+    company: brandForm.value.name,
+    category: brandForm.value.category,
+    units: Number(brandForm.value.units) || undefined,
+    price: Number(brandForm.value.price) || undefined,
+    message: 'Brand listing application from website.',
+  })
+}
+
+async function postInquiry(type: InquiryType, payload: Omit<SubmitInquiryPayload, 'type'>) {
+  submitting.value = true
+  error.value = ''
+  success.value = false
+  try {
+    await submitInquiry({ ...payload, type, email: payload.email })
+    success.value = true
+  } catch (e) {
+    error.value = getApiError(e)
+  } finally {
+    submitting.value = false
+  }
 }
 
 defineExpose({ setTab: (tab: 'hotel' | 'brand') => { activeTab.value = tab } })
@@ -316,5 +320,18 @@ defineExpose({ setTab: (tab: 'hotel' | 'brand') => { activeTab.value = tab } })
   margin-top: 10px;
   font-size: 12px;
   color: var(--color-muted);
+}
+
+.form-msg {
+  margin: 0.65rem 0 0;
+  font-size: 13px;
+}
+
+.form-msg--error {
+  color: #b42318;
+}
+
+.form-msg--success {
+  color: #027a48;
 }
 </style>

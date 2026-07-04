@@ -33,6 +33,7 @@
             <td class="admin-actions">
               <router-link :to="`/admin/hotels/${hotel.id}/edit`" class="admin-btn admin-btn--ghost">Edit</router-link>
               <router-link :to="`/admin/hotels/${hotel.id}/products`" class="admin-btn admin-btn--ghost">Products</router-link>
+              <router-link :to="`/admin/hotels/${hotel.id}/menu`" class="admin-btn admin-btn--ghost">Menu</router-link>
               <router-link :to="`/admin/import/${hotel.id}`" class="admin-btn admin-btn--ghost">Import CSV</router-link>
               <a :href="hotelEntryUrl(hotel.referral_code || hotel.code, hotel.slug, 'room')" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Room QR</a>
               <a :href="hotelEntryUrl(hotel.referral_code || hotel.code, hotel.slug, 'poster')" class="admin-btn admin-btn--ghost" target="_blank" rel="noopener">Poster QR</a>

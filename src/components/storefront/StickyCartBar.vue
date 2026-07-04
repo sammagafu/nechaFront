@@ -5,7 +5,8 @@
         <div v-if="count === 0" style="font-size: 12px; color: var(--sf-cream)">Your cart is empty</div>
         <div v-else style="font-size: 12px; color: var(--sf-cream)">{{ count }} {{ count === 1 ? 'item' : 'items' }} in your cart</div>
         <div style="font-size: 10px; color: var(--sf-muted); margin-top: 2px">
-          {{ count === 0 ? 'Add products above to get started' : formatTZS(total) }}
+          {{ count === 0 ? 'Add products above to get started' : '' }}
+          <DualPrice v-if="count > 0" :amount-tzs="total" />
         </div>
       </div>
       <router-link
@@ -24,7 +25,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCartStore } from '@/stores/cart'
-import { formatTZS } from '@/composables/usePricing'
+import DualPrice from '@/components/storefront/DualPrice.vue'
 
 const props = defineProps<{ hotelSlug: string }>()
 const cart = useCartStore()

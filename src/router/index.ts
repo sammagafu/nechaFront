@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/LandingView.vue'),
+      component: () => import('@/views/HotelPartnersView.vue'),
       meta: { fullWidth: true },
     },
     {
@@ -27,16 +27,18 @@ const router = createRouter({
       meta: { fullWidth: true },
     },
     {
-      path: '/shop',
-      name: 'shop',
-      component: () => import('@/views/ShopView.vue'),
+      path: '/discovery/:slug',
+      name: 'discovery-detail',
+      component: () => import('@/views/DiscoveryDetailView.vue'),
       meta: { fullWidth: true },
     },
     {
+      path: '/shop',
+      redirect: '/',
+    },
+    {
       path: '/shop/category/:categoryId',
-      name: 'shop-category',
-      component: () => import('@/views/ShopView.vue'),
-      meta: { fullWidth: true },
+      redirect: '/',
     },
     {
       path: '/product/:slug',
@@ -138,15 +140,23 @@ const router = createRouter({
     },
     {
       path: '/hotel-partners',
-      name: 'hotel-partners',
-      component: () => import('@/views/HotelPartnersView.vue'),
-      meta: { fullWidth: true },
+      redirect: '/',
+    },
+    {
+      path: '/hotel-partners/:rest(.*)',
+      redirect: '/',
     },
     {
       path: '/earn-with-necha',
       name: 'earn-with-necha',
       component: () => import('@/views/EarnWithNechaView.vue'),
       meta: { fullWidth: true },
+    },
+    {
+      path: '/rewards',
+      name: 'rewards',
+      component: () => import('@/views/RewardsView.vue'),
+      meta: { requiresCustomer: true },
     },
     {
       path: '/food-order',
@@ -166,12 +176,13 @@ const router = createRouter({
         { path: 'checkout', name: 'hotel-checkout', component: () => import('@/views/hotel/HotelCheckoutView.vue') },
         { path: 'payment/return', name: 'hotel-payment-return', component: () => import('@/views/hotel/HotelPaymentReturnView.vue') },
         { path: 'order-confirmed', name: 'hotel-order-confirmed', component: () => import('@/views/hotel/HotelOrderConfirmedView.vue') },
-        { path: 'discover', redirect: (to) => `/hotel/${to.params.slug}` },
-        { path: 'nearby', redirect: (to) => `/hotel/${to.params.slug}` },
-        { path: 'spa', name: 'hotel-spa', component: () => import('@/views/hotel/HotelServicePage.vue'), props: { title: 'Spa & wellness', subtitle: 'Book a massage, facial or treatment at the hotel spa', showDate: true, showTime: true } },
-        { path: 'restaurant', name: 'hotel-restaurant', component: () => import('@/views/hotel/HotelServicePage.vue'), props: { title: 'Restaurant', subtitle: 'Reserve a table for lunch or dinner', showDate: true, showTime: true, showGuests: true } },
-        { path: 'bar', name: 'hotel-bar', component: () => import('@/views/hotel/HotelServicePage.vue'), props: { title: 'Bar & lounge', subtitle: 'View the cocktail menu or reserve a spot at the bar', showDate: true, showTime: true, showGuests: true } },
-        { path: 'gym', name: 'hotel-gym', component: () => import('@/views/hotel/HotelServicePage.vue'), props: { title: 'Gym & fitness', subtitle: 'Book a fitness session or access the hotel gym', showDate: true, showTime: true } },
+        { path: 'discover', name: 'hotel-discover', component: () => import('@/views/hotel/HotelDiscoverView.vue') },
+        { path: 'discover/:section', name: 'hotel-discover-listing', component: () => import('@/views/hotel/HotelDiscoverListingView.vue') },
+        { path: 'nearby', redirect: (to) => `/hotel/${to.params.slug}/discover` },
+        { path: 'spa', name: 'hotel-spa', component: () => import('@/views/hotel/HotelWellnessOrderView.vue') },
+        { path: 'restaurant', redirect: (to) => `/hotel/${to.params.slug}/food` },
+        { path: 'bar', redirect: (to) => `/hotel/${to.params.slug}/food` },
+        { path: 'gym', redirect: (to) => `/hotel/${to.params.slug}/spa` },
         { path: 'food', name: 'hotel-food', component: () => import('@/views/hotel/HotelFoodOrderView.vue') },
         { path: 'shop', name: 'hotel-shop', component: () => import('@/views/hotel/HotelShopView.vue') },
         { path: 'product/:productSlug', name: 'hotel-product', component: () => import('@/views/hotel/HotelProductView.vue') },
@@ -197,6 +208,30 @@ const router = createRouter({
       component: () => import('@/views/ReservationDetailView.vue'),
     },
     {
+      path: '/partners/login',
+      redirect: '/partner/login',
+    },
+    {
+      path: '/partners',
+      redirect: '/partner',
+    },
+    {
+      path: '/partner/login',
+      name: 'partner-login',
+      component: () => import('@/views/partner/PartnerLoginView.vue'),
+      meta: { partnerGuest: true },
+    },
+    {
+      path: '/partner',
+      component: () => import('@/layouts/PartnerLayout.vue'),
+      meta: { requiresPartner: true },
+      children: [
+        { path: '', name: 'partner-dashboard', component: () => import('@/views/partner/PartnerDashboardView.vue') },
+        { path: 'orders', name: 'partner-orders', component: () => import('@/views/partner/PartnerOrdersView.vue') },
+        { path: 'products', name: 'partner-products', component: () => import('@/views/partner/PartnerProductsView.vue') },
+      ],
+    },
+    {
       path: '/admin/login',
       name: 'admin-login',
       component: () => import('@/views/admin/AdminLoginView.vue'),
@@ -217,6 +252,9 @@ const router = createRouter({
         { path: 'hotels/:hotelId/products', name: 'admin-products', component: () => import('@/views/admin/AdminProductsView.vue') },
         { path: 'hotels/:hotelId/products/new', name: 'admin-product-new', component: () => import('@/views/admin/AdminProductFormView.vue') },
         { path: 'hotels/:hotelId/products/:productId/edit', name: 'admin-product-edit', component: () => import('@/views/admin/AdminProductFormView.vue') },
+        { path: 'hotels/:hotelId/menu', name: 'admin-menu', component: () => import('@/views/admin/AdminMenuItemsView.vue') },
+        { path: 'hotels/:hotelId/menu/new', name: 'admin-menu-new', component: () => import('@/views/admin/AdminMenuItemFormView.vue') },
+        { path: 'hotels/:hotelId/menu/:itemId/edit', name: 'admin-menu-edit', component: () => import('@/views/admin/AdminMenuItemFormView.vue') },
         { path: 'import/:hotelId?', name: 'admin-hotel-import', component: () => import('@/views/admin/AdminHotelImportView.vue') },
         { path: 'orders', name: 'admin-orders', component: () => import('@/views/admin/AdminOrdersView.vue') },
         { path: 'orders/:id', name: 'admin-order-detail', component: () => import('@/views/admin/AdminOrderDetailView.vue') },
@@ -230,6 +268,10 @@ const router = createRouter({
         { path: 'chat/:id', name: 'admin-chat-detail', component: () => import('@/views/admin/AdminChatView.vue') },
         { path: 'alerts', name: 'admin-alerts', component: () => import('@/views/admin/AdminAlertsView.vue') },
         { path: 'webhooks', name: 'admin-webhooks', component: () => import('@/views/admin/AdminWebhooksView.vue') },
+        { path: 'inquiries', name: 'admin-inquiries', component: () => import('@/views/admin/AdminInquiriesView.vue') },
+        { path: 'influencers', name: 'admin-influencers', component: () => import('@/views/admin/AdminInfluencersView.vue') },
+        { path: 'catalogue', name: 'admin-catalogue', component: () => import('@/views/admin/AdminCatalogueView.vue') },
+        { path: 'payouts', name: 'admin-payouts', component: () => import('@/views/admin/AdminPayoutsView.vue') },
       ],
     },
   ],
@@ -238,6 +280,25 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const { useAuthStore } = await import('@/stores/auth')
   const auth = useAuthStore()
+
+  if (to.path.startsWith('/partner')) {
+    if (to.meta.partnerGuest) {
+      if (auth.token) {
+        if (!auth.user) await auth.loadMe()
+        if (auth.isPartner) return { path: '/partner' }
+      }
+      return true
+    }
+    if (to.meta.requiresPartner) {
+      if (!auth.token) return { name: 'partner-login', query: { redirect: to.fullPath } }
+      if (!auth.user) await auth.loadMe()
+      if (!auth.isPartner) {
+        auth.logout()
+        return { name: 'partner-login' }
+      }
+    }
+    return true
+  }
 
   if (!to.path.startsWith('/admin')) {
     const shopCartRoutes = new Set([

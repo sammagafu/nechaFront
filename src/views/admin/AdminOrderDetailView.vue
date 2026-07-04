@@ -41,15 +41,35 @@
 
         <section class="admin-card admin-card-body admin-order-items">
           <h3>Items ({{ order.items.length }})</h3>
-          <ul v-if="order.items.length" class="admin-order-line-list">
-            <li v-for="item in order.items" :key="item.id">
-              <div>
-                <strong>{{ item.quantity }}× {{ item.name }}</strong>
-                <p v-if="item.notes" class="admin-order-line-note">{{ item.notes }}</p>
-              </div>
-              <span>{{ formatPrice(item.total_price, order.currency) }}</span>
-            </li>
-          </ul>
+          <div v-if="order.items.length" class="admin-table-wrap admin-order-items-table">
+            <table class="admin-table admin-order-items-table-grid">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="admin-order-col-num">Qty</th>
+                  <th class="admin-order-col-num">Unit price</th>
+                  <th class="admin-order-col-num">Line total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in order.items" :key="item.id">
+                  <td>
+                    <strong>{{ item.name }}</strong>
+                    <p v-if="item.notes" class="admin-order-line-note">{{ item.notes }}</p>
+                  </td>
+                  <td class="admin-order-col-num">{{ item.quantity }}</td>
+                  <td class="admin-order-col-num">{{ formatPrice(item.unit_price, order.currency) }}</td>
+                  <td class="admin-order-col-num">{{ formatPrice(item.total_price, order.currency) }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="admin-order-items-total">
+                  <td colspan="3">Order total</td>
+                  <td class="admin-order-col-num">{{ formatPrice(order.total_amount, order.currency) }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
           <p v-else class="admin-empty">No line items recorded.</p>
         </section>
 
@@ -251,32 +271,29 @@ async function saveStatus() {
   font-size: 14px;
 }
 
-.admin-order-line-list {
-  list-style: none;
-  margin: 0.75rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.65rem;
+.admin-order-items-table {
+  margin: 0.75rem calc(-1 * var(--admin-pad-card-lg, 1.5rem)) 0;
 }
 
-.admin-order-line-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
+.admin-order-items-table-grid {
+  min-width: 32rem;
 }
 
-.admin-order-line-list li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.admin-order-col-num {
+  text-align: right;
+  white-space: nowrap;
 }
 
 .admin-order-line-note {
   margin: 0.2rem 0 0;
   font-size: 12px;
   color: var(--color-muted);
+}
+
+.admin-order-items-total td {
+  border-top: 1px solid var(--color-border);
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .admin-order-status-hint {

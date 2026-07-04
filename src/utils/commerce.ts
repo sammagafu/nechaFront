@@ -14,21 +14,26 @@ export function formatPrice(amount: number, currency = 'TZS') {
 
 export function productFromApi(p: {
   id: string
+  slug?: string
   name: string
   description: string
   price: number
   currency: string
   image_url?: string
   stock?: number
-}, hotelCode?: string) {
+  brand_name?: string
+}, hotelCode?: string, hotelSlug?: string) {
   return {
     id: p.id,
+    slug: p.slug || p.id,
+    brandName: p.brand_name || '',
     name: p.name,
     description: p.description,
     price: p.price,
     currency: p.currency,
     imageUrl: p.image_url,
     stock: p.stock,
-    hotelCode,
+    hotelCode: hotelCode || '',
+    hotelSlug: hotelSlug || hotelCode || '',
   }
 }

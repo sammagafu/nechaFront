@@ -51,7 +51,43 @@ export async function fetchHotelRooms(slug: string) {
   return data.data
 }
 
-export async function fetchHotelMenu(slug: string) {
-  const { data } = await client.get<ApiSuccess<HotelMenuResponse>>(`/hotels/slug/${slug}/menu`)
+export async function fetchHotelMenu(slug: string, kind?: string) {
+  const { data } = await client.get<ApiSuccess<HotelMenuResponse>>(`/hotels/slug/${slug}/menu`, {
+    params: kind ? { kind } : undefined,
+  })
+  return data.data
+}
+
+export interface ProductReview {
+  id: string
+  guest_name: string
+  rating: number
+  body: string
+  created_at: string
+}
+
+export interface CreateProductReviewPayload {
+  guest_name: string
+  guest_phone?: string
+  rating: number
+  body: string
+}
+
+export async function fetchProductReviews(slug: string, productSlug: string) {
+  const { data } = await client.get<ApiSuccess<ProductReview[]>>(
+    `/hotels/slug/${slug}/products/${productSlug}/reviews`,
+  )
+  return data.data
+}
+
+export async function submitProductReview(
+  slug: string,
+  productSlug: string,
+  payload: CreateProductReviewPayload,
+) {
+  const { data } = await client.post<ApiSuccess<ProductReview>>(
+    `/hotels/slug/${slug}/products/${productSlug}/reviews`,
+    payload,
+  )
   return data.data
 }

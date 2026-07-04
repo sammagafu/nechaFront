@@ -5,6 +5,7 @@ export interface User {
   phone: string
   role: string
   auth_provider?: string
+  hotel_id?: string
 }
 
 export interface AuthResponse {
@@ -83,13 +84,21 @@ export interface AdminHotel {
   location: string
   country: string
   zone: string
+  google_maps_url?: string
+  latitude?: number
+  longitude?: number
   phone: string
+  email?: string
   initials: string
   logo_url: string
   referral_code: string
   services: string[]
   is_verified: boolean
   kkooapp_id: string
+  partner_type?: string
+  commission_tier?: string
+  commission_tier_start_date?: string
+  selcom_payout_account?: string
   is_active: boolean
   product_count: number
   created_at: string
@@ -107,6 +116,7 @@ export interface AdminProduct {
   price: number
   currency: string
   image_url: string
+  images?: string[]
   stock: number
   is_featured: boolean
   is_active: boolean

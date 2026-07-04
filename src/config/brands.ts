@@ -29,8 +29,8 @@ export const heroSlideMeta: HeroSlideMeta[] = [
     wordRight: 'Deep',
     description:
       'Whipped shea and lemongrass body butter — deeply nourishing with a fresh citrus scent.',
-    cta: 'Shop body care',
-    ctaTo: '/shop?category=skin_care',
+    cta: 'Explore brands',
+    ctaTo: '/brands',
     productSlug: 'lemongrass-body-butter',
     tint: '#c4e86a',
   },
@@ -42,8 +42,8 @@ export const heroSlideMeta: HeroSlideMeta[] = [
     wordRight: 'Naturally',
     description:
       'Cold-pressed baobab face oil — vitamins A, D and E for skin and hair ritual.',
-    cta: 'Shop skincare',
-    ctaTo: '/shop?category=skin_care',
+    cta: 'Explore brands',
+    ctaTo: '/brands',
     productSlug: 'baobab-face-oil',
     tint: '#8ab4f8',
   },
@@ -55,8 +55,8 @@ export const heroSlideMeta: HeroSlideMeta[] = [
     wordRight: 'Clean',
     description:
       'Brightening turmeric bar — reduces dark spots and evens skin tone naturally.',
-    cta: 'Shop personal care',
-    ctaTo: '/shop?category=personal_care',
+    cta: 'Explore brands',
+    ctaTo: '/brands',
     productSlug: 'turmeric-soap',
     tint: '#f0c674',
   },
@@ -68,8 +68,8 @@ export const heroSlideMeta: HeroSlideMeta[] = [
     wordRight: 'Ritual',
     description:
       'Natural clove oil soap — antibacterial, antifungal and deeply cleansing.',
-    cta: 'Shop soaps',
-    ctaTo: '/shop?category=personal_care',
+    cta: 'Explore brands',
+    ctaTo: '/brands',
     productSlug: 'clove-soap',
     tint: '#e8a87c',
   },

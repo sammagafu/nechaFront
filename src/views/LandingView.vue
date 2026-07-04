@@ -44,7 +44,7 @@
               </div>
               <router-link
                 v-if="slide.productSlug"
-                :to="productPath(slide.productSlug)"
+                :to="demoProductPath(slide.productSlug)"
                 class="hero-product-chip"
               >
                 <img :src="slide.image" :alt="slide.imageAlt" loading="lazy" />
@@ -113,89 +113,14 @@
       </div>
     </section>
 
-    <!-- Categories rail -->
-    <section id="categories" class="section cat-rail-section">
-      <div class="section-inner">
-        <header class="section-head-row">
-          <div>
-            <p class="eyebrow">Shop by category</p>
-            <h2 class="section-title-sm">Five worlds of care</h2>
-          </div>
-          <router-link to="/shop" class="btn-view">View all →</router-link>
-        </header>
-        <div class="cat-rail">
-          <router-link
-            v-for="cat in shopCategories"
-            :key="cat.id"
-            :to="categoryShopLink(cat.id)"
-            class="cat-rail-card"
-          >
-            <div class="cat-rail-image">
-              <div class="cat-rail-image-mask">
-                <img :src="cat.image" :alt="cat.label" loading="lazy" />
-              </div>
-              <span class="cat-rail-icon" aria-hidden="true">
-                <Icon :name="cat.icon" :size="18" />
-              </span>
-            </div>
-            <h3>{{ cat.label }}</h3>
-            <span>{{ cat.count }} products</span>
-          </router-link>
-        </div>
-      </div>
-    </section>
-
     <!-- Vertical features -->
     <VerticalFeatures
       eyebrow="Everything in one place"
-      title="More than a shop"
-      title-accent="shop"
-      subtitle="Products, food, spa, dining and hotel services — designed for guests and everyday shoppers."
+      title="More than a storefront"
+      title-accent="storefront"
+      subtitle="Discover Tanzania, order food and wellness to your room, and explore partner hotels — all from one QR scan."
       :items="verticalFeatures"
     />
-
-    <!-- Promo banner -->
-    <section class="section promo-section">
-      <div class="section-inner">
-        <div class="promo-card">
-          <div class="promo-copy">
-            <p class="eyebrow">Necha Naturals</p>
-            <h2>Skincare that loves you back</h2>
-            <p>Botanical body care from Tanzania — same-day delivery by electric vehicle.</p>
-            <router-link to="/shop" class="btn btn-green">Shop collection →</router-link>
-          </div>
-          <div class="promo-visual">
-            <img :src="siteImages.products.lemongrass" alt="Necha products" loading="lazy" />
-          </div>
-          <div class="promo-stats">
-            <p><strong>10K+</strong><span>Happy guests</span></p>
-            <p><strong>4.9</strong><span>Average rating</span></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Bestsellers -->
-    <section id="bestsellers" class="section bestsellers-section">
-      <div class="section-inner">
-        <header class="section-head-row">
-          <div>
-            <p class="eyebrow">Guest favourites</p>
-            <h2 class="section-title-sm">Our bestsellers</h2>
-            <p class="section-sub">Top-rated by hotel guests across Dar es Salaam</p>
-          </div>
-          <router-link to="/shop" class="btn-view">View all →</router-link>
-        </header>
-        <div class="product-grid">
-          <ProductCard
-            v-for="product in showcaseProducts"
-            :key="product.id"
-            :product="product"
-            :to="product.slug ? productPath(product.slug) : undefined"
-          />
-        </div>
-      </div>
-    </section>
 
     <!-- Hotel portal -->
     <section id="enter-hotel" class="section hotel-section">
@@ -277,10 +202,10 @@
     <section id="contact" class="section cta-section">
       <div class="section-inner cta-band">
         <h2>Start your ritual today</h2>
-        <p>Shop online, order to your room, or explore our demo hotel portal.</p>
+        <p>Scan your hotel QR, explore partner properties, or discover Tanzania.</p>
         <div class="cta-actions">
-          <router-link to="/shop" class="btn btn-lg btn-green">Shop collection</router-link>
-          <button class="btn btn-lg btn-outline btn-outline-light" type="button" @click="tryDemo">Demo hotel</button>
+          <button class="btn btn-lg btn-green" type="button" @click="tryDemo">Enter demo hotel</button>
+          <router-link to="/discovery" class="btn btn-lg btn-outline btn-outline-light">Discover Tanzania</router-link>
         </div>
       </div>
     </section>
@@ -290,7 +215,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ProductCard from '@/components/ProductCard.vue'
 import Icon from '@/components/ui/Icon.vue'
 import VerticalFeatures from '@/components/home/VerticalFeatures.vue'
 import { heroSlideMeta, productImageBySlug, type HeroSlideMeta } from '@/config/brands'
@@ -304,10 +228,8 @@ interface VerticalFeature {
   to?: string
   href?: string
 }
-import { appConfig, catalogConfig, productPath } from '@/config/app'
-import { siteImages } from '@/config/images'
+import { appConfig, catalogConfig } from '@/config/app'
 import { useCatalogStore } from '@/stores/catalog'
-import { categoryShopLink, shopCategories } from '@/config/categories'
 
 const router = useRouter()
 const route = useRoute()
@@ -353,11 +275,10 @@ onUnmounted(() => {
 
 const showHotelError = computed(() => route.query.hotelError === '1')
 
-const showcaseProducts = computed(() => {
-  const featured = catalog.featuredProducts
-  if (featured.length) return featured.slice(0, 4)
-  return catalog.commerceProducts.slice(0, 4)
-})
+function demoProductPath(productSlug: string) {
+  const { hotelSlug } = appConfig.demoHotel
+  return `/hotel/${hotelSlug}/product/${productSlug}`
+}
 
 function stopHeroCarousel() {
   if (heroTimer) clearInterval(heroTimer)
@@ -410,18 +331,18 @@ const hotelServicePath = (segment: string) => {
 
 const verticalFeatures = computed<VerticalFeature[]>(() => [
   {
-    tag: 'Shop',
-    label: 'Personal care',
-    description: 'Browse NECHA NATURALS and curated African wellness products.',
-    action: 'Shop now',
-    tint: '#5a8f28',
-    icon: 'sparkles',
-    to: '/shop',
+    tag: 'Discover',
+    label: 'Discover Tanzania',
+    description: 'Restaurants, activities, tours and events curated for hotel guests.',
+    action: 'Explore',
+    tint: '#534AB7',
+    icon: 'star',
+    to: '/discovery',
   },
   {
     tag: 'Food',
     label: 'Order food',
-    description: 'Room service and dining — burgers, local plates, drinks to your door.',
+    description: 'Room service and bar menu — burgers, local plates, drinks to your door.',
     action: 'View menu',
     tint: '#854f0b',
     icon: 'gift',
@@ -437,29 +358,29 @@ const verticalFeatures = computed<VerticalFeature[]>(() => [
     to: hotelServicePath('spa'),
   },
   {
-    tag: 'Dine',
-    label: 'Reserve dining',
-    description: 'Lunch and dinner reservations at your hotel restaurant.',
-    action: 'Reserve table',
-    tint: '#534AB7',
-    icon: 'star',
-    to: hotelServicePath('restaurant'),
+    tag: 'Brands',
+    label: 'African brands',
+    description: 'Curated personal care and wellness labels — NECHA NATURALS and partners.',
+    action: 'View brands',
+    tint: '#5a8f28',
+    icon: 'sparkles',
+    to: '/brands',
   },
   {
-    tag: 'Bar',
-    label: 'Bar & lounge',
-    description: 'Cocktail menu and lounge reservations without leaving your room.',
-    action: 'View menu',
-    tint: '#2c2c2a',
-    icon: 'spray',
-    to: hotelServicePath('bar'),
+    tag: 'Partners',
+    label: 'Hotel partners',
+    description: 'Commission on every guest purchase — zero effort, automatic payouts.',
+    action: 'Join Necha',
+    tint: '#86bc42',
+    icon: 'scan',
+    to: '/hotel-partners',
   },
   {
     tag: 'Portal',
     label: 'Hotel portal',
     description: 'Enter your property code for the full guest commerce experience.',
     action: 'Enter code',
-    tint: '#86bc42',
+    tint: '#2c2c2a',
     icon: 'scan',
     href: '#enter-hotel',
   },

@@ -19,7 +19,7 @@ export const appConfig = {
   logoUrl,
   phone: '+255 784 455 439',
   email: 'info@necha.africa',
-  address: 'House No. 2, Salous St, Africana, Mbezi Beach, DSM',
+  address: 'House No. 2, Selous St, Africana, Mbezi Beach, DSM',
   hours: 'Mon–Sat: 9:00am – 6:00pm',
   demoHotel: demoHotelConfig,
   social: {
@@ -44,9 +44,11 @@ export function hotelEntryUrl(
   hotelCode: string,
   slug = catalogConfig.hotelSlug,
   channel: 'room' | 'poster' | 'lobby' = 'room',
+  room?: string,
 ): string {
   const base = (appConfig.appUrl || '').replace(/\/$/, '') || ''
   const params = new URLSearchParams({ ref: hotelCode })
   if (channel !== 'room') params.set('channel', channel)
+  if (room?.trim()) params.set('room', room.trim())
   return `${base}/hotel/${slug}?${params.toString()}`
 }
