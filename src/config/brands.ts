@@ -19,11 +19,11 @@ export interface HeroSlideMeta {
   tint: string
 }
 
-/** Hero carousel — one featured product per slide (NECHA NATURALS). */
+/** Hero carousel — featured partner catalogue products. */
 export const heroSlideMeta: HeroSlideMeta[] = [
   {
     id: 'body',
-    brand: 'NECHA NATURALS',
+    brand: 'Necha Africa',
     label: 'Body butter',
     wordLeft: 'Skin',
     wordRight: 'Deep',
@@ -36,7 +36,7 @@ export const heroSlideMeta: HeroSlideMeta[] = [
   },
   {
     id: 'oil',
-    brand: 'NECHA NATURALS',
+    brand: 'Necha Africa',
     label: 'Face oil',
     wordLeft: 'Glow',
     wordRight: 'Naturally',
@@ -49,7 +49,7 @@ export const heroSlideMeta: HeroSlideMeta[] = [
   },
   {
     id: 'soap',
-    brand: 'NECHA NATURALS',
+    brand: 'Necha Africa',
     label: 'Turmeric soap',
     wordLeft: 'Bright',
     wordRight: 'Clean',
@@ -62,7 +62,7 @@ export const heroSlideMeta: HeroSlideMeta[] = [
   },
   {
     id: 'clove',
-    brand: 'NECHA NATURALS',
+    brand: 'Necha Africa',
     label: 'Clove soap',
     wordLeft: 'Pure',
     wordRight: 'Ritual',

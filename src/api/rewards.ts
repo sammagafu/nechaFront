@@ -19,3 +19,11 @@ export async function fetchRewardBalance() {
   const { data } = await client.get<ApiSuccess<RewardBalance>>('/rewards/balance')
   return data.data
 }
+
+export async function redeemRewardPoints(points: number) {
+  const { data } = await client.post<ApiSuccess<{ balance: number; redeemed_points: number }>>(
+    '/rewards/redeem',
+    { points },
+  )
+  return data.data
+}

@@ -9,7 +9,7 @@
         :aria-selected="activeTab === 'hotel'"
         @click="activeTab = 'hotel'"
       >
-        I manage a hotel
+        I represent a hotel
       </button>
       <button
         type="button"
@@ -54,7 +54,7 @@
         <span>Phone (optional — for faster response)</span>
         <input v-model="hotelForm.phone" type="tel" placeholder="+255 7xx xxx xxx" />
       </label>
-      <button type="submit" class="sub-btn" :disabled="submitting">{{ submitting ? 'Sending…' : 'Request a partnership call ↗' }}</button>
+      <button type="submit" class="sub-btn" :disabled="submitting">{{ submitting ? 'Sending…' : 'Join now ↗' }}</button>
       <p v-if="error" class="form-msg form-msg--error">{{ error }}</p>
       <p v-if="success" class="form-msg form-msg--success">Thank you — we'll be in touch within 24 hours.</p>
     </form>
@@ -132,11 +132,14 @@ const hotelRoles = [
 ]
 
 const brandCategories = [
-  'Skincare & beauty',
-  'Wellness & supplements',
-  'Personal care',
-  'Natural & organic',
-  'Other',
+  'Personal Care',
+  'Skin Care',
+  'Wellness',
+  'Travel Essentials',
+  'Gifts',
+  'Souvenirs',
+  'Local Artisan Products',
+  'Tour Services',
 ]
 
 const hotelForm = ref({

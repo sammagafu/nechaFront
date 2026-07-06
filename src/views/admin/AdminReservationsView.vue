@@ -53,7 +53,7 @@
               </td>
               <td>
                 {{ formatAdminDateTime(r.created_at) }}
-                <br><small>{{ r.kkooapp_ref || '—' }}</small>
+                <br><small>{{ r.order_ref || '—' }}</small>
               </td>
               <td>
                 <span class="admin-table-action">View →</span>

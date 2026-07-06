@@ -8,12 +8,13 @@
           </div>
           <header class="hp-head-row" style="margin-bottom: 1rem">
             <div>
-              <p class="eyebrow">Discovery Portal</p>
+              <p class="eyebrow">Discovery</p>
               <h2 class="hp-title">
-                Help guests explore Dar — <em style="font-style: italic; color: var(--color-muted)">from their room</em>
+                Help your guests create a lasting memory on their holiday
               </h2>
               <p class="hp-lead">
-                Events, dining, tours and experiences curated for hotel guests — co-branded under your property.
+                We make sure your guests have access to all the right information about their destination stay —
+                a seamless concierge and retail experience curated for travellers and tourists.
               </p>
             </div>
           </header>

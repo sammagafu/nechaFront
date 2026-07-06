@@ -16,6 +16,10 @@ export interface DiscoveryItem {
   event_ends_at?: string
   ticket_url: string
   ticket_mode: 'none' | 'referral' | 'platform'
+  price_tzs?: number
+  ticket_capacity?: number
+  tickets_sold?: number
+  tickets_left?: number
   organizer_name?: string
   is_featured: boolean
 }

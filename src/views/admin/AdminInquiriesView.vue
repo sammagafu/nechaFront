@@ -19,6 +19,7 @@
         <option value="contact">Contact</option>
         <option value="event_listing">Event listing</option>
         <option value="partner_referral">Partner referral</option>
+        <option value="discovery_booking">Discovery booking</option>
         <option value="newsletter">Newsletter</option>
       </select>
       <button type="button" class="admin-btn admin-btn--ghost" @click="load">Refresh</button>

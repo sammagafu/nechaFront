@@ -103,7 +103,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { createFoodOrder } from '@/api/orders'
 import { fetchHotelMenu, fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
@@ -122,7 +121,6 @@ interface WellnessMenuItem {
 }
 
 const session = useHotelSessionStore()
-const router = useRouter()
 const activeCategory = ref('all')
 const checkoutOpen = ref(false)
 const checkoutDialog = ref<HTMLDialogElement | null>(null)
@@ -225,24 +223,48 @@ async function submit() {
   error.value = ''
   try {
     session.setRoomNumber(form.room_number)
-    const payload = {
-      hotel_code: session.hotel.code,
-      customer_name: form.customer_name,
-      customer_phone: form.customer_phone,
-      room_number: form.room_number,
-      notes: form.notes ? `Wellness: ${form.notes}` : 'Wellness request',
-      items: orderLines.value.map((l) => ({
-        name: l.name,
-        quantity: l.quantity,
-        unit_price: l.unit_price,
-      })),
+    const freeLines = orderLines.value.filter((l) => !l.requiresPayment || l.unit_price <= 0)
+    const paidLines = orderLines.value.filter((l) => l.requiresPayment && l.unit_price > 0)
+
+    if (freeLines.length) {
+      const order = await createFoodOrder({
+        hotel_code: session.hotel.code,
+        customer_name: form.customer_name,
+        customer_phone: form.customer_phone,
+        room_number: form.room_number,
+        notes: form.notes ? `Wellness: ${form.notes}` : 'Wellness request',
+        items: freeLines.map((l) => ({
+          name: l.name,
+          quantity: l.quantity,
+          unit_price: l.unit_price,
+        })),
+      })
+      success.value = order.id?.slice(0, 8) ?? 'sent'
     }
-    const order = await createFoodOrder(payload)
-    success.value = order.id?.slice(0, 8) ?? 'sent'
-    if (hasPaidItems.value) {
-      router.push(`/hotel/${session.slug}/checkout`)
-      return
+
+    if (paidLines.length) {
+      const order = await createFoodOrder({
+        hotel_code: session.hotel.code,
+        customer_name: form.customer_name,
+        customer_phone: form.customer_phone,
+        room_number: form.room_number,
+        notes: form.notes ? `Wellness paid: ${form.notes}` : 'Wellness paid service',
+        require_payment: true,
+        return_url: `${window.location.origin}/hotel/${session.slug}/payment/return`,
+        cancel_url: `${window.location.origin}/hotel/${session.slug}/spa`,
+        items: paidLines.map((l) => ({
+          name: l.name,
+          quantity: l.quantity,
+          unit_price: l.unit_price,
+        })),
+      })
+      if (order.payment_url) {
+        window.location.href = order.payment_url
+        return
+      }
+      success.value = order.id?.slice(0, 8) ?? 'sent'
     }
+
     Object.keys(cart).forEach((k) => delete cart[k])
     closeCheckout()
   } catch (e) {

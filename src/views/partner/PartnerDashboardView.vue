@@ -2,7 +2,10 @@
   <div class="admin-page">
     <header class="admin-page-intro">
       <h2>{{ dashboard?.hotel?.name || 'Your property' }}</h2>
-      <p>Live storefront performance for your property on Necha Africa.</p>
+      <p v-if="isAffiliatePartner">
+        Introduce travellers and track referral attribution from your partner dashboard.
+      </p>
+      <p v-else>Live storefront performance for your property on Necha Africa.</p>
     </header>
 
     <div v-if="loading" class="admin-loading">Loading your dashboard…</div>
@@ -10,6 +13,14 @@
     <div v-else-if="dashboard" class="admin-analytics-grid">
       <div v-if="dashboard.hotel" class="admin-store-links">
         <router-link
+          v-if="isAffiliatePartner"
+          to="/partner/referrals"
+          class="admin-btn admin-btn--ghost"
+        >
+          Manage referrals
+        </router-link>
+        <router-link
+          v-else
           :to="`/hotel/${dashboard.hotel.slug}?ref=${encodeURIComponent(dashboard.hotel.referral_code || dashboard.hotel.code)}`"
           class="admin-btn admin-btn--ghost"
           target="_blank"
@@ -30,24 +41,27 @@
           <strong>{{ formatPrice(dashboard.revenue_last_30_days, dashboard.currency) }}</strong>
           <span>Revenue (30d)</span>
         </div>
-        <div class="admin-stat">
-          <strong>{{ dashboard.orders }}</strong>
-          <span>Orders</span>
-        </div>
-        <div class="admin-stat">
-          <strong>{{ dashboard.orders_last_30_days }}</strong>
-          <span>Orders (30d)</span>
-        </div>
-        <div class="admin-stat">
-          <strong>{{ dashboard.reservations }}</strong>
-          <span>Reservations</span>
-        </div>
-        <div class="admin-stat">
-          <strong>{{ dashboard.pending_orders }}</strong>
-          <span>Pending orders</span>
-        </div>
+        <template v-if="!isAffiliatePartner">
+          <div class="admin-stat">
+            <strong>{{ dashboard.orders }}</strong>
+            <span>Orders</span>
+          </div>
+          <div class="admin-stat">
+            <strong>{{ dashboard.orders_last_30_days }}</strong>
+            <span>Orders (30d)</span>
+          </div>
+          <div class="admin-stat">
+            <strong>{{ dashboard.reservations }}</strong>
+            <span>Reservations</span>
+          </div>
+          <div class="admin-stat">
+            <strong>{{ dashboard.pending_orders }}</strong>
+            <span>Pending orders</span>
+          </div>
+        </template>
       </div>
 
+      <template v-if="!isAffiliatePartner">
       <div class="admin-chart-grid">
         <div class="admin-card admin-chart-card">
           <h3>Orders — last 14 days</h3>
@@ -112,6 +126,16 @@
           </table>
         </div>
       </div>
+      </template>
+
+      <div v-else class="admin-card">
+        <h2>Affiliate partner</h2>
+        <p class="admin-muted">
+          Create traveller referrals so orders during their trip are attributed to your account.
+          Commission payouts appear under Payouts once released by Necha.
+        </p>
+        <router-link to="/partner/referrals" class="admin-btn admin-btn--primary">Go to referrals</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -130,6 +154,9 @@ import { formatPrice } from '@/utils/commerce'
 const dashboard = ref<StoreDashboard | null>(null)
 const loading = ref(true)
 const error = ref('')
+
+const affiliateTypes = new Set(['tour_operator', 'travel_agent', 'airline'])
+const isAffiliatePartner = computed(() => affiliateTypes.has(dashboard.value?.hotel?.partner_type || 'hotel'))
 
 const productRows = computed(() =>
   (dashboard.value?.top_products ?? []).map((product, index) => ({

@@ -1,7 +1,7 @@
 <template>
   <span class="dual-price" :class="{ 'dual-price--stack': stack }">
     <span class="dual-price-tzs">{{ tzs }}</span>
-    <span class="dual-price-usd">{{ usd }}</span>
+    <span v-if="showUsd" class="dual-price-usd">{{ usd }}</span>
   </span>
 </template>
 
@@ -17,12 +17,13 @@ const props = withDefaults(
   { stack: false },
 )
 
-const { ensureLoaded, formatDualPrice } = usePlatformSettings()
+const { ensureLoaded, formatDualPrice, isFeatureEnabled } = usePlatformSettings()
 
 onMounted(() => {
   void ensureLoaded()
 })
 
+const showUsd = computed(() => isFeatureEnabled('dual_currency_enabled'))
 const tzs = computed(() => formatDualPrice(props.amountTzs).tzs)
 const usd = computed(() => formatDualPrice(props.amountTzs).usd)
 </script>

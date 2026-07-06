@@ -79,7 +79,7 @@
 
     <GuestRequestForm class="sf-reveal" />
 
-    <div class="rewards-banner sf-reveal">
+    <div v-if="rewardsEnabled" class="rewards-banner sf-reveal">
       <div>
         <h3>Earn Necha rewards on every purchase</h3>
         <p>Every order earns you points — redeem for a discount or withdraw as cash to your mobile money account.</p>
@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
 import { useDeliveryNote } from '@/composables/useDeliveryNote'
@@ -102,12 +102,19 @@ import type { IconName } from '@/components/ui/icons'
 import StorefrontProductCard from '@/components/storefront/StorefrontProductCard.vue'
 import CategoryPills from '@/components/storefront/CategoryPills.vue'
 import GuestRequestForm from '@/components/storefront/GuestRequestForm.vue'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
 import { toCommerceProduct } from '@/utils/storefront'
 import type { StorefrontProduct } from '@/types/storefront'
 
 const session = useHotelSessionStore()
 const cart = useCartStore()
 const { note: deliveryNote } = useDeliveryNote()
+const { ensureLoaded, features } = usePlatformSettings()
+const rewardsEnabled = computed(() => features.value.rewards_enabled)
+
+onMounted(() => {
+  void ensureLoaded()
+})
 
 const productsRef = computed(() => session.products)
 const { activeCategory, visibleCategories, filteredProducts } = useProductCategoryFilter(productsRef)

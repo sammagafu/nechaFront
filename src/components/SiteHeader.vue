@@ -56,8 +56,15 @@
     <div class="header-nav">
       <div class="header-nav-inner">
         <nav class="main-nav" aria-label="Primary">
-          <router-link to="/" :class="{ active: route.name === 'home' }" @click="closeMenus">Home</router-link>
+          <router-link to="/" :class="{ active: route.name === 'home' && !route.hash }" @click="closeMenus">Home</router-link>
           <router-link to="/about" :class="{ active: route.name === 'about' }" @click="closeMenus">About</router-link>
+          <router-link
+            to="/#form-sec"
+            :class="{ active: route.name === 'home' && route.hash === '#form-sec' }"
+            @click="closeMenus"
+          >
+            Hotel Partners
+          </router-link>
           <router-link to="/brands" :class="{ active: route.name === 'brands' }" @click="closeMenus">Brands</router-link>
           <router-link to="/discovery" :class="{ active: isDiscoveryRoute }" @click="closeMenus">Discover Tanzania</router-link>
         </nav>
@@ -74,12 +81,13 @@
           <button type="submit" aria-label="Search">Search</button>
         </form>
         <nav class="mobile-nav" aria-label="Mobile">
-          <router-link to="/" :class="{ active: route.name === 'home' }" @click="closeMenus">Home</router-link>
+          <router-link to="/" :class="{ active: route.name === 'home' && !route.hash }" @click="closeMenus">Home</router-link>
           <router-link to="/about" @click="closeMenus">About</router-link>
+          <router-link to="/#form-sec" @click="closeMenus">Hotel Partners</router-link>
           <router-link to="/brands" @click="closeMenus">Brands</router-link>
           <router-link to="/discovery" @click="closeMenus">Discover Tanzania</router-link>
           <router-link to="/contact" @click="closeMenus">Contact</router-link>
-          <router-link to="/partner/login" @click="closeMenus">Hotel Portal</router-link>
+          <router-link v-if="partnerPortalEnabled" to="/partner/login" @click="closeMenus">Hotel Portal</router-link>
         </nav>
       </div>
     </Transition>
@@ -103,10 +111,13 @@ import ThemeToggle from '@/components/ThemeToggle.vue'
 import { storefrontConfig } from '@/config/storefront'
 import Icon from '@/components/ui/Icon.vue'
 import { useAuthStore } from '@/stores/auth'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const { ensureLoaded, features } = usePlatformSettings()
+const partnerPortalEnabled = computed(() => features.value.partner_portal_enabled)
 const scrolled = ref(false)
 const menuOpen = ref(false)
 const searchQuery = ref('')
@@ -171,7 +182,10 @@ watch(
   () => closeMenus(),
 )
 
-onMounted(() => window.addEventListener('scroll', onScroll))
+onMounted(() => {
+  void ensureLoaded()
+  window.addEventListener('scroll', onScroll)
+})
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
   setBodyScroll(false)

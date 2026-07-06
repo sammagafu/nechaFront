@@ -75,6 +75,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { submitDiscoveryEvent } from '@/api/discovery'
+import { submitInquiry } from '@/api/inquiries'
 import { eventSubcategories } from '@/config/discovery'
 import { getApiError } from '@/api/client'
 
@@ -116,6 +117,15 @@ async function submit() {
       event_ends_at: form.event_ends_at ? toApiDateTime(form.event_ends_at) : undefined,
       hotel_slug: props.hotelSlug,
       ticket_mode: form.ticket_url ? 'referral' : 'none',
+    })
+    await submitInquiry({
+      type: 'event_listing',
+      name: form.organizer_name,
+      email: form.organizer_email,
+      phone: form.organizer_phone,
+      category: form.subcategory,
+      location: form.location || form.venue,
+      message: `${form.name}: ${form.description}`,
     })
     success.value = true
   } catch (e) {

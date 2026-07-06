@@ -44,7 +44,7 @@
               </router-link>
               <router-link :to="`${basePath}/shop`" @click="closeNav">Shop</router-link>
               <router-link v-if="showDiscover" :to="`${basePath}/discover`" @click="closeNav">Discover Tanzania</router-link>
-              <router-link v-if="showFood" :to="`${basePath}/food`" @click="closeNav">Food</router-link>
+              <router-link v-if="showFood" :to="`${basePath}/food`" @click="closeNav">Food &amp; Bar</router-link>
               <router-link v-if="showWellness" :to="`${basePath}/spa`" @click="closeNav">Wellness</router-link>
             </div>
           </nav>

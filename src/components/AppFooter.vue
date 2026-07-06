@@ -7,7 +7,7 @@
             <NechaLogo alt="Necha Africa" class="footer-logo" :width="120" :height="32" />
           </router-link>
           <p class="footer-about">
-            Personal care, beauty and wellness — delivered across Dar es Salaam.
+            A hospitality industry commerce infrastructure layer for African tourism.
             Scan your hotel QR to order to your room.
           </p>
           <ul class="footer-contact-list">
@@ -31,12 +31,12 @@
           <nav class="footer-links">
             <router-link to="/">Home</router-link>
             <router-link to="/about">About Us</router-link>
-            <router-link to="/discovery">Discover Tanzania</router-link>
-            <router-link to="/#form-sec">Become a partner</router-link>
-            <router-link to="/brands">Brands</router-link>
-            <router-link to="/earn-with-necha">Earn With Necha</router-link>
+            <router-link to="/#form-sec">Hotel Partners</router-link>
+            <router-link to="/brands">Brand Partners</router-link>
+            <router-link to="/discovery">Discovery</router-link>
+            <router-link to="/earn-with-necha">Earn with Necha</router-link>
             <router-link to="/delivery">Delivery Information</router-link>
-            <router-link to="/rewards">Rewards</router-link>
+            <router-link v-if="rewardsEnabled" to="/rewards">Rewards / Influencer program</router-link>
             <router-link to="/terms">Terms &amp; Conditions</router-link>
             <router-link to="/contact">Contact</router-link>
           </nav>
@@ -45,20 +45,23 @@
         <div class="footer-col">
           <h4 class="footer-widget-title">My Account</h4>
           <nav class="footer-links">
-            <router-link to="/sign-in">Sign in</router-link>
-            <router-link to="/account">My account</router-link>
+            <router-link to="/sign-in">Sign In</router-link>
+            <router-link to="/sign-up">Sign Up</router-link>
+            <router-link to="/admin/login">Admin Login</router-link>
+            <router-link to="/account">My Account</router-link>
           </nav>
         </div>
 
         <div class="footer-col footer-col--newsletter">
           <h4 class="footer-widget-title">Newsletter</h4>
           <p class="footer-newsletter-text">
-            Get wellness tips, new arrivals and exclusive offers delivered to your inbox.
+            Get wellness tips, new arrivals and exclusive offers to your inbox.
           </p>
-          <form class="footer-newsletter" @submit.prevent>
-            <input type="email" placeholder="Your email address" aria-label="Email address" />
-            <button type="submit">Subscribe</button>
+          <form class="footer-newsletter" @submit.prevent="submitNewsletter">
+            <input v-model="newsletterEmail" type="email" placeholder="Your email address" aria-label="Email address" required />
+            <button type="submit" :disabled="newsletterSubmitting">{{ newsletterSubmitting ? '…' : 'Subscribe' }}</button>
           </form>
+          <p v-if="newsletterMessage" class="footer-newsletter-msg">{{ newsletterMessage }}</p>
         </div>
       </div>
     </div>
@@ -77,11 +80,44 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import NechaLogo from '@/components/NechaLogo.vue'
 import Icon from '@/components/ui/Icon.vue'
 import { appConfig } from '@/config/app'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
+import { submitInquiry } from '@/api/inquiries'
+import { getApiError } from '@/api/client'
 
 const year = new Date().getFullYear()
+const { ensureLoaded, features } = usePlatformSettings()
+const rewardsEnabled = computed(() => features.value.rewards_enabled)
+const newsletterEmail = ref('')
+const newsletterSubmitting = ref(false)
+const newsletterMessage = ref('')
+
+onMounted(() => {
+  void ensureLoaded()
+})
+
+async function submitNewsletter() {
+  if (!newsletterEmail.value.trim()) return
+  newsletterSubmitting.value = true
+  newsletterMessage.value = ''
+  try {
+    await submitInquiry({
+      type: 'newsletter',
+      name: 'Newsletter subscriber',
+      email: newsletterEmail.value.trim(),
+      message: 'Footer newsletter signup',
+    })
+    newsletterMessage.value = 'Thanks — you are subscribed.'
+    newsletterEmail.value = ''
+  } catch (e) {
+    newsletterMessage.value = getApiError(e)
+  } finally {
+    newsletterSubmitting.value = false
+  }
+}
 </script>
 
 <style scoped>

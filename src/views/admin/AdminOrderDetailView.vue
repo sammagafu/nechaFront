@@ -76,7 +76,7 @@
         <section class="admin-card admin-card-body">
           <h3>Reference</h3>
           <dl class="admin-detail-list">
-            <div><dt>Kkooapp ref</dt><dd>{{ order.kkooapp_ref || '—' }}</dd></div>
+            <div><dt>Order reference</dt><dd>{{ order.order_ref || order.id || '—' }}</dd></div>
             <div><dt>Placed</dt><dd>{{ formatAdminDateTime(order.created_at) }}</dd></div>
             <div><dt>Last updated</dt><dd>{{ formatAdminDateTime(order.updated_at) }}</dd></div>
             <div v-if="order.notes"><dt>Order notes</dt><dd>{{ order.notes }}</dd></div>

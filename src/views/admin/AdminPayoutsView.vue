@@ -39,6 +39,7 @@
               <th>Records</th>
               <th>Total</th>
               <th>Status</th>
+              <th>Disbursement</th>
               <th></th>
             </tr>
           </thead>
@@ -56,6 +57,13 @@
                 >
                   {{ batch.status }}
                 </span>
+              </td>
+              <td>
+                <span v-if="batch.disbursement_status === 'completed'" class="admin-muted">
+                  {{ batch.disbursement_ref }}
+                </span>
+                <span v-else-if="batch.disbursement_status" class="admin-muted">{{ batch.disbursement_status }}</span>
+                <span v-else class="admin-muted">—</span>
               </td>
               <td>
                 <button

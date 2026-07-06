@@ -1,39 +1,41 @@
 /* Necha Africa — editorial luxury design system */
 
 :root {
-  --font-body: 'Poppins', system-ui, -apple-system, sans-serif;
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-numeric: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-numeric: 'Inter', system-ui, -apple-system, sans-serif;
 
-  /* Brand — pure black, light/dark aware via companion tokens */
-  --color-brand: #000000;
-  --color-brand-rgb: 0, 0, 0;
-  --color-brand-soft: #141414;
-  --color-brand-muted: #3a3a3a;
-  --color-brand-ink: #000000;
+  /* Necha Africa — luxury hospitality palette */
+  --color-brand: #1a4731;
+  --color-brand-rgb: 26, 71, 49;
+  --color-brand-soft: #0f6e56;
+  --color-brand-muted: #2d5a47;
+  --color-brand-ink: #1e293b;
   --color-on-brand: #ffffff;
+  --color-accent-gold: #d4af37;
+  --color-accent-gold-soft: #f5ecd7;
 
-  --color-black: var(--color-brand);
-  --color-black-soft: var(--color-brand-soft);
+  --color-black: var(--color-brand-ink);
+  --color-black-soft: #334155;
   --color-white: #ffffff;
-  --color-text: var(--color-brand-ink);
-  --color-body: #5c5a56;
-  --color-muted: #9a9690;
-  --color-border: #e8e4de;
-  --color-border-subtle: #f0ece6;
-  --color-bg: #faf9f7;
-  --color-bg-soft: #f3f1ec;
-  --color-bg-warm: #ebe8e2;
-  --color-bg-blush: #faf9f7;
+  --color-text: #1e293b;
+  --color-body: #475569;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-border-subtle: #f1f5f9;
+  --color-bg: #faf8f3;
+  --color-bg-soft: #f5f2eb;
+  --color-bg-warm: #efe9df;
+  --color-bg-blush: #faf8f3;
   --color-surface-elevated: #ffffff;
   --color-footer: var(--color-brand);
   --color-footer-bar: var(--color-brand);
-  --color-footer-text: #e8e8e8;
-  --color-footer-muted: #a3a3a3;
+  --color-footer-text: #f8fafc;
+  --color-footer-muted: #94a3b8;
 
-  --color-necha-green: #86bc42;
-  --color-necha-green-light: #e8f4d8;
-  --color-necha-green-dark: #5a8f28;
+  --color-necha-green: #0f6e56;
+  --color-necha-green-light: #e1f5ee;
+  --color-necha-green-dark: #1a4731;
 
   --color-surface: var(--color-surface-elevated);
   --color-surface-overlay: rgba(255, 255, 255, 0.94);
@@ -44,8 +46,8 @@
   --color-focus-ring: rgba(var(--color-brand-rgb), 0.08);
   --footer-bar-bg: var(--color-white);
 
-  --color-accent: var(--color-brand);
-  --color-accent-hover: var(--color-brand-soft);
+  --color-accent: var(--color-brand-soft);
+  --color-accent-hover: var(--color-brand);
   --color-success: var(--color-necha-green);
   --color-error: #cf2e2e;
 
@@ -122,7 +124,7 @@
   --card-radius-compact: var(--radius-lg);
   --card-image-ratio: 1;
 
-  --header-bg: rgba(250, 249, 247, 0.92);
+  --header-bg: rgba(250, 248, 243, 0.94);
   --header-border: var(--color-border);
   --topbar-bg: var(--color-brand);
   --footer-widgets-bg: var(--color-bg-warm);

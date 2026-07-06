@@ -28,6 +28,9 @@ export interface Hotel {
   referral_code?: string
   services?: string[]
   is_verified?: boolean
+  google_maps_url?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface Product {
@@ -100,7 +103,7 @@ export interface Reservation {
   hotel_id: string
   type: string
   status: string
-  kkooapp_ref: string
+  order_ref: string
   guest_name: string
   guest_email: string
   guest_phone: string
@@ -129,6 +132,20 @@ export interface FoodOrderRequest {
   room_number?: string
   items: FoodOrderItem[]
   notes?: string
+  require_payment?: boolean
+  customer_email?: string
+  return_url?: string
+  cancel_url?: string
+}
+
+export interface DiscoveryOrderRequest {
+  discovery_slug: string
+  customer_name: string
+  customer_phone: string
+  customer_email?: string
+  quantity: number
+  return_url?: string
+  cancel_url?: string
 }
 
 export interface ProductOrderItem {
@@ -155,6 +172,7 @@ export interface ProductOrderRequest {
   cancel_url?: string
   items: ProductOrderItem[]
   notes?: string
+  redeem_points?: number
 }
 
 export interface Order {
@@ -162,7 +180,7 @@ export interface Order {
   hotel_id: string
   type: string
   status: string
-  kkooapp_ref: string
+  order_ref: string
   customer_name: string
   customer_phone: string
   table_number?: string
@@ -188,6 +206,6 @@ export interface Order {
 export interface OrderTrack {
   id: string
   status: string
-  kkooapp_ref: string
+  order_ref: string
   updated_at: string
 }

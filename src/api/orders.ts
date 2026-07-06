@@ -1,5 +1,5 @@
 import client from './client'
-import type { ApiSuccess, FoodOrderRequest, Order, OrderTrack, ProductOrderRequest } from '@/types/api'
+import type { ApiSuccess, DiscoveryOrderRequest, FoodOrderRequest, Order, OrderTrack, ProductOrderRequest } from '@/types/api'
 
 export async function createProductOrder(payload: ProductOrderRequest) {
   const { data } = await client.post<ApiSuccess<Order>>('/orders/product', payload)
@@ -8,6 +8,11 @@ export async function createProductOrder(payload: ProductOrderRequest) {
 
 export async function createFoodOrder(payload: FoodOrderRequest) {
   const { data } = await client.post<ApiSuccess<Order>>('/orders/food', payload)
+  return data.data
+}
+
+export async function createDiscoveryOrder(payload: DiscoveryOrderRequest) {
+  const { data } = await client.post<ApiSuccess<Order>>('/orders/discovery', payload)
   return data.data
 }
 

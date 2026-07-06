@@ -1,31 +1,61 @@
-import { ref } from 'vue'
-import { fetchPlatformSettings, type PlatformSettings } from '@/api/inquiries'
+import { computed, ref } from 'vue'
+import { fetchPlatformSettings, type PlatformFeatures, type PlatformSettings } from '@/api/inquiries'
 import { storefrontConfig } from '@/config/storefront'
+
+const defaultFeatures = (): PlatformFeatures => ({
+  rewards_enabled: true,
+  rewards_redeem_enabled: false,
+  discovery_ticketing_enabled: false,
+  partner_portal_enabled: true,
+  partner_products_manage_enabled: false,
+  dual_currency_enabled: true,
+  distance_delivery_enabled: true,
+})
 
 const settings = ref<PlatformSettings | null>(null)
 let loadPromise: Promise<PlatformSettings> | null = null
 
+function fallbackSettings(): PlatformSettings {
+  return {
+    tzs_to_usd_rate: storefrontConfig.tzsToUsdRate,
+    free_delivery_threshold_tzs: storefrontConfig.freeDeliveryThresholdTZS,
+    default_delivery_fee_tzs: storefrontConfig.deliveryFeeTZS,
+    delivery_base_fee_tzs: 3000,
+    delivery_per_km_tzs: 1000,
+    features: defaultFeatures(),
+    zones: [],
+  }
+}
+
 export function usePlatformSettings() {
-  async function ensureLoaded() {
-    if (settings.value) return settings.value
+  async function ensureLoaded(force = false) {
+    if (settings.value && !force) return settings.value
+    if (force) {
+      loadPromise = null
+      settings.value = null
+    }
     if (!loadPromise) {
       loadPromise = fetchPlatformSettings()
         .then((data) => {
-          settings.value = data
-          return data
+          settings.value = {
+            ...fallbackSettings(),
+            ...data,
+            features: { ...defaultFeatures(), ...data.features },
+          }
+          return settings.value
         })
         .catch(() => {
-          const fallback: PlatformSettings = {
-            tzs_to_usd_rate: storefrontConfig.tzsToUsdRate,
-            free_delivery_threshold_tzs: storefrontConfig.freeDeliveryThresholdTZS,
-            default_delivery_fee_tzs: storefrontConfig.deliveryFeeTZS,
-            zones: [],
-          }
-          settings.value = fallback
-          return fallback
+          settings.value = fallbackSettings()
+          return settings.value
         })
     }
     return loadPromise
+  }
+
+  const features = computed(() => settings.value?.features ?? defaultFeatures())
+
+  function isFeatureEnabled(key: keyof PlatformFeatures) {
+    return features.value[key] ?? false
   }
 
   function formatDualPrice(amountTzs: number) {
@@ -50,5 +80,5 @@ export function usePlatformSettings() {
     return subtotalTzs >= threshold ? 0 : fee
   }
 
-  return { settings, ensureLoaded, formatDualPrice, deliveryFeeForSubtotal }
+  return { settings, features, ensureLoaded, isFeatureEnabled, formatDualPrice, deliveryFeeForSubtotal }
 }

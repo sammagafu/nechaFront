@@ -16,6 +16,22 @@
         <span v-if="redeemValue > 0" class="muted">≈ {{ formatPrice(redeemValueTotal) }} in redeem value</span>
       </div>
 
+      <section v-if="redeemEnabled" class="rewards-redeem card card-elevated">
+        <h2>Redeem points</h2>
+        <p class="muted">Redeem now or apply points at hotel checkout on your next order.</p>
+        <form class="rewards-redeem-form" @submit.prevent="submitRedeem">
+          <label>
+            Points to redeem
+            <input v-model.number="redeemPoints" type="number" min="1" :max="balance" required />
+          </label>
+          <button type="submit" class="btn btn-green" :disabled="redeeming || balance <= 0">
+            {{ redeeming ? 'Redeeming…' : 'Redeem points' }}
+          </button>
+        </form>
+        <p v-if="redeemError" class="rewards-error">{{ redeemError }}</p>
+        <p v-if="redeemSuccess" class="rewards-success">{{ redeemSuccess }}</p>
+      </section>
+
       <section class="rewards-ledger">
         <h2>Activity</h2>
         <ul v-if="ledger.length" class="rewards-ledger-list">
@@ -40,8 +56,13 @@
       </section>
 
       <p class="muted rewards-note">
-        Points are earned automatically when your orders are confirmed. To redeem, mention your points
-        balance at checkout or contact us at <a :href="`mailto:${appConfig.email}`">{{ appConfig.email }}</a>.
+        <template v-if="redeemEnabled">
+          Points are earned automatically when your orders are confirmed. Redeem above or apply them at hotel checkout when signed in.
+        </template>
+        <template v-else>
+          Points are earned automatically when your orders are confirmed. Contact us at
+          <a :href="`mailto:${appConfig.email}`">{{ appConfig.email }}</a> to redeem.
+        </template>
       </p>
     </template>
   </div>
@@ -49,16 +70,24 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { fetchRewardBalance, type RewardLedgerEntry } from '@/api/rewards'
+import { fetchRewardBalance, redeemRewardPoints, type RewardLedgerEntry } from '@/api/rewards'
 import { getApiError } from '@/api/client'
 import { appConfig } from '@/config/app'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
 import { formatPrice } from '@/utils/commerce'
+
+const { ensureLoaded, features } = usePlatformSettings()
+const redeemEnabled = computed(() => features.value.rewards_redeem_enabled)
 
 const balance = ref(0)
 const ledger = ref<RewardLedgerEntry[]>([])
 const loading = ref(true)
 const error = ref('')
 const redeemValue = ref(10)
+const redeemPoints = ref(0)
+const redeeming = ref(false)
+const redeemError = ref('')
+const redeemSuccess = ref('')
 
 const redeemValueTotal = computed(() => balance.value * redeemValue.value)
 
@@ -77,11 +106,33 @@ function formatDate(iso: string) {
   })
 }
 
-onMounted(async () => {
+async function loadBalance() {
+  const data = await fetchRewardBalance()
+  balance.value = data.balance
+  ledger.value = data.ledger ?? []
+}
+
+async function submitRedeem() {
+  redeemError.value = ''
+  redeemSuccess.value = ''
+  redeeming.value = true
   try {
-    const data = await fetchRewardBalance()
-    balance.value = data.balance
-    ledger.value = data.ledger ?? []
+    const result = await redeemRewardPoints(redeemPoints.value)
+    balance.value = result.balance
+    redeemSuccess.value = `Redeemed ${result.redeemed_points.toLocaleString()} points.`
+    redeemPoints.value = 0
+    await loadBalance()
+  } catch (e) {
+    redeemError.value = getApiError(e)
+  } finally {
+    redeeming.value = false
+  }
+}
+
+onMounted(async () => {
+  await ensureLoaded()
+  try {
+    await loadBalance()
   } catch (e) {
     error.value = getApiError(e)
   } finally {
@@ -103,6 +154,38 @@ onMounted(async () => {
   text-align: center;
   padding: var(--space-6);
   margin-bottom: var(--space-5);
+}
+
+.rewards-redeem {
+  margin-bottom: var(--space-5);
+  padding: var(--space-5);
+}
+
+.rewards-redeem h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.rewards-redeem-form {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+
+.rewards-redeem-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.rewards-redeem-form input {
+  min-width: 140px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-md, 12px);
+  font: inherit;
 }
 
 .rewards-balance-label {
@@ -172,5 +255,10 @@ onMounted(async () => {
 
 .rewards-error {
   color: #b91c1c;
+}
+
+.rewards-success {
+  color: #047857;
+  margin-top: var(--space-2);
 }
 </style>

@@ -59,6 +59,16 @@
       <p>{{ product.description }}</p>
     </section>
 
+    <section v-if="productSpecs.length" class="hotel-product-detail">
+      <h2>Specifications</h2>
+      <dl class="hotel-product-specs">
+        <div v-for="spec in productSpecs" :key="spec.label">
+          <dt>{{ spec.label }}</dt>
+          <dd>{{ spec.value }}</dd>
+        </div>
+      </dl>
+    </section>
+
     <section class="hotel-product-reviews">
       <h2>Guest reviews</h2>
 
@@ -151,6 +161,16 @@ const reviewSummary = computed(() => {
   if (!count) return { count: 0, average: 0 }
   const total = reviews.value.reduce((sum, r) => sum + r.rating, 0)
   return { count, average: total / count }
+})
+
+const productSpecs = computed(() => {
+  if (!product.value) return []
+  const specs: { label: string; value: string }[] = []
+  if (product.value.category) specs.push({ label: 'Category', value: product.value.category })
+  if (product.value.brand_name) specs.push({ label: 'Brand', value: product.value.brand_name })
+  if (product.value.badge) specs.push({ label: 'Badge', value: product.value.badge.replace(/_/g, ' ') })
+  if (product.value.stock != null) specs.push({ label: 'Availability', value: `${product.value.stock} in stock` })
+  return specs
 })
 
 function starString(n: number) {
@@ -440,5 +460,28 @@ async function submitReview() {
 .hotel-product-loading {
   padding: 2rem;
   text-align: center;
+}
+
+.hotel-product-specs {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.hotel-product-specs div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.75rem;
+  font-size: 13px;
+}
+
+.hotel-product-specs dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sf-muted);
+}
+
+.hotel-product-specs dd {
+  margin: 0;
 }
 </style>

@@ -13,7 +13,7 @@
           <span class="eyebrow">Status</span>
           <strong class="success">{{ track.status }}</strong>
         </p>
-        <p><span class="label">Reference</span> {{ track.kkooapp_ref }}</p>
+        <p><span class="label">Reference</span> {{ track.order_ref }}</p>
         <p class="muted">Last updated: {{ track.updated_at }}</p>
         <button class="btn btn-sm" @click="refresh">Refresh</button>
       </div>

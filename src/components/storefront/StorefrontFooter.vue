@@ -31,6 +31,15 @@ const hotel = computed(() => session.hotel)
           Personal care, beauty &amp; wellness — powered by Necha Africa.
         </template>
       </p>
+      <a
+        v-if="hotel?.google_maps_url"
+        :href="hotel.google_maps_url"
+        class="sf-footer-map"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        View on Google Maps →
+      </a>
     </div>
   </footer>
 </template>

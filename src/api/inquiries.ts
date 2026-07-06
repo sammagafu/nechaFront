@@ -8,6 +8,7 @@ export type InquiryType =
   | 'newsletter'
   | 'event_listing'
   | 'partner_referral'
+  | 'discovery_booking'
 
 export interface SubmitInquiryPayload {
   type: InquiryType
@@ -57,10 +58,23 @@ export interface DeliveryZone {
   free_threshold_tzs: number
 }
 
+export interface PlatformFeatures {
+  rewards_enabled: boolean
+  rewards_redeem_enabled: boolean
+  discovery_ticketing_enabled: boolean
+  partner_portal_enabled: boolean
+  partner_products_manage_enabled: boolean
+  dual_currency_enabled: boolean
+  distance_delivery_enabled: boolean
+}
+
 export interface PlatformSettings {
   tzs_to_usd_rate: number
   free_delivery_threshold_tzs: number
   default_delivery_fee_tzs: number
+  delivery_base_fee_tzs: number
+  delivery_per_km_tzs: number
+  features: PlatformFeatures
   zones: DeliveryZone[]
 }
 

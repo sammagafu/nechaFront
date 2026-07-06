@@ -129,7 +129,7 @@ export interface AdminOrder {
   hotel_name: string
   type: string
   status: string
-  kkooapp_ref: string
+  order_ref: string
   customer_name: string
   customer_phone: string
   room_number: string
@@ -206,7 +206,7 @@ export interface AdminReservation {
   hotel_name: string
   type: string
   status: string
-  kkooapp_ref: string
+  order_ref: string
   guest_name: string
   guest_email: string
   guest_phone: string

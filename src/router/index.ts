@@ -229,6 +229,11 @@ const router = createRouter({
         { path: '', name: 'partner-dashboard', component: () => import('@/views/partner/PartnerDashboardView.vue') },
         { path: 'orders', name: 'partner-orders', component: () => import('@/views/partner/PartnerOrdersView.vue') },
         { path: 'products', name: 'partner-products', component: () => import('@/views/partner/PartnerProductsView.vue') },
+        { path: 'menu', name: 'partner-menu', component: () => import('@/views/partner/PartnerMenuView.vue') },
+        { path: 'guests', name: 'partner-guests', component: () => import('@/views/partner/PartnerGuestInsightsView.vue') },
+        { path: 'referrals', name: 'partner-referrals', component: () => import('@/views/partner/PartnerReferralsView.vue') },
+        { path: 'payouts', name: 'partner-payouts', component: () => import('@/views/partner/PartnerPayoutsView.vue') },
+        { path: 'settings', name: 'partner-settings', component: () => import('@/views/partner/PartnerSettingsView.vue') },
       ],
     },
     {
@@ -271,7 +276,9 @@ const router = createRouter({
         { path: 'inquiries', name: 'admin-inquiries', component: () => import('@/views/admin/AdminInquiriesView.vue') },
         { path: 'influencers', name: 'admin-influencers', component: () => import('@/views/admin/AdminInfluencersView.vue') },
         { path: 'catalogue', name: 'admin-catalogue', component: () => import('@/views/admin/AdminCatalogueView.vue') },
+        { path: 'commission-rules', name: 'admin-commission-rules', component: () => import('@/views/admin/AdminCommissionRulesView.vue') },
         { path: 'payouts', name: 'admin-payouts', component: () => import('@/views/admin/AdminPayoutsView.vue') },
+        { path: 'settings', name: 'admin-settings', component: () => import('@/views/admin/AdminPlatformSettingsView.vue') },
       ],
     },
   ],
@@ -280,8 +287,14 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const { useAuthStore } = await import('@/stores/auth')
   const auth = useAuthStore()
+  const { usePlatformSettings } = await import('@/composables/usePlatformSettings')
+  const platform = usePlatformSettings()
+  await platform.ensureLoaded()
 
   if (to.path.startsWith('/partner')) {
+    if (!platform.isFeatureEnabled('partner_portal_enabled')) {
+      return { path: '/' }
+    }
     if (to.meta.partnerGuest) {
       if (auth.token) {
         if (!auth.user) await auth.loadMe()
@@ -341,6 +354,10 @@ router.beforeEach(async (to) => {
       if (!auth.isCustomer) {
         return { name: 'sign-in', query: { redirect: to.fullPath } }
       }
+    }
+
+    if (to.name === 'rewards' && !platform.isFeatureEnabled('rewards_enabled')) {
+      return { path: '/' }
     }
 
     return true

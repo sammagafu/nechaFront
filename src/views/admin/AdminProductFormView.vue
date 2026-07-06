@@ -64,7 +64,7 @@ const saving = ref(false)
 const error = ref('')
 
 const form = reactive({
-  name: '', slug: '', brand_name: 'NECHA NATURALS', description: '', category: 'skin_care',
+  name: '', slug: '', brand_name: 'Necha Africa', description: '', category: 'skin_care',
   badge: '', price: 0, currency: 'TZS', image_url: '', stock: 0, is_featured: false, is_active: true,
 })
 const extraImages = ref('')

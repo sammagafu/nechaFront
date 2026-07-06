@@ -57,7 +57,15 @@ function mapItem(item: DiscoveryItem) {
   }
 }
 
-const sections = computed(() => [
+const sections = computed(() => {
+  const hotelServices = (session.hotel?.services ?? []).map((svc) => ({
+    tag: 'Hotel service',
+    name: svc.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    description: `Available at ${session.hotel?.name ?? 'your hotel'}.`,
+    slug: '',
+  }))
+
+  return [
   {
     id: 'restaurants',
     title: 'Restaurant',
@@ -80,9 +88,9 @@ const sections = computed(() => [
     id: 'hotel-services',
     title: 'Your Hotel Services',
     description: 'Optional in-hotel services from your property, or external suppliers where the hotel has no facility.',
-    items: [] as ReturnType<typeof mapItem>[],
+    items: hotelServices,
   },
-])
+]})
 
 onMounted(async () => {
   if (!session.slug) {

@@ -44,6 +44,25 @@
         <button v-if="session.referralApplied" type="button" style="font-size: 11px; color: var(--sf-muted); margin-top: 8px" @click="confirmRemoveReferral">Remove code</button>
       </div>
 
+      <div v-if="redeemEnabled && auth.isCustomer" class="checkout-section">
+        <div class="checkout-label">Rewards</div>
+        <p v-if="rewardBalance > 0" class="checkout-field-hint">
+          You have {{ rewardBalance.toLocaleString() }} points available (≈ {{ formatPrice(rewardDiscountPreview) }} off).
+        </p>
+        <p v-else class="checkout-field-hint">No reward points on this account yet.</p>
+        <div v-if="rewardBalance > 0" class="sf-form-fields">
+          <label class="sf-field-label" for="checkout-redeem">Points to apply</label>
+          <input
+            id="checkout-redeem"
+            v-model.number="redeemPoints"
+            type="number"
+            min="0"
+            :max="rewardBalance"
+            placeholder="0"
+          />
+        </div>
+      </div>
+
       <div class="checkout-section">
         <div class="checkout-label">Payment</div>
         <p class="checkout-field-hint">You'll pay securely on Selcom — M-Pesa, Tigo Pesa, cards, and more.</p>
@@ -63,6 +82,10 @@
           <span v-if="fee === 0" :style="{ color: 'var(--sf-green-checkout)' }">Free</span>
           <DualPrice v-else :amount-tzs="fee" />
         </div>
+        <div v-if="redeemDiscount > 0" style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px">
+          <span>Rewards discount</span>
+          <span :style="{ color: 'var(--sf-green-checkout)' }">− {{ formatPrice(redeemDiscount) }}</span>
+        </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--sf-warm-grey)">
           <span>Total</span><DualPrice :amount-tzs="total" />
         </div>
@@ -71,7 +94,7 @@
       <div class="checkout-submit-wrap">
         <p v-if="submitError" class="checkout-field-error">{{ submitError }}</p>
         <button type="submit" class="sf-btn-primary sf-btn-primary--block" :disabled="submitting">
-          {{ submitting ? 'Redirecting to Selcom…' : 'Pay with Selcom →' }}
+          {{ submitting ? 'Redirecting to payment…' : 'Pay now →' }}
         </button>
       </div>
     </form>
@@ -84,16 +107,23 @@ import { useRouter } from 'vue-router'
 import { createProductOrder } from '@/api/orders'
 import { fetchHotelRooms } from '@/api/hotels'
 import { getApiError } from '@/api/client'
+import { fetchRewardBalance } from '@/api/rewards'
 import DualPrice from '@/components/storefront/DualPrice.vue'
 import { usePlatformSettings } from '@/composables/usePlatformSettings'
 import { useHotelSessionStore } from '@/stores/hotelSession'
 import { useCartStore } from '@/stores/cart'
+import { useAuthStore } from '@/stores/auth'
 import { handleOrderPayment } from '@/utils/checkoutPayment'
+import { formatPrice } from '@/utils/commerce'
 
 const session = useHotelSessionStore()
 const cart = useCartStore()
+const auth = useAuthStore()
 const router = useRouter()
-const { ensureLoaded, deliveryFeeForSubtotal } = usePlatformSettings()
+const { ensureLoaded, deliveryFeeForSubtotal, features } = usePlatformSettings()
+
+const redeemEnabled = computed(() => features.value.rewards_redeem_enabled)
+const redeemValuePerPoint = 10
 
 const room = ref(session.roomNumber)
 const fullName = ref('')
@@ -103,13 +133,31 @@ const roomError = ref(false)
 const submitError = ref('')
 const submitting = ref(false)
 const roomOptions = ref<string[]>([])
+const rewardBalance = ref(0)
+const redeemPoints = ref(0)
 
 const fee = computed(() => deliveryFeeForSubtotal(cart.subtotal, session.hotel?.zone))
-const total = computed(() => cart.subtotal + fee.value)
+const redeemDiscount = computed(() => {
+  const points = Math.max(0, Math.min(redeemPoints.value || 0, rewardBalance.value))
+  if (!redeemEnabled.value || points <= 0) return 0
+  return Math.min(Math.round(points * redeemValuePerPoint), cart.subtotal + fee.value)
+})
+const rewardDiscountPreview = computed(() =>
+  Math.min(rewardBalance.value * redeemValuePerPoint, cart.subtotal + fee.value),
+)
+const total = computed(() => Math.max(0, cart.subtotal + fee.value - redeemDiscount.value))
 
-onMounted(() => {
-  void ensureLoaded()
+onMounted(async () => {
+  await ensureLoaded()
   void loadRooms()
+  if (redeemEnabled.value && auth.isCustomer) {
+    try {
+      const data = await fetchRewardBalance()
+      rewardBalance.value = data.balance
+    } catch {
+      // Optional — guest may not have rewards yet
+    }
+  }
 })
 
 watch(
@@ -150,6 +198,10 @@ async function submit() {
   try {
     const base = window.location.origin
     const slug = session.slug
+    const pointsToRedeem =
+      redeemEnabled.value && auth.isCustomer && redeemPoints.value > 0
+        ? Math.min(redeemPoints.value, rewardBalance.value)
+        : 0
     const order = await createProductOrder({
       hotel_code: session.hotel.code,
       customer_name: fullName.value.trim(),
@@ -169,6 +221,7 @@ async function submit() {
         unit_price: item.price,
       })),
       notes: session.referralApplied ? `referral:${session.referralCode}` : '',
+      redeem_points: pointsToRedeem > 0 ? pointsToRedeem : undefined,
     })
     if (handleOrderPayment(order)) {
       cart.clear()

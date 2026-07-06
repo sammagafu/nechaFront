@@ -73,6 +73,8 @@ export interface PayoutBatch {
   period_start?: string
   period_end?: string
   released_at?: string
+  disbursement_ref?: string
+  disbursement_status?: string
   created_at: string
   updated_at: string
 }

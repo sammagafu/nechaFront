@@ -1,32 +1,70 @@
 <template>
   <div class="brands-page">
-    <header class="brands-hero section-inner">
-      <p class="kicker">Brands</p>
-      <h1 class="page-title">Authentic African Beauty</h1>
-      <p class="brands-lead">
-        Curated personal care and wellness labels from across the continent — available through
-        Necha partner hotels and our delivery network.
-      </p>
+    <header class="brands-hero" :style="{ '--hero-bg': `url(${siteImages.partnerLanding.brands})` }">
+      <div class="brands-hero-inner section-inner">
+        <p class="kicker">Necha Africa for brand partners</p>
+        <h1 class="page-title">Reach travellers &amp; tourists on their holiday journey</h1>
+        <p class="brands-lead">
+          A direct channel into the tourism economy through our hotel &amp; partner network —
+          without building your own distribution.
+        </p>
+        <button type="button" class="btn btn-green" @click="scrollToJoin">Apply to join Necha ecosystem</button>
+      </div>
     </header>
 
-    <section class="section-inner brands-showcase">
-      <article class="brand-card card card-elevated">
-        <img :src="siteImages.products.lemongrass" alt="NECHA NATURALS" loading="lazy" />
-        <div class="brand-card-body">
-          <p class="brand-label">Flagship</p>
-          <h2>NECHA NATURALS</h2>
-          <p>
-            Botanical body care crafted in Tanzania — shea, baobab, lemongrass, turmeric and
-            hibiscus for skin, hair and ritual.
+    <section class="section-inner brands-steps">
+      <header class="hp-head-row">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2 class="hp-title">Four steps to your first sale</h2>
+          <p class="hp-lead">
+            Join the growing network of hotel partners and tour operators recommending your products to travellers.
           </p>
-          <button type="button" class="text-link" @click="tryDemo">Order at a partner hotel →</button>
         </div>
-      </article>
+      </header>
+      <ol class="brands-step-list">
+        <li v-for="(step, i) in steps" :key="step.title">
+          <span class="brands-step-num">{{ i + 1 }}</span>
+          <div>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.body }}</p>
+          </div>
+        </li>
+      </ol>
+    </section>
 
-      <div class="brands-benefits">
-        <article v-for="item in benefits" :key="item.title" class="benefit-tile">
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.body }}</p>
+    <section class="section brands-why">
+      <div class="section-inner">
+        <header class="hp-head-row hp-head-row--center">
+          <div>
+            <p class="eyebrow">Why partner with Necha</p>
+            <h2 class="hp-title">Why Necha</h2>
+          </div>
+        </header>
+        <div class="brands-benefits">
+          <article v-for="item in whyItems" :key="item.title" class="benefit-tile">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.body }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-inner brands-categories-sec">
+      <header class="hp-head-row hp-head-row--center">
+        <div>
+          <p class="eyebrow">Brand categories</p>
+          <h2 class="hp-title">Categories we onboard</h2>
+        </div>
+      </header>
+      <ul class="brands-category-grid">
+        <li v-for="cat in brandCategories" :key="cat">{{ cat }}</li>
+      </ul>
+      <div class="brands-stats">
+        <article v-for="stat in brandStats" :key="stat.label" class="hp-stat-card" :class="{ 'hp-stat-card--accent': stat.accent }">
+          <p class="hp-stat-kicker">{{ stat.kicker }}</p>
+          <p class="hp-stat-value">{{ stat.value }}</p>
+          <p class="hp-stat-label">{{ stat.label }}</p>
         </article>
       </div>
     </section>
@@ -34,15 +72,9 @@
     <section id="join-brand" class="section brands-join">
       <div class="section-inner brands-join-inner">
         <div class="brands-join-copy">
-          <p class="kicker">Join Necha</p>
-          <h2 class="page-title-sm">List your brand on Necha Africa</h2>
-          <p>
-            Reach hotel guests across Dar es Salaam. We handle logistics, delivery and guest
-            checkout — you focus on great products.
-          </p>
-          <ul class="brands-join-list">
-            <li v-for="point in joinPoints" :key="point">{{ point }}</li>
-          </ul>
+          <p class="kicker">Join Necha Africa</p>
+          <h2 class="page-title-sm">Join Necha Africa</h2>
+          <p>We respond within 24 hours. No spam. No obligation until you countersign.</p>
         </div>
         <PartnerSignupForm initial-tab="brand" wide />
       </div>
@@ -51,37 +83,43 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import PartnerSignupForm from '@/components/partners/PartnerSignupForm.vue'
-import { appConfig } from '@/config/app'
 import { siteImages } from '@/config/images'
+import '@/assets/home-sections.css'
 
-const router = useRouter()
-
-const benefits = [
-  {
-    title: 'Hotel distribution',
-    body: 'Your products appear on every partner hotel storefront — guests order from their room.',
-  },
-  {
-    title: 'Electric delivery',
-    body: 'Necha handles same-day delivery across Dar es Salaam by electric vehicle.',
-  },
-  {
-    title: 'Transparent payouts',
-    body: 'Commission and settlement tracked per order — paid after delivery is confirmed.',
-  },
+const brandCategories = [
+  'Personal Care',
+  'Skin Care',
+  'Wellness',
+  'Travel Essentials',
+  'Gifts',
+  'Souvenirs',
+  'Local Artisan Products',
+  'Tour Services',
 ]
 
-const joinPoints = [
-  'Personal care, beauty, wellness and travel essentials',
-  'Onboarding review within 48 hours',
-  'Central catalogue — one listing, all partner hotels',
+const steps = [
+  { title: 'Sign the agreement', body: 'Fill in KYC form. Agree to commission rates.' },
+  { title: 'Onboard products on Necha platform', body: 'Provide product price list. Agree fulfilment terms.' },
+  { title: 'Go live', body: 'Products and services featured on Necha platform, ready for customers.' },
+  { title: 'Earn every month', body: 'Commission and brand payouts done monthly. Sales data sent monthly.' },
 ]
 
-function tryDemo() {
-  const { hotelSlug, hotelCode } = appConfig.demoHotel
-  router.push(`/hotel/${hotelSlug}?ref=${encodeURIComponent(hotelCode)}`)
+const whyItems = [
+  { title: 'Hotel distribution', body: 'Your products appear on every partner hotel storefront — guests order from their room.' },
+  { title: 'Holiday mindset', body: 'Reach guests already spending in a relaxed, holiday mindset.' },
+  { title: 'Brand storytelling', body: 'Tell your brand story to a captive high-intent audience.' },
+  { title: 'Zero acquisition cost', body: 'No media spend required — distribution through our partner network.' },
+]
+
+const brandStats = [
+  { kicker: 'Visitor volume', value: '2.14M', label: 'International visitors to Tanzania, 2024' },
+  { kicker: 'Avg. spend', value: 'USD 243', label: 'Average tourist spend per night' },
+  { kicker: 'The gap', value: '0', label: 'Local brands with hotel-room distribution today', accent: true },
+]
+
+function scrollToJoin() {
+  document.getElementById('join-brand')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 </script>
 
@@ -92,110 +130,150 @@ function tryDemo() {
 }
 
 .brands-hero {
-  padding-block: 3rem 2rem;
+  position: relative;
+  padding-block: clamp(3rem, 10vw, 5rem);
+  background: linear-gradient(135deg, rgba(26, 71, 49, 0.9), rgba(15, 110, 86, 0.75)), var(--hero-bg) center / cover;
+  color: #fff;
   border-bottom: 1px solid var(--color-border);
 }
 
-.brands-lead {
-  margin: 0.75rem 0 0;
-  max-width: 52ch;
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--color-body);
+.brands-hero .kicker {
+  color: var(--color-accent-gold, #d4af37);
 }
 
-.brands-showcase {
-  padding-top: 2.5rem;
-  display: grid;
-  gap: 2rem;
-}
-
-.brand-card {
-  overflow: hidden;
-  display: grid;
-}
-
-@media (min-width: 768px) {
-  .brand-card {
-    grid-template-columns: 1fr 1.2fr;
-  }
-}
-
-.brand-card img {
-  width: 100%;
-  min-height: 240px;
-  object-fit: cover;
-}
-
-.brand-card-body {
-  padding: 1.75rem;
-}
-
-.brand-label {
-  margin: 0 0 0.35rem;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-necha-green);
-}
-
-.brand-card-body h2 {
-  margin: 0 0 0.65rem;
+.brands-hero .page-title {
+  color: #fff;
   font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
-.brand-card-body p {
-  margin: 0 0 1rem;
-  font-size: 14px;
+.brands-lead {
+  margin: 0.75rem 0 1.5rem;
+  max-width: 52ch;
   line-height: 1.65;
-  color: var(--color-body);
+  color: rgba(255, 255, 255, 0.88);
 }
 
-.text-link {
-  border: none;
-  background: none;
+.brands-steps {
+  padding-block: 3rem;
+}
+
+.brands-step-list {
+  list-style: none;
+  margin: 2rem 0 0;
   padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.brands-step-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.brands-step-num {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.brands-step-list h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.brands-step-list p {
+  margin: 0;
+  color: var(--color-muted);
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-necha-green-dark);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  line-height: 1.55;
+}
+
+.brands-why {
+  background: var(--color-bg-soft);
+  padding-block: 3rem;
 }
 
 .brands-benefits {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .brands-benefits {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .benefit-tile {
   padding: 1.25rem;
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
 }
 
 .benefit-tile h3 {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 500;
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
 }
 
 .benefit-tile p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--color-body);
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.brands-category-grid {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.brands-category-grid li {
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.brands-stats {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .brands-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .brands-join {
   padding-block: 3rem;
-  background: var(--color-bg-soft);
-  border-block: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
 }
 
 .brands-join-inner {
@@ -211,42 +289,12 @@ function tryDemo() {
 }
 
 .brands-join-copy .page-title-sm {
-  margin: 0 0 0.75rem;
+  margin: 0.35rem 0 0.75rem;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 500;
 }
 
-.brands-join-copy p {
-  margin: 0 0 1rem;
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--color-body);
-}
-
-.brands-join-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.brands-join-list li {
-  font-size: 14px;
-  color: var(--color-body);
-  padding-left: 1.25rem;
-  position: relative;
-}
-
-.brands-join-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-necha-green);
+.hp-head-row--center {
+  text-align: center;
+  justify-content: center;
 }
 </style>

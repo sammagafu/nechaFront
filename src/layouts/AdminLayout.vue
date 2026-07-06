@@ -129,6 +129,15 @@
           Catalogue
         </router-link>
         <router-link
+          to="/admin/commission-rules"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/commission-rules') }"
+          @click="navOpen = false"
+        >
+          Commission rules
+        </router-link>
+        <router-link
           to="/admin/payouts"
           active-class=""
           exact-active-class=""
@@ -136,6 +145,17 @@
           @click="navOpen = false"
         >
           Payouts
+        </router-link>
+
+        <p class="admin-nav-label">Configuration</p>
+        <router-link
+          to="/admin/settings"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/admin/settings') }"
+          @click="navOpen = false"
+        >
+          Platform settings
         </router-link>
 
         <p class="admin-nav-label">Engagement</p>
@@ -242,6 +262,7 @@ const titles: Record<string, string> = {
   'admin-influencers': 'Influencers',
   'admin-catalogue': 'Central catalogue',
   'admin-payouts': 'Payout batches',
+  'admin-settings': 'Platform settings',
 }
 
 function navActive(path: string, options?: { exact?: boolean }) {

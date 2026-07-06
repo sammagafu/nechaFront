@@ -32,7 +32,7 @@
     <label>Services (comma-separated)
       <input v-model="servicesText" placeholder="spa, restaurant, bar, gym, discover" />
     </label>
-    <label>Kkooapp ID<input v-model="form.kkooapp_id" /></label>
+    <label>Property integration ID (optional)<input v-model="form.kkooapp_id" placeholder="Legacy external ID" /></label>
     <div class="admin-form-row">
       <label>Partner type
         <select v-model="form.partner_type">

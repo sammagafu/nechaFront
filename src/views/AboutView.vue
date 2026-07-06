@@ -189,7 +189,7 @@ import { siteImages } from '@/config/images'
 const pillars = [
   {
     title: 'African sourcing',
-    body: 'We curate personal care, beauty, and wellness from trusted African brands — starting with NECHA NATURALS.',
+    body: 'We curate personal care, beauty, and wellness from trusted African brands across our partner network.',
   },
   {
     title: 'Same-day delivery',

@@ -13,7 +13,7 @@
           <span class="eyebrow">Status</span>
           <strong class="success">{{ reservation.status }}</strong>
         </p>
-        <p><span class="label">Reference</span> {{ reservation.kkooapp_ref }}</p>
+        <p><span class="label">Reference</span> {{ reservation.order_ref }}</p>
         <p><span class="label">Guest</span> {{ reservation.guest_name }}</p>
         <p v-if="reservation.room_type"><span class="label">Room</span> {{ reservation.room_type }}</p>
         <p v-if="reservation.check_in"><span class="label">Check-in</span> {{ reservation.check_in }}</p>

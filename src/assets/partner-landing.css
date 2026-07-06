@@ -4474,3 +4474,313 @@
     padding-top: 0.5rem;
   }
 }
+
+/* Excel MOC — homepage intro & audience pillars */
+.pl-hero-intro {
+  padding: clamp(2rem, 5vw, 3rem) var(--pl-gutter) clamp(2.5rem, 6vw, 3.5rem);
+  text-align: center;
+  max-width: min(820px, 100%);
+}
+
+.pl-hero-kicker {
+  margin: 0 0 0.65rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pl-teal);
+}
+
+.pl-hero-title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.5vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.pl-hero-lead {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  line-height: 1.55;
+  color: var(--color-body, var(--color-text));
+}
+
+.pl-hero-tag {
+  margin: 0 0 1.25rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pl-amber);
+}
+
+.pl-hero-bullets {
+  list-style: none;
+  margin: 0 auto 1.5rem;
+  padding: 0;
+  max-width: 640px;
+  display: grid;
+  gap: 0.5rem;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.pl-hero-bullets li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.pl-hero-bullets li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--pl-mint);
+  font-weight: 600;
+}
+
+.pl-hero-cta {
+  margin-inline: auto;
+}
+
+.pl-audience {
+  padding-block: var(--pl-section-y);
+}
+
+.pl-sh--center {
+  text-align: center;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.pl-audience-grid {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: var(--pl-stack);
+}
+
+@media (min-width: 900px) {
+  .pl-audience-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pl-audience-card {
+  padding: 1.5rem;
+  border: 1px solid var(--pl-border);
+  border-radius: var(--radius-lg, 16px);
+  background: var(--pl-surface);
+}
+
+.pl-audience-label {
+  margin: 0 0 0.5rem;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pl-teal);
+}
+
+.pl-audience-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.pl-audience-card > p {
+  margin: 0 0 0.85rem;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.pl-audience-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-body, var(--color-text));
+}
+
+.pl-founding-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 1rem 0;
+}
+
+.pl-founding-stat {
+  font-size: 13px;
+  color: var(--pl-on-band-muted, rgba(255, 255, 255, 0.75));
+}
+
+.pl-founding-stat strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--pl-on-band, #fff);
+}
+
+.pl-partner-logos {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.pl-partner-logos-label {
+  margin: 0 0 0.5rem;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pl-on-band-muted, rgba(255, 255, 255, 0.62));
+  text-align: center;
+}
+
+/* Premium homepage hero */
+.pl-home-hero {
+  position: relative;
+  min-height: clamp(420px, 72vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(3rem, 8vw, 5rem) 0;
+  background: var(--color-brand) center / cover no-repeat;
+  background-image: linear-gradient(135deg, rgba(26, 71, 49, 0.92), rgba(15, 110, 86, 0.78)), var(--hero-bg);
+  color: #fff;
+}
+
+.pl-home-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15, 20, 25, 0.55), transparent 55%);
+  pointer-events: none;
+}
+
+.pl-home-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+}
+
+.pl-home-hero-kicker {
+  margin: 0 0 0.75rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold, #d4af37);
+}
+
+.pl-home-hero-title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.pl-home-hero-sub {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.pl-home-hero-lead {
+  margin: 0 0 1.5rem;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 56ch;
+}
+
+.pl-home-hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.pl-hero-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.pl-hero-cta-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.pl-hero-cta-btn--primary {
+  background: var(--color-accent-gold, #d4af37);
+  border-color: var(--color-accent-gold, #d4af37);
+  color: #1e293b;
+}
+
+.pl-hero-cta-btn--primary:hover {
+  background: #e8c45a;
+  border-color: #e8c45a;
+}
+
+.pl-hero-cta-btn--ghost {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pl-showcase-strip {
+  padding-block: var(--pl-section-y);
+}
+
+.pl-showcase-logos {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+}
+
+.pl-brand-categories {
+  list-style: none;
+  margin: 1.5rem auto 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 900px;
+}
+
+.pl-brand-categories li {
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--pl-border);
+  background: var(--pl-surface);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pl-showcase-cta {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.hp-head-row--center {
+  text-align: center;
+  justify-content: center;
+}

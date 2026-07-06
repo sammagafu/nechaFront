@@ -44,28 +44,79 @@
         </router-link>
 
         <p class="admin-nav-label">Storefront</p>
+        <template v-if="!isAffiliatePartner">
+          <router-link
+            to="/partner/orders"
+            active-class=""
+            exact-active-class=""
+            :class="{ 'router-link-active': navActive('/partner/orders') }"
+            @click="navOpen = false"
+          >
+            Orders
+          </router-link>
+          <router-link
+            to="/partner/products"
+            active-class=""
+            exact-active-class=""
+            :class="{ 'router-link-active': navActive('/partner/products') }"
+            @click="navOpen = false"
+          >
+            Products
+          </router-link>
+          <router-link
+            to="/partner/menu"
+            active-class=""
+            exact-active-class=""
+            :class="{ 'router-link-active': navActive('/partner/menu') }"
+            @click="navOpen = false"
+          >
+            Menu
+          </router-link>
+        </template>
         <router-link
-          to="/partner/orders"
+          v-else
+          to="/partner/referrals"
           active-class=""
           exact-active-class=""
-          :class="{ 'router-link-active': navActive('/partner/orders') }"
+          :class="{ 'router-link-active': navActive('/partner/referrals') }"
           @click="navOpen = false"
         >
-          Orders
+          Traveller referrals
+        </router-link>
+
+        <p class="admin-nav-label">Insights</p>
+        <router-link
+          v-if="!isAffiliatePartner"
+          to="/partner/guests"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/partner/guests') }"
+          @click="navOpen = false"
+        >
+          Guest insights
         </router-link>
         <router-link
-          to="/partner/products"
+          to="/partner/payouts"
           active-class=""
           exact-active-class=""
-          :class="{ 'router-link-active': navActive('/partner/products') }"
+          :class="{ 'router-link-active': navActive('/partner/payouts') }"
           @click="navOpen = false"
         >
-          Products
+          Payouts
+        </router-link>
+        <router-link
+          to="/partner/settings"
+          active-class=""
+          exact-active-class=""
+          :class="{ 'router-link-active': navActive('/partner/settings') }"
+          @click="navOpen = false"
+        >
+          Settings
         </router-link>
 
         <p class="admin-nav-label">Site</p>
         <router-link
-          v-if="hotelBrand"
+          v-if="hotelBrand && !isAffiliatePartner"
           :to="`/hotel/${hotelBrand.slug}`"
           class="admin-nav-external"
           target="_blank"
@@ -123,7 +174,15 @@ const titles: Record<string, string> = {
   'partner-dashboard': 'Dashboard',
   'partner-orders': 'Orders',
   'partner-products': 'Products',
+  'partner-menu': 'Menu',
+  'partner-guests': 'Guest insights',
+  'partner-payouts': 'Payouts',
+  'partner-settings': 'Settings',
+  'partner-referrals': 'Traveller referrals',
 }
+
+const affiliateTypes = new Set(['tour_operator', 'travel_agent', 'airline'])
+const isAffiliatePartner = computed(() => affiliateTypes.has(hotelBrand.value?.partner_type || 'hotel'))
 
 function navActive(path: string, options?: { exact?: boolean }) {
   const current = route.path

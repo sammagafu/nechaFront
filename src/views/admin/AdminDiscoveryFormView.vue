@@ -31,6 +31,10 @@
       <label>Distance<input v-model="form.distance" placeholder="1.2km" /></label>
       <label>Price hint<input v-model="form.price_hint" placeholder="From TZS 50,000" /></label>
     </div>
+    <div v-if="form.ticket_mode === 'platform'" class="admin-form-row">
+      <label>Ticket price (TZS)<input v-model.number="form.price_tzs" type="number" min="0" step="1000" /></label>
+      <label>Ticket capacity<input v-model.number="form.ticket_capacity" type="number" min="0" placeholder="0 = unlimited" /></label>
+    </div>
     <div class="admin-form-row">
       <label>Phone<input v-model="form.phone" /></label>
       <label>Website<input v-model="form.website" type="url" /></label>
@@ -54,6 +58,19 @@
       <div class="admin-form-row">
         <label>Organiser name<input v-model="form.organizer_name" /></label>
         <label>Organiser email<input v-model="form.organizer_email" type="email" /></label>
+      </div>
+    </template>
+    <template v-if="form.section === 'tours'">
+      <div class="admin-form-row">
+        <label>
+          Ticket mode
+          <select v-model="form.ticket_mode">
+            <option value="none">None</option>
+            <option value="referral">Referral link</option>
+            <option value="platform">Platform ticketing</option>
+          </select>
+        </label>
+        <label>Ticket URL<input v-model="form.ticket_url" type="url" /></label>
       </div>
     </template>
     <label>Image URL<input v-model="form.image_url" /></label>
@@ -103,6 +120,8 @@ const form = reactive({
   phone: '',
   website: '',
   price_hint: '',
+  price_tzs: 0,
+  ticket_capacity: 0,
   image_url: '',
   event_starts_at: '',
   event_ends_at: '',

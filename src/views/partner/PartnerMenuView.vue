@@ -2,86 +2,78 @@
   <div class="admin-page">
     <header class="admin-page-head">
       <div>
-        <h2>Products</h2>
-        <p class="admin-muted">
-          <template v-if="productsManageEnabled">
-            Update prices, stock and visibility for your storefront catalogue.
-          </template>
-          <template v-else>
-            Your storefront catalogue. Contact Necha to add or update products.
-          </template>
-        </p>
+        <h2>Menu</h2>
+        <p class="admin-muted">Food, bar and wellness menu items shown on your storefront.</p>
       </div>
     </header>
 
-    <div v-if="loading" class="admin-loading">Loading products…</div>
+    <div v-if="loading" class="admin-loading">Loading menu…</div>
     <div v-else-if="error" class="admin-error">{{ error }}</div>
     <div v-else class="admin-card">
       <div class="admin-table-wrap">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Product</th>
-              <th>Brand</th>
+              <th>Item</th>
+              <th>Kind</th>
               <th>Category</th>
               <th>Price</th>
-              <th>Stock</th>
               <th>Status</th>
-              <th v-if="productsManageEnabled"></th>
+              <th v-if="canEdit"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="product in products" :key="product.id">
-              <td>{{ product.name }}</td>
-              <td>{{ product.brand_name || '—' }}</td>
-              <td>{{ product.category || '—' }}</td>
+            <tr v-for="item in items" :key="item.id">
+              <td>
+                <template v-if="editingId === item.id">
+                  <input v-model="editForm.name" class="partner-inline-input" />
+                  <textarea v-model="editForm.description" rows="2" class="partner-inline-input" />
+                </template>
+                <template v-else>
+                  {{ item.name }}
+                  <br />
+                  <small class="admin-muted">{{ item.description }}</small>
+                </template>
+              </td>
+              <td>{{ item.menu_kind || '—' }}</td>
+              <td>{{ item.category || '—' }}</td>
               <td>
                 <input
-                  v-if="editingId === product.id"
+                  v-if="editingId === item.id"
                   v-model.number="editForm.price"
                   type="number"
                   min="0"
                   class="partner-inline-input partner-inline-input--narrow"
                 />
-                <template v-else>{{ formatPrice(product.price, product.currency) }}</template>
+                <template v-else>{{ formatPrice(item.price, item.currency) }}</template>
               </td>
               <td>
-                <input
-                  v-if="editingId === product.id"
-                  v-model.number="editForm.stock"
-                  type="number"
-                  min="0"
-                  class="partner-inline-input partner-inline-input--narrow"
-                />
-                <template v-else>{{ product.stock }}</template>
-              </td>
-              <td>
-                <label v-if="editingId === product.id" class="partner-inline-check">
+                <label v-if="editingId === item.id" class="partner-inline-check">
                   <input v-model="editForm.is_active" type="checkbox" /> Active
                 </label>
-                <span v-else class="admin-badge" :class="product.is_active ? 'admin-badge--active' : 'admin-badge--inactive'">
-                  {{ product.is_active ? 'Active' : 'Inactive' }}
+                <span v-else class="admin-badge" :class="item.is_active ? 'admin-badge--active' : 'admin-badge--inactive'">
+                  {{ item.is_active ? 'Active' : 'Hidden' }}
                 </span>
               </td>
-              <td v-if="productsManageEnabled">
+              <td v-if="canEdit">
                 <button
-                  v-if="editingId !== product.id"
+                  v-if="editingId !== item.id"
                   type="button"
                   class="admin-btn admin-btn--ghost"
-                  @click="startEdit(product)"
+                  @click="startEdit(item)"
                 >
                   Edit
                 </button>
                 <template v-else>
-                  <button type="button" class="admin-btn admin-btn--primary" :disabled="saving" @click="saveEdit(product.id)">
+                  <button type="button" class="admin-btn admin-btn--primary" :disabled="saving" @click="saveEdit(item.id)">
                     Save
                   </button>
                   <button type="button" class="admin-btn admin-btn--ghost" @click="cancelEdit">Cancel</button>
                 </template>
               </td>
             </tr>
-            <tr v-if="!products.length">
-              <td :colspan="productsManageEnabled ? 7 : 6" class="admin-empty">No products yet.</td>
+            <tr v-if="!items.length">
+              <td :colspan="canEdit ? 6 : 5" class="admin-empty">No menu items yet.</td>
             </tr>
           </tbody>
         </table>
@@ -93,31 +85,32 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { fetchPartnerProducts, updatePartnerProduct } from '@/api/partner'
+import { fetchPartnerMenuItems, updatePartnerMenuItem } from '@/api/partner'
 import { getApiError } from '@/api/client'
 import { usePlatformSettings } from '@/composables/usePlatformSettings'
-import type { AdminProduct } from '@/types/auth'
+import type { AdminMenuItem } from '@/api/admin'
 import { formatPrice } from '@/utils/commerce'
 
 const { ensureLoaded, features } = usePlatformSettings()
-const productsManageEnabled = computed(() => features.value.partner_products_manage_enabled)
+const canEdit = computed(() => features.value.partner_products_manage_enabled)
 
-const products = ref<AdminProduct[]>([])
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
 const saveError = ref('')
+const items = ref<AdminMenuItem[]>([])
 const editingId = ref('')
 const editForm = reactive({
+  name: '',
+  description: '',
   price: 0,
-  stock: 0,
   is_active: true,
 })
 
 onMounted(async () => {
   await ensureLoaded()
   try {
-    products.value = await fetchPartnerProducts()
+    items.value = await fetchPartnerMenuItems()
   } catch (e) {
     error.value = getApiError(e)
   } finally {
@@ -125,11 +118,12 @@ onMounted(async () => {
   }
 })
 
-function startEdit(product: AdminProduct) {
-  editingId.value = product.id
-  editForm.price = product.price
-  editForm.stock = product.stock
-  editForm.is_active = product.is_active
+function startEdit(item: AdminMenuItem) {
+  editingId.value = item.id
+  editForm.name = item.name
+  editForm.description = item.description
+  editForm.price = item.price
+  editForm.is_active = item.is_active
   saveError.value = ''
 }
 
@@ -141,12 +135,13 @@ async function saveEdit(id: string) {
   saving.value = true
   saveError.value = ''
   try {
-    const updated = await updatePartnerProduct(id, {
+    const updated = await updatePartnerMenuItem(id, {
+      name: editForm.name,
+      description: editForm.description,
       price: editForm.price,
-      stock: editForm.stock,
       is_active: editForm.is_active,
     })
-    products.value = products.value.map((row) => (row.id === id ? updated : row))
+    items.value = items.value.map((row) => (row.id === id ? updated : row))
     editingId.value = ''
   } catch (e) {
     saveError.value = getApiError(e)
@@ -158,6 +153,8 @@ async function saveEdit(id: string) {
 
 <style scoped>
 .partner-inline-input {
+  width: 100%;
+  margin-bottom: 0.35rem;
   padding: 0.35rem 0.5rem;
   font: inherit;
   border: 1px solid var(--color-border, #e5e7eb);

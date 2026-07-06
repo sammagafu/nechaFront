@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Necha Africa — The commerce and discovery layer for African tourism. Hospitality, discovery, and concierge commerce for hotels, brands and travellers." />
     <link rel="icon" type="image/svg+xml" href="/necha-logo.svg" />
     <link rel="apple-touch-icon" href="/necha-logo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-    <title>Necha Africa — Personal Care, Beauty &amp; Wellness</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+    <title>Necha Africa — Commerce &amp; Discovery for African Tourism</title>
     <script>
       (function () {
         var stored = localStorage.getItem('necha_theme');
@@ -18,24 +19,24 @@
         var theme = dark ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.colorScheme = theme;
-        var bg = dark ? '#0a0a0a' : '#faf9f7';
+        var bg = dark ? '#0f1419' : '#faf8f3';
         document.documentElement.style.background = bg;
         document.body && (document.body.style.background = bg);
       })();
     </script>
     <style>
-      html, body { background: #faf9f7; }
-      html[data-theme='dark'], html[data-theme='dark'] body { background: #0a0a0a; }
+      html, body { background: #faf8f3; }
+      html[data-theme='dark'], html[data-theme='dark'] body { background: #0f1419; }
       #app:empty::before {
         content: '';
         position: fixed;
         inset: 0;
-        background: #faf9f7;
+        background: #faf8f3;
       }
       html[data-theme='dark'] #app:empty::before {
         background:
-          radial-gradient(ellipse 70% 45% at 50% 100%, rgba(134, 188, 66, 0.14), transparent 72%),
-          #0a0a0a;
+          radial-gradient(ellipse 70% 45% at 50% 100%, rgba(15, 110, 86, 0.18), transparent 72%),
+          #0f1419;
       }
     </style>
   </head>

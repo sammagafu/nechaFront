@@ -62,7 +62,7 @@
         <section class="admin-card admin-card-body">
           <h3>Reference</h3>
           <dl class="admin-detail-list">
-            <div><dt>Kkooapp ref</dt><dd>{{ reservation.kkooapp_ref || '—' }}</dd></div>
+            <div><dt>Booking reference</dt><dd>{{ reservation.order_ref || reservation.id || '—' }}</dd></div>
             <div><dt>Requested</dt><dd>{{ formatAdminDateTime(reservation.created_at) }}</dd></div>
             <div v-if="reservation.updated_at">
               <dt>Last updated</dt>

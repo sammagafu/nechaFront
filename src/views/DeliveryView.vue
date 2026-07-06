@@ -11,14 +11,13 @@
     </p>
 
     <h2>Delivery zones</h2>
-    <ul>
-      <li><strong>Zone A:</strong> Mbezi Beach</li>
-      <li><strong>Zone B:</strong> Kunduchi</li>
-      <li><strong>Zone C:</strong> Mikocheni</li>
-      <li><strong>Zone D:</strong> City Centre</li>
-      <li><strong>Zone E:</strong> Oysterbay / Masaki</li>
-      <li><strong>Zone F:</strong> Airport</li>
+    <ul v-if="zones.length">
+      <li v-for="zone in zones" :key="zone.code">
+        <strong>Zone {{ zone.code }}:</strong> {{ zone.label }}
+        <span v-if="zone.delivery_fee_tzs"> — TZS {{ zone.delivery_fee_tzs.toLocaleString() }}</span>
+      </li>
     </ul>
+    <p v-else>Loading delivery zones…</p>
 
     <h2>Hotel room delivery</h2>
     <p>
@@ -34,5 +33,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import PageDocument from '@/components/PageDocument.vue'
+import { usePlatformSettings } from '@/composables/usePlatformSettings'
+
+const { settings, ensureLoaded } = usePlatformSettings()
+
+onMounted(() => void ensureLoaded())
+
+const zones = computed(() => settings.value?.zones ?? [])
 </script>

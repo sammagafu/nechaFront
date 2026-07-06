@@ -19,8 +19,8 @@ export const appConfig = {
   logoUrl,
   phone: '+255 784 455 439',
   email: 'info@necha.africa',
-  address: 'House No. 2, Selous St, Africana, Mbezi Beach, DSM',
-  hours: 'Mon–Sat: 9:00am – 6:00pm',
+  address: 'House No. 2, Selous St, Africana, Mbezi Beach, Dar es Salaam',
+  hours: 'Mon - Sat: 9am - 6pm',
   demoHotel: demoHotelConfig,
   social: {
     instagram: 'https://www.instagram.com/nechaafrica',
